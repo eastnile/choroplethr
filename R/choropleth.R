@@ -240,37 +240,71 @@ Choropleth = R6Class("Choropleth",
       }
     },
     
-    # Removes axes, margins and sets the background to white.
-    # This code, with minor modifications, comes from section 13.19 
+    # theme_clean and theme_inset are used to draw the map over a clean background.
+    # The difference is that theme_inset also removes the legend of the map.
+    # These functions used to be based on the code from section 13.19 of  
     # "Making a Map with a Clean Background" of "R Graphics Cookbook" by Winston Chang.  
-    # Reused with permission. 
+    # 
+    # However, it appears that as of version 2.2.1.9000 of ggplot2 that code simply does not work
+    # anymore. (In particular, calling ggplotGrob on maps created with those themes (which choroplethr
+    # does for maps that appear as insets, such as Alaska) was causing a crash).
+    #' @importFrom ggplot2 theme_void
     theme_clean = function()
     {
-      theme(
-        axis.title        = element_blank(),
-        axis.text         = element_blank(),
-        panel.background  = element_blank(),
-        panel.grid        = element_blank(),
-        axis.ticks.length = unit(0, "cm"),
-        panel.spacing     = unit(0, "lines"),
-        plot.margin       = unit(c(0, 0, 0, 0), "lines"),
-        complete          = TRUE
-      )
+      ggplot2::theme_void()
     },
     
-    # like theme clean, but also remove the legend
+    # This is a copy of the actual code in theme_void, but it also remove the legend
+    #' @importFrom ggplot2 element_blank element_text margin rel
     theme_inset = function()
     {
+      base_size = 11 
+      base_family = ""
+      base_line_size = base_size / 22
+      base_rect_size = base_size / 22
+      
+      half_line <- base_size / 2
+      
+      # Only keep indispensable text: legend and plot titles
       theme(
-        legend.position   = "none",
-        axis.title        = element_blank(),
-        axis.text         = element_blank(),
-        panel.background  = element_blank(),
-        panel.grid        = element_blank(),
-        axis.ticks.length = unit(0, "cm"),
-        panel.spacing     = unit(0, "lines"),
-        plot.margin       = unit(c(0, 0, 0, 0), "lines"),
-        complete          = TRUE
+        line =               element_blank(),
+        rect =               element_blank(),
+        text =               element_text(
+          family = base_family, face = "plain",
+          colour = "black", size = base_size,
+          lineheight = 0.9, hjust = 0.5, vjust = 0.5, angle = 0,
+          margin = margin(), debug = FALSE
+        ),
+        axis.text =          element_blank(),
+        axis.title =         element_blank(),
+        axis.ticks.length =  unit(0, "pt"),
+        legend.key.size =    unit(1.2, "lines"),
+        legend.position =    "none",
+        legend.text =        element_text(size = rel(0.8)),
+        legend.title =       element_text(hjust = 0),
+        strip.text =         element_text(size = rel(0.8)),
+        strip.switch.pad.grid = unit(0.1, "cm"),
+        strip.switch.pad.wrap = unit(0.1, "cm"),
+        panel.ontop =        FALSE,
+        panel.spacing =      unit(half_line, "pt"),
+        plot.margin =        unit(c(0, 0, 0, 0), "lines"),
+        plot.title =         element_text(
+          size = rel(1.2),
+          hjust = 0, vjust = 1,
+          margin = margin(t = half_line * 1.2)
+        ),
+        plot.subtitle =      element_text(
+          size = rel(0.9),
+          hjust = 0, vjust = 1,
+          margin = margin(t = half_line * 0.9)
+        ),
+        plot.caption =       element_text(
+          size = rel(0.9),
+          hjust = 1, vjust = 1,
+          margin = margin(t = half_line * 0.9)
+        ),
+        
+        complete = TRUE
       )
     },
   
