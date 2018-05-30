@@ -8,8 +8,8 @@ choroplethr simplifies the creation of choropleth maps in R. Choropleths are the
 
 ## Free Course
 
-If you would like a guided introduction to choroplethr, then take the free course [Learn to Map Census Data in R](http://www.CensusMappingCourse.com).
+If you would like a guided introduction to choroplethr, then take the free course [Learn to Map Census Data in R](www.CensusMappingCourse.com)
 
 ## Documentation
 
-Documentation for choroplethr can be found [here](http://www.arilamstein.com/open-source).
+Documentation for choroplethr can be found [here](www.Choroplethr.com).

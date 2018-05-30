@@ -240,38 +240,27 @@ Choropleth = R6Class("Choropleth",
       }
     },
     
-    # Removes axes, margins and sets the background to white.
-    # This code, with minor modifications, comes from section 13.19 
+    # theme_clean and theme_inset are used to draw the map over a clean background.
+    # The difference is that theme_inset also removes the legend of the map.
+    # These functions used to be based on the code from section 13.19 of  
     # "Making a Map with a Clean Background" of "R Graphics Cookbook" by Winston Chang.  
-    # Reused with permission. 
+    # 
+    # However, it appears that as of version 2.2.1.9000 of ggplot2 that code simply does not work
+    # anymore. (In particular, calling ggplotGrob on maps created with those themes (which choroplethr
+    # does for maps that appear as insets, such as Alaska) was causing a crash).
+    # So these functions now use theme_void
+    #' @importFrom ggplot2 theme_void
     theme_clean = function()
     {
-      theme(
-        axis.title        = element_blank(),
-        axis.text         = element_blank(),
-        panel.background  = element_blank(),
-        panel.grid        = element_blank(),
-        axis.ticks.length = unit(0, "cm"),
-        panel.spacing     = unit(0, "lines"),
-        plot.margin       = unit(c(0, 0, 0, 0), "lines"),
-        complete          = TRUE
-      )
+      ggplot2::theme_void()
     },
     
-    # like theme clean, but also remove the legend
+    # This is a copy of the actual code in theme_void, but it also remove the legend
+    #' @importFrom ggplot2 theme_void theme "%+replace%"
     theme_inset = function()
     {
-      theme(
-        legend.position   = "none",
-        axis.title        = element_blank(),
-        axis.text         = element_blank(),
-        panel.background  = element_blank(),
-        panel.grid        = element_blank(),
-        axis.ticks.length = unit(0, "cm"),
-        panel.spacing     = unit(0, "lines"),
-        plot.margin       = unit(c(0, 0, 0, 0), "lines"),
-        complete          = TRUE
-      )
+      ggplot2::theme_void() %+replace%
+        ggplot2::theme(legend.position = "none")
     },
   
     # Make the output of cut2 a bit easier to read
