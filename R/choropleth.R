@@ -248,6 +248,7 @@ Choropleth = R6Class("Choropleth",
     # However, it appears that as of version 2.2.1.9000 of ggplot2 that code simply does not work
     # anymore. (In particular, calling ggplotGrob on maps created with those themes (which choroplethr
     # does for maps that appear as insets, such as Alaska) was causing a crash).
+    # So these functions now use theme_void
     #' @importFrom ggplot2 theme_void
     theme_clean = function()
     {
@@ -255,57 +256,11 @@ Choropleth = R6Class("Choropleth",
     },
     
     # This is a copy of the actual code in theme_void, but it also remove the legend
-    #' @importFrom ggplot2 element_blank element_text margin rel
+    #' @importFrom ggplot2 theme_void theme "%+replace%"
     theme_inset = function()
     {
-      base_size = 11 
-      base_family = ""
-      base_line_size = base_size / 22
-      base_rect_size = base_size / 22
-      
-      half_line <- base_size / 2
-      
-      # Only keep indispensable text: legend and plot titles
-      theme(
-        line =               element_blank(),
-        rect =               element_blank(),
-        text =               element_text(
-          family = base_family, face = "plain",
-          colour = "black", size = base_size,
-          lineheight = 0.9, hjust = 0.5, vjust = 0.5, angle = 0,
-          margin = margin(), debug = FALSE
-        ),
-        axis.text =          element_blank(),
-        axis.title =         element_blank(),
-        axis.ticks.length =  unit(0, "pt"),
-        legend.key.size =    unit(1.2, "lines"),
-        legend.position =    "none",
-        legend.text =        element_text(size = rel(0.8)),
-        legend.title =       element_text(hjust = 0),
-        strip.text =         element_text(size = rel(0.8)),
-        strip.switch.pad.grid = unit(0.1, "cm"),
-        strip.switch.pad.wrap = unit(0.1, "cm"),
-        panel.ontop =        FALSE,
-        panel.spacing =      unit(half_line, "pt"),
-        plot.margin =        unit(c(0, 0, 0, 0), "lines"),
-        plot.title =         element_text(
-          size = rel(1.2),
-          hjust = 0, vjust = 1,
-          margin = margin(t = half_line * 1.2)
-        ),
-        plot.subtitle =      element_text(
-          size = rel(0.9),
-          hjust = 0, vjust = 1,
-          margin = margin(t = half_line * 0.9)
-        ),
-        plot.caption =       element_text(
-          size = rel(0.9),
-          hjust = 1, vjust = 1,
-          margin = margin(t = half_line * 0.9)
-        ),
-        
-        complete = TRUE
-      )
+      ggplot2::theme_void() %+replace%
+        ggplot2::theme(legend.position = "none")
     },
   
     # Make the output of cut2 a bit easier to read
