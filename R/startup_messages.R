@@ -3,8 +3,7 @@
   
   tips <- c(
     "View the Choroplethr documentation at www.Choroplethr.com",
-    "Choroplethr has a free course: www.CensusMappingCourse.com",
-    "Need help? Try Stackoverflow: https://stackoverflow.com/tags/choroplethr"
+    "Choroplethr has a free course: www.CensusMappingCourse.com"
   )
   
   tip <- sample(tips, 1)
