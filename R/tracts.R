@@ -115,7 +115,6 @@ TractChoropleth = R6Class("TractChoropleth",
 #' @importFrom stringr str_extract_all
 #' @importFrom ggplot2 ggplot aes geom_polygon scale_fill_brewer ggtitle theme theme_grey element_blank geom_text
 #' @importFrom ggplot2 scale_fill_continuous scale_colour_brewer  
-#' @importFrom scales comma
 tract_choropleth = function(df, 
                             state_name,
                             title         = "", 

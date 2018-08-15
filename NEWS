@@ -1,3 +1,10 @@
+choroplethr 3.6.3
+----------------------------------------------------------------
+Remove dependency on scales package. The recent update of the scales package 
+from 0.5 to 1.0.0 broke choroplethr.
+
+Minor changes in order to have the package work work with the pkgdown package for documentation.
+
 choroplethr 3.6.1
 ----------------------------------------------------------------
 -Setting num_colors=0 will use a divergent scale. Useful when looking at percent change maps, or 

@@ -4,8 +4,8 @@
 \alias{state_choropleth_acs}
 \title{Create a US State choropleth from ACS data}
 \usage{
-state_choropleth_acs(tableId, endyear = 2011, span = 5, num_colors = 7,
-  zoom = NULL)
+state_choropleth_acs(tableId, endyear = 2011, span = 5,
+  num_colors = 7, zoom = NULL)
 }
 \arguments{
 \item{tableId}{The id of an ACS table}

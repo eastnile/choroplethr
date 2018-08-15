@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^\.travis\.yml$
 wiki-images
+^docs$
+^_pkgdown\.yml$
+^pkgdown$

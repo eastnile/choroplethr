@@ -1,6 +1,5 @@
 #' The base Choropleth object.
 #' @importFrom R6 R6Class
-#' @importFrom scales comma
 #' @importFrom ggplot2 scale_color_continuous coord_quickmap coord_map scale_x_continuous scale_y_continuous
 #' @importFrom ggmap get_map ggmap
 #' @importFrom RgoogleMaps MaxZoom
@@ -211,7 +210,6 @@ Choropleth = R6Class("Choropleth",
       self$bind() # bind the input values to the map values
     },
 
-    #' @importFrom scales comma
     #' @importFrom ggplot2 scale_fill_gradient2
     get_scale = function()
     {
@@ -223,7 +221,7 @@ Choropleth = R6Class("Choropleth",
         max_value = max(self$choropleth.df$value, na.rm = TRUE)
         stopifnot(!is.na(min_value) && !is.na(max_value))
 
-        scale_fill_gradient2(self$legend, labels=comma, na.value = "black", limits = c(min_value, max_value))
+        scale_fill_gradient2(self$legend, na.value = "black", limits = c(min_value, max_value))
 
       } else if (private$num_colors == 1) {
         
@@ -234,9 +232,9 @@ Choropleth = R6Class("Choropleth",
         # by default, scale_fill_continuous uses a light value for high values and a dark value for low values
         # however, this is the opposite of how choropleths are normally colored (see wikipedia)
         # these low and high values are from the 7 color brewer blue scale (see colorbrewer.org)
-        scale_fill_continuous(self$legend, low="#eff3ff", high="#084594", labels=comma, na.value="black", limits=c(min_value, max_value))
+        scale_fill_continuous(self$legend, low="#eff3ff", high="#084594", na.value="black", limits=c(min_value, max_value))
       } else {
-        scale_fill_brewer(self$legend, drop=FALSE, labels=comma, na.value="black")        
+        scale_fill_brewer(self$legend, drop=FALSE, na.value="black")        
       }
     },
     
