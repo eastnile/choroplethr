@@ -27,7 +27,7 @@ Imports:
     WDI,
     ggmap,
     RgoogleMaps,
-    tigris,
+    tigris (>= 1.0),
     gridExtra
 Suggests:
     testthat,
@@ -53,7 +53,7 @@ Collate:
     'get_tract_demographics.R'
     'startup_messages.R'
     'state.R'
-    'tracts.R'
+    'tract.R'
     'utils.R'
 RoxygenNote: 7.1.1
 Encoding: UTF-8
