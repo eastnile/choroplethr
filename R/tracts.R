@@ -78,7 +78,15 @@ TractChoropleth = R6Class("TractChoropleth",
         # if county_zoom field is selected, extract zips from counties  
       } else if (!is.null(county_zoom)) {
         stopifnot(all(county_zoom %in% unique(self$map.df$county.fips.numeric)))
+
+        # wow, this line below *literally* does not return a vector of regions.
+        # the class of self$map.df is a tuple: " "sf"         "data.frame"". I can only
+        # guess that sf somehow doesn't allow you to strip the geometry column out this way
         tracts = self$map.df[self$map.df$county.fips.numeric %in% county_zoom, "region"]
+        
+        # this line fixes the issue above. We just want a vector of regions here
+        tracts = tracts$region
+        
         super$set_zoom(tracts)        
       }
     }
