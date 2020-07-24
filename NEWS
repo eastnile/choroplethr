@@ -4,6 +4,8 @@ choroplethr 3.6.4
 -There seems to be a bug in R CMD check, or in the documentation which roxygen2 generates. The examples in ?calculate_percent_change now cause R CMD check to fail. However, the code works fine. These examples are not enclosed in a \dontrun for the sole purpose of satisfying R CMD check. This seems like a poor reason to enclose examples in a \dontrun block, but I don't see another option at this time.
 -The main purpose for this update is a change to ?tract_choropleth. Choroplethr cannot possibly ship with tract level maps, since they are at the state (not national) level, are are quite large. Instead, choroplethr has always used the tigris package to get these maps on the fly from the Census API. Tigris previously defaulted to returning SpatialPoygonDataFrames, which choroplethr required since it depends on ggplot2 to make the maps. But Tigris just switched to default to Simple Features (SF), and ggplot2 now supports SF, so this seemed like a good time to try and update choroplethr to handle SF as well. This feature should be considered beta for now, but it is better than the complete loss of functionality it replaces. 
 -Remove all deprecated functions. While those functions are normally only removed after a major update (which this is not), they have been listed as deprecated for years now.
+-Add dataset ?df_pop_ny_tracts which contains 2012 population estimates for all Census Tracts in New York State.
+-Add dataset ?df_ny_tract_demographics which contains 2013 demographic statistics for all Census Tracts in New York State
 
 choroplethr 3.6.3
 ----------------------------------------------------------------
