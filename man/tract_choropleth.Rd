@@ -4,9 +4,16 @@
 \alias{tract_choropleth}
 \title{Create a choropleth of Census Tracts in a particular state.}
 \usage{
-tract_choropleth(df, state_name, title = "", legend = "",
-  num_colors = 7, tract_zoom = NULL, county_zoom = NULL,
-  reference_map = FALSE)
+tract_choropleth(
+  df,
+  state_name,
+  title = "",
+  legend = "",
+  num_colors = 7,
+  tract_zoom = NULL,
+  county_zoom = NULL,
+  reference_map = FALSE
+)
 }
 \arguments{
 \item{df}{A data.frame with a column named "region" and a column named "value".}
@@ -35,5 +42,5 @@ of the object returned from "get_tract_map".}
 Create a choropleth of Census Tracts in a particular state.
 }
 \seealso{
-\url{https://www.census.gov/geo/reference/gtc/gtc_ct.html} for more information on Census Tracts
+\url{https://www.census.gov/data/academy/data-gems/2018/tract.html} for more information on Census Tracts
 }

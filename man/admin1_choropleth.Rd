@@ -4,8 +4,15 @@
 \alias{admin1_choropleth}
 \title{Create an admin1-level choropleth for a specified country}
 \usage{
-admin1_choropleth(country.name, df, title = "", legend = "",
-  num_colors = 7, zoom = NULL, reference_map = FALSE)
+admin1_choropleth(
+  country.name,
+  df,
+  title = "",
+  legend = "",
+  num_colors = 7,
+  zoom = NULL,
+  reference_map = FALSE
+)
 }
 \arguments{
 \item{country.name}{The name of the country. Must exactly match how the country is named in the "country"

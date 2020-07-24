@@ -4,8 +4,13 @@
 \alias{choroplethr_wdi}
 \title{Create a country-level choropleth using data from the World Bank's World Development Indicators (WDI)}
 \usage{
-choroplethr_wdi(code = "SP.POP.TOTL", year = 2012, title = "",
-  num_colors = 7, zoom = NULL)
+choroplethr_wdi(
+  code = "SP.POP.TOTL",
+  year = 2012,
+  title = "",
+  num_colors = 7,
+  zoom = NULL
+)
 }
 \arguments{
 \item{code}{The WDI code to use.}

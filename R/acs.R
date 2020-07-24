@@ -17,8 +17,6 @@ if (base::getRversion() >= "2.15.1") {
 #' ?state.regions.
 #' @return A choropleth.
 #' 
-#' @keywords choropleth, acs
-#' 
 #' @seealso \code{api.key.install} in the acs package which sets an Census API key for the acs library
 #' @seealso http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS 
 #' which contains a list of all ACS surveys.
@@ -55,8 +53,6 @@ state_choropleth_acs = function(tableId, endyear=2011, span=5, num_colors=7, zoo
 #' @param county_zoom An optional vector of counties to zoom in on. Elements of this vector must exactly 
 #' match the names of counties as they appear in the "region" column of ?county.regions.
 #' @return A choropleth.
-#' 
-#' @keywords choropleth, acs
 #' 
 #' @seealso \code{api.key.install} in the acs package which sets an Census API key for the acs library
 #' @seealso http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS 

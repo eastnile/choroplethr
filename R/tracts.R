@@ -21,19 +21,13 @@ get_state_fips_from_name = function(state_name)
 #' @export
 #' @importFrom tigris tracts
 #' @importFrom dplyr inner_join
-#' @importFrom ggplot2 fortify
 get_tract_map = function(state_name) 
 {
   state_fips = get_state_fips_from_name(state_name)
   
-  # tigris returns the map as a SpatialPolygonsDataFrame, 
-  tract.map = tracts(state = state_fips, cb = TRUE)
-
-  # but ggplot2 needs it as a dataframe
-  tract.map@data$id = rownames(tract.map@data)
-  tract.map.points  = fortify(tract.map, region="id")
-  tract.map.df      = inner_join(tract.map.points, tract.map@data, by="id")
-
+  # tigris returns the map as a Simple Features data frame, 
+  tract.map.df = tracts(state = state_fips, cb = TRUE)
+  
   # and choroplethr requires a "region" column
   # calling as.numeric is the easiest way to handle leading 0's
   tract.map.df$region = as.numeric(tract.map.df$GEOID)
@@ -109,7 +103,7 @@ TractChoropleth = R6Class("TractChoropleth",
 #' of the object returned from "get_tract_map".
 #' @param reference_map If true, render the choropleth over a reference map from Google Maps.
 #'
-#' @seealso \url{https://www.census.gov/geo/reference/gtc/gtc_ct.html} for more information on Census Tracts
+#' @seealso \url{https://www.census.gov/data/academy/data-gems/2018/tract.html} for more information on Census Tracts
 #' @export
 #' @importFrom Hmisc cut2
 #' @importFrom stringr str_extract_all

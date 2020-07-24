@@ -4,8 +4,14 @@
 \alias{county_choropleth_acs}
 \title{Create a US County choropleth from ACS data}
 \usage{
-county_choropleth_acs(tableId, endyear = 2011, span = 5,
-  num_colors = 7, state_zoom = NULL, county_zoom = NULL)
+county_choropleth_acs(
+  tableId,
+  endyear = 2011,
+  span = 5,
+  num_colors = 7,
+  state_zoom = NULL,
+  county_zoom = NULL
+)
 }
 \arguments{
 \item{tableId}{The id of an ACS table}
@@ -60,5 +66,3 @@ Uses the acs package created by Ezra Haber Glenn.
 http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS 
 which contains a list of all ACS surveys.
 }
-\keyword{acs}
-\keyword{choropleth,}

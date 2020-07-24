@@ -1,6 +1,6 @@
 #' The base Choropleth object.
 #' @importFrom R6 R6Class
-#' @importFrom ggplot2 scale_color_continuous coord_quickmap coord_map scale_x_continuous scale_y_continuous
+#' @importFrom ggplot2 scale_color_continuous coord_quickmap coord_map scale_x_continuous scale_y_continuous geom_sf coord_sf
 #' @importFrom ggmap get_map ggmap
 #' @importFrom RgoogleMaps MaxZoom
 #' @importFrom stringr str_extract_all
@@ -24,6 +24,10 @@ Choropleth = R6Class("Choropleth",
     # in the constructor instead
     projection     = NULL, 
     ggplot_polygon = NULL, 
+    
+    # variables for working with simple features
+    projection_sf  = NULL,
+    ggplot_sf      = NULL,
       
     # a choropleth map is defined by these two variables
     # a data.frame of a map
@@ -71,18 +75,30 @@ Choropleth = R6Class("Choropleth",
       self$projection     = coord_quickmap()
       self$ggplot_polygon = geom_polygon(aes(fill = value), color = "dark grey", size = 0.2)
       
+      # experimental features for porting to simple features
+      self$projection_sf = coord_sf()
+      self$ggplot_sf     = geom_sf(aes(fill = value), color = "dark grey", size = 0.2)
     },
 
     render = function() 
     {
       self$prepare_map()
       
-      ggplot(self$choropleth.df, aes(long, lat, group = group)) +
-        self$ggplot_polygon + 
-        self$get_scale() +
-        self$theme_clean() + 
-        ggtitle(self$title) + 
-        self$projection
+      if ("sf" %in% class(self$choropleth.df)) {
+        ggplot(self$choropleth.df) +
+          self$ggplot_sf +
+          self$get_scale() +
+          self$theme_clean() + 
+          ggtitle(self$title) +
+          self$projection_sf
+      } else {
+        ggplot(self$choropleth.df, aes(long, lat, group = group)) +
+          self$ggplot_polygon + 
+          self$get_scale() +
+          self$theme_clean() + 
+          ggtitle(self$title) + 
+          self$projection
+      }
     },
 
     # left
@@ -200,7 +216,10 @@ Choropleth = R6Class("Choropleth",
         warning(warning_string);
       }
       
-      self$choropleth.df = self$choropleth.df[order(self$choropleth.df$order), ];
+      # does this work?
+      if ("SpatialPolygonsDataFrame" %in% class(self$choropleth.df)) {
+        self$choropleth.df = self$choropleth.df[order(self$choropleth.df$order), ];
+      }
     },
     
     prepare_map = function()

@@ -17,6 +17,7 @@ df1$value to df2$value. Result is in the new "value" column, and rounded to two
 digits.
 }
 \examples{
+\dontrun{
 # load median age estimates from 2010 and 2015
 data(df_state_age_2010)
 data(df_state_age_2015)
@@ -26,5 +27,5 @@ state_choropleth(df_age_diff,
     title      = "Percent Change in Median Age, 2010-2015", 
     legend     = "Percent Change", 
     num_colors = 0)
-
+}
 }

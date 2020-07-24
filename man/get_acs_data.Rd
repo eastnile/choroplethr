@@ -4,8 +4,14 @@
 \alias{get_acs_data}
 \title{Returns a list representing American Community Survey (ACS) estimates}
 \usage{
-get_acs_data(tableId, map, endyear = 2012, span = 5, column_idx = -1,
-  include_moe = FALSE)
+get_acs_data(
+  tableId,
+  map,
+  endyear = 2012,
+  span = 5,
+  column_idx = -1,
+  include_moe = FALSE
+)
 }
 \arguments{
 \item{tableId}{The id of an ACS table}

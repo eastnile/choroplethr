@@ -4,8 +4,7 @@
 \alias{country_choropleth}
 \title{Create a country-level choropleth}
 \usage{
-country_choropleth(df, title = "", legend = "", num_colors = 7,
-  zoom = NULL)
+country_choropleth(df, title = "", legend = "", num_colors = 7, zoom = NULL)
 }
 \arguments{
 \item{df}{A data.frame with a column named "region" and a column named "value".  Elements in 
