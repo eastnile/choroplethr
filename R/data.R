@@ -79,7 +79,7 @@ NULL
 #' @usage data(df_state_age_2015)
 NULL
 
-#' A data.frame containing all US presdiential election results from 1789 to 2012
+#' A data.frame containing all US presidential election results from 1789 to 2012
 #' 
 #' Legend: 
 #' \itemize{
