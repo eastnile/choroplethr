@@ -5,3 +5,5 @@ wiki-images
 ^docs$
 ^_pkgdown\.yml$
 ^pkgdown$
+^CRAN-RELEASE$
+^cran-comments\.md$
