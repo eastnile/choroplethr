@@ -194,3 +194,19 @@ NULL
 #' @keywords data
 #' @author Ari Lamstein
 NULL
+
+#' A data.frame containing geographic metadata about the 116th Congressional Congress
+#' 
+#' Column region is how the Census Bureau refers to the geography. Note that this region is a 4-character string,
+#' and so has a leading 0 if necessary. The first two characters are the state FIPS code, and the second two characters
+#' are the district ID. States that only have 1 district (i.e. a representative "at large") have district 00. 
+#' All other states seem to start at 01.
+#' 
+#' In addition to the region column, this data.frame has the state name (both in English and as a FIPS code),
+#' as well as the district number
+#' @name df_congress_116_regions
+#' @usage data(df_congress_116_regions)
+#' @docType data
+#' @keywords data
+#' @author Ari Lamstein
+NULL

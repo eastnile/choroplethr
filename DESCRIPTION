@@ -31,7 +31,8 @@ Imports:
     gridExtra,
     xml2,
     rvest,
-    tidyr
+    tidyr,
+    tidycensus
 Suggests:
     testthat,
     choroplethrMaps,
@@ -52,6 +53,7 @@ Collate:
     'county_zoom.R'
     'data.R'
     'get_congress_116_party_data.R'
+    'get_congressional_demographics.R'
     'get_county_demographics.R'
     'get_state_demograhpics.R'
     'get_tract_demographics.R'

@@ -1,6 +1,8 @@
 choroplethr 3.6.5
 ----------------------------------------------------------------
+-Add a data.frame df_congress_116_regions that contains geographic metadata about the 116th congress.
 -Add a data.frame df_congress_116_party that contains party affiliation of the 116th congress.
+-Add a function get_congressional_district_demographics that returns a data.frame with several demographic statistics about each congressional district.
 
 choroplethr 3.6.4
 ----------------------------------------------------------------
