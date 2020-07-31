@@ -1,3 +1,7 @@
+choroplethr 3.6.5
+----------------------------------------------------------------
+-Add a data.frame df_congress_116_party that contains party affiliation of the 116th congress.
+
 choroplethr 3.6.4
 ----------------------------------------------------------------
 -Update ?tract_choropleth so that it works with the new version of tigris package (v1.0), which defaults to using Simple Features instead of SpatialPolygonDataFrames. This feature should be considered beta for now, but it is better than the complete loss of functionality it replaces.

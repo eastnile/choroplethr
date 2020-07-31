@@ -8,7 +8,7 @@ Description: Choropleths are thematic maps where geographic regions, such as
     choropleths. 3. Providing a framework for creating choropleths from
     arbitrary shapefiles. 4. Overlaying those maps over reference maps from
     Google Maps. 
-Version: 3.6.4
+Version: 3.6.5
 Authors@R: c(
     person("Ari", "Lamstein", , "ari@lamsteinconsulting.com", c("aut", "cre")),
     person("Brian", "Johnson", , role = "ctb"),
@@ -28,7 +28,10 @@ Imports:
     ggmap,
     RgoogleMaps,
     tigris (>= 1.0),
-    gridExtra
+    gridExtra,
+    xml2,
+    rvest,
+    tidyr
 Suggests:
     testthat,
     choroplethrMaps,
@@ -48,6 +51,7 @@ Collate:
     'county.R'
     'county_zoom.R'
     'data.R'
+    'get_congress_116_party_data.R'
     'get_county_demographics.R'
     'get_state_demograhpics.R'
     'get_tract_demographics.R'
