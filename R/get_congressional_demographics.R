@@ -1,4 +1,13 @@
+#' Get a handful of demographic variables on US Congressional Districts from the US Census Bureau as a data.frame.
+#' 
+#' The data comes from the American Community Survey (ACS). The variables are: total population, percent White 
+#' not Hispanic, Percent Black or African American not Hispanic, percent Asian not Hispanic,
+#' percent Hispanic all races, per-capita income, median rent and median age.
+#' @param year The year the survey was published
+#' @param survey The survey. Either "acs5" or "acs1"
+#' 
 #' @importFrom tidycensus get_acs
+#' @export
 get_congressional_district_demographics = function(year=2018, survey="acs5")
 {
   # get race data
@@ -30,6 +39,5 @@ get_congressional_district_demographics = function(year=2018, survey="acs5")
   df_demographics = merge(df_demographics, df_rent  , all.x=TRUE)  
   df_demographics = merge(df_demographics, df_age   , all.x=TRUE)
   
-
   df_demographics
 }
