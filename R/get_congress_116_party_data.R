@@ -1,4 +1,4 @@
-utils::globalVariables(c("District", "Member", "Party", "fips.character", "number"))
+utils::globalVariables(c("District", "Member", "Party", "fips.character", "region", "district.number"))
 
 # The data comes in as table #6 from wikipedia
 # this function scrapes that data, puts it into a df,
@@ -13,8 +13,6 @@ get_congressional_rep_raw_data = function()
   tables = rvest::html_nodes(file, "table")
   
   # Table #6 is titled "Voting members by state"
-  # We care about 2 columns: "District" and "Party" 
-  # But we include Member (i.e. their name) for debugging purposes
   reps = rvest::html_table(tables[6], fill = TRUE)
   reps = as.data.frame(reps)
   
@@ -24,54 +22,57 @@ get_congressional_rep_raw_data = function()
   reps$District = gsub("\u00A0", " ", reps$District, fixed = TRUE)
   reps$Member   = gsub("\u00A0", " ", reps$Member  , fixed = TRUE)
   reps$Party    = gsub("\u00A0", " ", reps$Party.1 , fixed = TRUE)
-  
-  dplyr::select(reps, District, Member, Party)
+
+  # We really only care about 2 columns: "District" and "Party" 
+  # But we include Member (i.e. their name) for debugging purposes
+  reps = dplyr::select(reps, District, Member, Party)
+  reps[, c("District", "Party", "Member")]
 }
 
 # add a new column, "state.fips", to the df
 # the df must have a column named "state", with the state in all lowercase letters
 add_state_fips_code = function(df) 
 {
-  stopifnot("state" %in% colnames(df))
+  stopifnot("state.name" %in% colnames(df))
   
   # merge with "state.regions" df in the choroplethrMaps package
   data("state.regions", package="choroplethrMaps", envir=environment())
   state.regions = state.regions[, c("region", "fips.character")]
-  colnames(state.regions) = c("state", "fips.character")
+  colnames(state.regions) = c("state.name", "fips.character")
   
   merge(df, state.regions)
 }
 
-# the "number" column must always have a leading "0"
-# and "at" (short for "at-large") must become "00"
-#' @importFrom stringr str_pad
-process_number_column = function(df) 
+# the district column comes in as "Alaska at-large" or "New York 3".
+# We want all state information in one column, and all district numeric information in another column
+#' @importFrom stringr str_extract str_pad
+split_district_column = function(df)
 {
-  df$number[df$number == "at"] = "00"
+  # step 1: split out the numerical data into a column called "district.number"
+  # replace "at-large" with "00"
+  df$District = gsub("at-large", "00", df$District)
+  # create a separate column with district numbers
+  df$district.number = stringr::str_extract(df$District, pattern="[0-9]+") 
+  # add a leading 0 if necessary
+  df$district.number = stringr::str_pad(df$district.number, width=2, side="left", pad="0")
+  # remove the numbers from the original vector (we want them to be just state names)
   
-  # now add leading 0
-  df$number = stringr::str_pad(df$number, width=2, side="left", pad="0")
+  # for reasons I do not understand, the below line does not work
+  # df$District = stringr::str_replace(df$Distrct, "[0-9]+", "")
+  # but breaking it up into multiple steps with a temporary variable does
+  tmp = df$District
+  tmp = stringr::str_replace(tmp, "[0-9]+", "")
+  df$District = tmp
+  
+  # step 2: split out the state information into a column called "state.name"
+  df$state.name = df$District
+  df$state.name = trimws(df$state.name)
+  df$state.name = tolower(df$state.name)
+    
+  # step 3: delete the original column
+  df$District = NULL
+  
   df
-}
-
-# The df comes in with a column named District with values like "Alabama 1" or "Alaska at-large"
-# We need a column called "region" that has this same information encoded like "0101" (Alabama first district)
-# or "0200" ("Alaska at-large"). 
-# The pattern is "state fips code" + "district #". In the case of "at large" district # is 00.
-# We need this because the Census API uses this, and we want to add demographics
-#' @importFrom tidyr separate unite
-add_geoid_to_congressional_rep_data = function(df) 
-{
-  # first isolate the state name and the congressional seate id.
-  df = tidyr::separate(df, col="District", into=c("state", "number"))
-  df$state = tolower(df$state)
-  
-  # now do the processing
-  df = add_state_fips_code(df)  
-  df = process_number_column(df)
-  
-  # we can now add a new column, "region" that is the state fips code + the processed number column
-  tidyr::unite(df, "region", fips.character, number, sep="", remove=FALSE)
 }
 
 # revert party affiliations that changed since the inauguration of this congress
@@ -92,6 +93,30 @@ revert_changes = function(df)
   df[df$District == "Texas 4"          , "Party"] = "Republican"
   
   df
+}
+
+# The df comes in with a column named District with values like "Alabama 1" or "Alaska at-large"
+# We need a column called "region" that has this same information encoded like "0101" (Alabama first district)
+# or "0200" ("Alaska at-large"). 
+# The pattern is "state fips code" + "district #". In the case of "at large" district # is 00.
+# We need this because the Census API uses this, and we want to add demographics
+#' @importFrom tidyr separate unite
+add_geoid_to_congressional_rep_data = function(df) 
+{
+  # "Alabama 1" -> should be 2 columns, one with state.name and one with district.number
+  df = split_district_column(df) 
+  
+  # we need a fips code for the state as well
+  df = add_state_fips_code(df)  
+  
+  # we can now add a new column, "region" that is the state fips code + district.number column
+  df = tidyr::unite(df, "region", fips.character, district.number, sep="", remove=FALSE)
+  
+  # pretty up the df
+  colnames(df) = tolower(colnames(df))
+  
+  df = df[, c("region", "party", "state.name", "district.number", "member")] 
+  dplyr::arrange(df, region)
 }
 
 get_congressional_116_party_data = function()

@@ -202,8 +202,8 @@ NULL
 #' are the district ID. States that only have 1 district (i.e. a representative "at large") have district 00. 
 #' All other states seem to start at 01.
 #' 
-#' In addition to the region column, this data.frame has the state name (both in English and as a FIPS code),
-#' as well as the district number
+#' In addition to the region column, this data.frame has the party the region voted for, as well 
+#' as other metadata about the District.
 #' @name df_congress_116_regions
 #' @usage data(df_congress_116_regions)
 #' @docType data
