@@ -202,8 +202,8 @@ NULL
 #' are the district ID. States that only have 1 district (i.e. a representative "at large") have district 00. 
 #' All other states start at 01.
 #' 
-#' @name df_congress_116_regions
-#' @usage data(df_congress_116_regions)
+#' @name congress116.regions
+#' @usage data(congress116.regions)
 #' @docType data
 #' @keywords data
 #' @author Ari Lamstein
