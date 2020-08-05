@@ -179,23 +179,7 @@ NULL
 #' @author Ari Lamstein
 NULL
 
-#' A data.frame containing party affiliation data about the 116th Congressional Congress
-#' 
-#' Contains the party affiliation of each member of the 116th Congress, along with metadata.
-#' Note that party affiliation is of who the citizens voted for, and not who is currently 
-#' (July 30, 2020) serving. Currently three members have resigned since being elected, one 
-#' switched party and one died. For details of how this data was compiled, please see function 
-#' get_congressional_116_party_data in file get_congress_116_party_data That file ships with this package, 
-#' but is not exported, since it relies on scraping data from wikipedia, and that web page is subject 
-#' to change.
-#' @name df_congress_116_party
-#' @usage data(df_congress_116_party)
-#' @docType data
-#' @keywords data
-#' @author Ari Lamstein
-NULL
-
-#' A data.frame containing geographic metadata about the 116th Congressional Congress
+#' A data.frame containing geographic metadata about the Congressional Districts of the 116th US Congress
 #' 
 #' Column region is how the Census Bureau refers to the geography. Note that this region is a 4-character string,
 #' and so has a leading 0 if necessary. The first two characters are the state FIPS code, and the second two characters
@@ -206,7 +190,21 @@ NULL
 #' @usage data(congress116.regions)
 #' @docType data
 #' @keywords data
-#' @author Ari Lamstein
+NULL
+
+#' A data.frame containing party affiliation data about the Congressional Districts of 116th US Congress
+#' 
+#' Contains the party affiliation of each member elected to the House of Representatives of the 116th Congress, along with metadata.
+#' Note that party affiliation is of who the citizens voted for, and not who is currently 
+#' (July 30, 2020) serving. Currently three members have resigned since being elected, one 
+#' switched party and one died. For details of how this data was compiled, please see function 
+#' get_congressional_116_party_data in file get_congress_116_party_data. That file ships with this package, 
+#' but is not exported, since it relies on scraping data from Wikipedia, and that web page is subject 
+#' to change.
+#' @name df_congress116_party
+#' @usage data(df_congress116_party)
+#' @docType data
+#' @keywords data
 NULL
 
 #' A data.frame containing demographic statistics about the 116th Congressional Districts
