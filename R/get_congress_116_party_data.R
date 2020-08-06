@@ -6,7 +6,7 @@ utils::globalVariables(c("District", "Member", "Party", "fips.character", "regio
 #' @importFrom xml2 read_html
 #' @importFrom rvest html_nodes html_table
 #' @importFrom dplyr select
-get_congressional_rep_raw_data = function()
+get_current_congressional_rep_raw_data = function()
 {
   url    = "https://en.m.wikipedia.org/wiki/List_of_current_members_of_the_United_States_House_of_Representatives"
   file   = xml2::read_html(url)
@@ -77,20 +77,32 @@ split_district_column = function(df)
 
 # revert party affiliations that changed since the inauguration of this congress
 # do this because we care about the relationship between demographics and party affiliation
-# that people voted for. This is obscured by the following changes that happened since
-# citizens elected official
-# 1. Michigan 03. Revert from "Libertarian" to "Republican". Rep. Justin Amash changed party affiliation while in office: https://en.wikipedia.org/wiki/Michigan%27s_3rd_congressional_district
-# 2. California 50: Revert "" to "Republican". Rep. Duncan Hunter resigned: https://en.wikipedia.org/wiki/California%27s_50th_congressional_district. 
-# 3. Georgia 5: Revert "" to "Democrat".Rep. John Lewis died: https://en.wikipedia.org/wiki/Georgia%27s_5th_congressional_district
-# 4. North Carolina 11: Revert "" to "Republican". Rep Mark Meadows resigned: https://en.wikipedia.org/wiki/North_Carolina%27s_11th_congressional_district
-# 5. Texas 4: Revert "" to "Republican". Rep. John Ratcliffe resigned: https://en.wikipedia.org/wiki/Texas%27s_4th_congressional_district
+# that people voted for. This is obscured by the following changes that happened since election
 revert_changes = function(df)
 {
-  df[df$District == "Michigan 3"       , "Party"] = "Republican"
-  df[df$District == "California 50"    , "Party"] = "Republican"
-  df[df$District == "Georgia 5"        , "Party"] = "Democratic"
-  df[df$District == "North Carolina 11", "Party"] = "Republican"
-  df[df$District == "Texas 4"          , "Party"] = "Republican"
+  # Michigan 03. Justin Amash changed party affiliation while in office 
+  # https://en.wikipedia.org/wiki/Michigan%27s_3rd_congressional_district
+  df[df$District == "Michigan 3", "Party"] = "Republican"
+  
+  # California 50. Duncan Hunter (R) resigned
+  # https://en.wikipedia.org/wiki/California%27s_50th_congressional_district. 
+  df[df$District == "California 50", "Party"]  = "Republican"
+  df[df$District == "California 50", "Member"] = "Duncan Hunter"
+  
+  # Georgia 5. John Lewis (D) died 
+  # https://en.wikipedia.org/wiki/Georgia%27s_5th_congressional_district
+  df[df$District == "Georgia 5", "Party"]  = "Democratic"
+  df[df$District == "Georgia 5", "Member"] = "John Lewis"
+  
+  # North Carolina 11. Mark Meadows (R) resigned: 
+  # https://en.wikipedia.org/wiki/North_Carolina%27s_11th_congressional_district
+  df[df$District == "North Carolina 11", "Party"]  = "Republican"
+  df[df$District == "North Carolina 11", "Member"] = "Mark Meadows"
+  
+  # Texas 4. John Ratcliffe resigned: 
+  # https://en.wikipedia.org/wiki/Texas%27s_4th_congressional_district
+  df[df$District == "Texas 4", "Party"]  = "Republican"
+  df[df$District == "Texas 4", "Member"] = "John Ratcliffe"
   
   df
 }
@@ -119,9 +131,9 @@ add_geoid_to_congressional_rep_data = function(df)
   dplyr::arrange(df, region)
 }
 
-get_congressional_116_party_data = function()
+get_congress116_party_data = function()
 {
-  df = get_congressional_rep_raw_data()
+  df = get_current_congressional_rep_raw_data()
   df = revert_changes(df)
   add_geoid_to_congressional_rep_data(df)
 }

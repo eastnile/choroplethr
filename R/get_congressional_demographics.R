@@ -39,5 +39,32 @@ get_congressional_district_demographics = function(year=2018, survey="acs5")
   df_demographics = merge(df_demographics, df_rent  , all.x=TRUE)  
   df_demographics = merge(df_demographics, df_age   , all.x=TRUE)
   
-  df_demographics
+  filter_to_voting_congressional_districts(df_demographics)
+}
+
+#' Remove non-voting Congressional Districts from a data.frame
+#'
+#' The data.frame must have a column named region with a 4-character Congressional District code.
+#' Remove districts that have a district code of 98 (non-voting) or ZZ (undefined district). See 
+#' https://www.census.gov/geographies/mapping-files/2019/dec/rdo/116-congressional-district-bef.html
+#' At the time this function was created, tidycensus returned 5 non-voting districts. See 
+#' https://github.com/walkerke/tidycensus/issues/277
+#' @param df A data.frame. Must have a column named region that contains character vectors of length 4. The first 2 characters should be a state FIPS code and the second 2 characters should be a Congressional District Number
+#' @importFrom dplyr filter
+#' @export
+filter_to_voting_congressional_districts = function(df)
+{
+  stopifnot("region" %in% colnames(df))
+  stopifnot(is.character(df$region))
+  stopifnot(all(nchar(df$region) == 4))
+  
+  invalid_district_numbers = c("98", "ZZ")
+  df = dplyr::filter(df, !(substr(region, 3, 4) %in% invalid_district_numbers))
+  
+  # there are exactly 435 voting members of the house of representatives, 
+  # so we should never return more than that many values
+  # https://en.wikipedia.org/wiki/List_of_United_States_congressional_districts
+  stopifnot(length(unique(df$region)) <= 435)
+  
+  df
 }
