@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_congressional_demographics.R
 \name{filter_to_voting_congressional_districts}
 \alias{filter_to_voting_congressional_districts}
-\title{Remove non-voting Congresional Districts from a data.frame}
+\title{Remove non-voting Congressional Districts from a data.frame}
 \usage{
 filter_to_voting_congressional_districts(df)
 }
