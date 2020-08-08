@@ -4,6 +4,7 @@ choroplethr 3.7.0
 -Add a data.frame df_congress116_demographics that contains demographic information about the Congressional Districts of the 116th Congress. Data comes from the 2018 5-year ACS.
 -Add a data.frame df_congress116_party that contains party affiliation of representatives elected to the 116th congress.
 -Add a function get_congressional_district_demographics that returns a data.frame with several demographic statistics about each congressional district.
+-Add a function visualize_df_by_race_ethnicity_party that makes a complex boxplot that does exactly what the name says.
 
 choroplethr 3.6.4
 ----------------------------------------------------------------

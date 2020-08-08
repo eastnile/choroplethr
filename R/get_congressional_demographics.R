@@ -1,3 +1,5 @@
+globalVariables(c("Race", "Percent"))
+
 #' Get a handful of demographic variables on US Congressional Districts from the US Census Bureau as a data.frame.
 #' 
 #' The data comes from the American Community Survey (ACS). The variables are: total population, percent White 
@@ -67,4 +69,33 @@ filter_to_voting_congressional_districts = function(df)
   stopifnot(length(unique(df$region)) <= 435)
   
   df
+}
+
+#' Create box plots to visualize race and ethnicity by party
+#' 
+#' Requires a data.frame with specific column names. In practice, the data.frame is expected
+#' to come from a function like ?get_congressional_districts and then merged with a data.frame 
+#' that has column "party".
+#' 
+#' @param df A data.frame with columns "party", "percent_white", "percent_black", "percent_asian", "percent_hispanic"
+#' @example 
+#' data("df_congress116_demographics")
+#' data("df_congress116_party")
+#' # Race and Ethnicity by Congressional District from the 2018 5-year American Community Survey
+#' visualize_df_by_race_ethnicity_party(df) 
+#' @importFrom ggplot2 ggplot geom_boxplot scale_fill_manual
+#' @importFrom tidyr pivot_longer
+#' @export
+visualize_df_by_race_ethnicity_party = function(df) 
+{
+  required_colnames = c("party", "percent_white", "percent_black", "percent_asian", "percent_hispanic")
+  stopifnot(required_colnames %in% colnames(df))
+  
+  df_race = df[, c("party", "percent_white", "percent_black", "percent_asian", "percent_hispanic")]
+  colnames(df_race) = c("Party", "White", "Black", "Asian", "Hispanic")
+  df_race = tidyr::pivot_longer(df_race, c("White", "Black", "Asian", "Hispanic"), names_to="Race", values_to="Percent")
+  
+  ggplot2::ggplot(df_race, aes(Race, Percent)) + 
+    ggplot2::geom_boxplot(aes(fill = Party)) + 
+    ggplot2::scale_fill_manual(values = c("blue", "red"))   
 }
