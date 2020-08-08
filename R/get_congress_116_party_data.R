@@ -19,6 +19,7 @@ get_current_congressional_rep_raw_data = function()
   # While the spaces will appear as spaces, they are actually encoded as &nbsp; 
   # which leads to problems later on. This code fixes that.
   # See https://stackoverflow.com/questions/63126514/error-subsetting-data-frame-from-xml2-and-rvest/63126714#63126714
+  # and https://github.com/tidyverse/rvest/issues/284
   reps$District = gsub("\u00A0", " ", reps$District, fixed = TRUE)
   reps$Member   = gsub("\u00A0", " ", reps$Member  , fixed = TRUE)
   reps$Party    = gsub("\u00A0", " ", reps$Party.1 , fixed = TRUE)
