@@ -14,3 +14,11 @@ Requires a data.frame with specific column names. In practice, the data.frame is
 to come from a function like ?get_congressional_districts and then merged with a data.frame 
 that has column "party".
 }
+\examples{
+data("df_congress116_demographics")
+data("df_congress116_party")
+df = merge(df_congress116_demographics, df_congress116_party)
+# Race and Ethnicity of the 116th Congressional Districts using data from
+# the 2018 5-year American Community Survey
+visualize_df_by_race_ethnicity_party(df) 
+}

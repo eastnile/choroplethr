@@ -78,14 +78,16 @@ filter_to_voting_congressional_districts = function(df)
 #' that has column "party".
 #' 
 #' @param df A data.frame with columns "party", "percent_white", "percent_black", "percent_asian", "percent_hispanic"
-#' @example 
-#' data("df_congress116_demographics")
-#' data("df_congress116_party")
-#' # Race and Ethnicity by Congressional District from the 2018 5-year American Community Survey
-#' visualize_df_by_race_ethnicity_party(df) 
 #' @importFrom ggplot2 ggplot geom_boxplot scale_fill_manual
 #' @importFrom tidyr pivot_longer
 #' @export
+#' @examples 
+#' data("df_congress116_demographics")
+#' data("df_congress116_party")
+#' df = merge(df_congress116_demographics, df_congress116_party)
+#' # Race and Ethnicity of the 116th Congressional Districts using data from
+#' # the 2018 5-year American Community Survey
+#' visualize_df_by_race_ethnicity_party(df) 
 visualize_df_by_race_ethnicity_party = function(df) 
 {
   required_colnames = c("party", "percent_white", "percent_black", "percent_asian", "percent_hispanic")
