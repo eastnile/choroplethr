@@ -6,10 +6,10 @@ Choroplethr simplifies the creation of choropleth maps in R. Choropleths are the
 2. Providing API connections to interesting data sources for making choropleths.
 3. Providing a framework for creating choropleths from arbitrary shapefiles.
 
-## Free Course
-
-If you would like a guided introduction to choroplethr, then take the free course [Learn to Map Census Data in R](https://arilamstein.com/census-mapping-course/).
-
 ## Documentation
 
 Documentation for choroplethr can be found [Choroplethr.com](http://www.Choroplethr.com).
+
+## Technical Support
+
+If you have a technical question about Choroplethr, please ask on StackOverflow: https://stackoverflow.com/questions/tagged/choroplethr.

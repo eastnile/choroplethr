@@ -14,43 +14,43 @@ Create a county-level choropleth
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{CountyChoropleth$new()}}
-\item \href{#method-clip}{\code{CountyChoropleth$clip()}}
-\item \href{#method-clone}{\code{CountyChoropleth$clone()}}
+\item \href{#method-CountyChoropleth-new}{\code{CountyChoropleth$new()}}
+\item \href{#method-CountyChoropleth-clip}{\code{CountyChoropleth$clip()}}
+\item \href{#method-CountyChoropleth-clone}{\code{CountyChoropleth$clone()}}
 }
 }
-\if{html}{
-\out{<details ><summary>Inherited methods</summary>}
-\itemize{
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="bind">}\href{../../choroplethr/html/Choropleth.html#method-bind}{\code{choroplethr::Choropleth$bind()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="discretize">}\href{../../choroplethr/html/Choropleth.html#method-discretize}{\code{choroplethr::Choropleth$discretize()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="format_levels">}\href{../../choroplethr/html/Choropleth.html#method-format_levels}{\code{choroplethr::Choropleth$format_levels()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_bounding_box">}\href{../../choroplethr/html/Choropleth.html#method-get_bounding_box}{\code{choroplethr::Choropleth$get_bounding_box()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_choropleth_as_polygon">}\href{../../choroplethr/html/Choropleth.html#method-get_choropleth_as_polygon}{\code{choroplethr::Choropleth$get_choropleth_as_polygon()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_max_lat">}\href{../../choroplethr/html/Choropleth.html#method-get_max_lat}{\code{choroplethr::Choropleth$get_max_lat()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_max_long">}\href{../../choroplethr/html/Choropleth.html#method-get_max_long}{\code{choroplethr::Choropleth$get_max_long()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_min_lat">}\href{../../choroplethr/html/Choropleth.html#method-get_min_lat}{\code{choroplethr::Choropleth$get_min_lat()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_min_long">}\href{../../choroplethr/html/Choropleth.html#method-get_min_long}{\code{choroplethr::Choropleth$get_min_long()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_reference_map">}\href{../../choroplethr/html/Choropleth.html#method-get_reference_map}{\code{choroplethr::Choropleth$get_reference_map()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_scale">}\href{../../choroplethr/html/Choropleth.html#method-get_scale}{\code{choroplethr::Choropleth$get_scale()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_x_scale">}\href{../../choroplethr/html/Choropleth.html#method-get_x_scale}{\code{choroplethr::Choropleth$get_x_scale()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_y_scale">}\href{../../choroplethr/html/Choropleth.html#method-get_y_scale}{\code{choroplethr::Choropleth$get_y_scale()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_zoom">}\href{../../choroplethr/html/Choropleth.html#method-get_zoom}{\code{choroplethr::Choropleth$get_zoom()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="prepare_map">}\href{../../choroplethr/html/Choropleth.html#method-prepare_map}{\code{choroplethr::Choropleth$prepare_map()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="render_with_reference_map">}\href{../../choroplethr/html/Choropleth.html#method-render_with_reference_map}{\code{choroplethr::Choropleth$render_with_reference_map()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="set_num_colors">}\href{../../choroplethr/html/Choropleth.html#method-set_num_colors}{\code{choroplethr::Choropleth$set_num_colors()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="theme_clean">}\href{../../choroplethr/html/Choropleth.html#method-theme_clean}{\code{choroplethr::Choropleth$theme_clean()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="theme_inset">}\href{../../choroplethr/html/Choropleth.html#method-theme_inset}{\code{choroplethr::Choropleth$theme_inset()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="USAChoropleth" data-id="render">}\href{../../choroplethr/html/USAChoropleth.html#method-render}{\code{choroplethr::USAChoropleth$render()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="USAChoropleth" data-id="render_helper">}\href{../../choroplethr/html/USAChoropleth.html#method-render_helper}{\code{choroplethr::USAChoropleth$render_helper()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="USAChoropleth" data-id="render_state_outline">}\href{../../choroplethr/html/USAChoropleth.html#method-render_state_outline}{\code{choroplethr::USAChoropleth$render_state_outline()}}\out{</span>}
-\item \out{<span class="pkg-link" data-pkg="choroplethr" data-topic="USAChoropleth" data-id="set_zoom">}\href{../../choroplethr/html/USAChoropleth.html#method-set_zoom}{\code{choroplethr::USAChoropleth$set_zoom()}}\out{</span>}
-}
-\out{</details>}
-}
+\if{html}{\out{
+<details><summary>Inherited methods</summary>
+<ul>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="bind"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-bind'><code>choroplethr::Choropleth$bind()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="discretize"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-discretize'><code>choroplethr::Choropleth$discretize()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="format_levels"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-format_levels'><code>choroplethr::Choropleth$format_levels()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_bounding_box"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-get_bounding_box'><code>choroplethr::Choropleth$get_bounding_box()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_choropleth_as_polygon"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-get_choropleth_as_polygon'><code>choroplethr::Choropleth$get_choropleth_as_polygon()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_max_lat"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-get_max_lat'><code>choroplethr::Choropleth$get_max_lat()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_max_long"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-get_max_long'><code>choroplethr::Choropleth$get_max_long()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_min_lat"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-get_min_lat'><code>choroplethr::Choropleth$get_min_lat()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_min_long"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-get_min_long'><code>choroplethr::Choropleth$get_min_long()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_reference_map"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-get_reference_map'><code>choroplethr::Choropleth$get_reference_map()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_scale"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-get_scale'><code>choroplethr::Choropleth$get_scale()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_x_scale"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-get_x_scale'><code>choroplethr::Choropleth$get_x_scale()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_y_scale"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-get_y_scale'><code>choroplethr::Choropleth$get_y_scale()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="get_zoom"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-get_zoom'><code>choroplethr::Choropleth$get_zoom()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="prepare_map"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-prepare_map'><code>choroplethr::Choropleth$prepare_map()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="render_with_reference_map"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-render_with_reference_map'><code>choroplethr::Choropleth$render_with_reference_map()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="set_num_colors"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-set_num_colors'><code>choroplethr::Choropleth$set_num_colors()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="theme_clean"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-theme_clean'><code>choroplethr::Choropleth$theme_clean()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="Choropleth" data-id="theme_inset"><a href='../../choroplethr/html/Choropleth.html#method-Choropleth-theme_inset'><code>choroplethr::Choropleth$theme_inset()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="USAChoropleth" data-id="render"><a href='../../choroplethr/html/USAChoropleth.html#method-USAChoropleth-render'><code>choroplethr::USAChoropleth$render()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="USAChoropleth" data-id="render_helper"><a href='../../choroplethr/html/USAChoropleth.html#method-USAChoropleth-render_helper'><code>choroplethr::USAChoropleth$render_helper()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="USAChoropleth" data-id="render_state_outline"><a href='../../choroplethr/html/USAChoropleth.html#method-USAChoropleth-render_state_outline'><code>choroplethr::USAChoropleth$render_state_outline()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="choroplethr" data-topic="USAChoropleth" data-id="set_zoom"><a href='../../choroplethr/html/USAChoropleth.html#method-USAChoropleth-set_zoom'><code>choroplethr::USAChoropleth$set_zoom()</code></a></span></li>
+</ul>
+</details>
+}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-CountyChoropleth-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CountyChoropleth-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CountyChoropleth$new(user.df)}\if{html}{\out{</div>}}
@@ -58,8 +58,8 @@ Create a county-level choropleth
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clip"></a>}}
-\if{latex}{\out{\hypertarget{method-clip}{}}}
+\if{html}{\out{<a id="method-CountyChoropleth-clip"></a>}}
+\if{latex}{\out{\hypertarget{method-CountyChoropleth-clip}{}}}
 \subsection{Method \code{clip()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CountyChoropleth$clip()}\if{html}{\out{</div>}}
@@ -67,8 +67,8 @@ Create a county-level choropleth
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-CountyChoropleth-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-CountyChoropleth-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{
