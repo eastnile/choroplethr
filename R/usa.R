@@ -21,7 +21,7 @@ USAChoropleth = R6Class("USAChoropleth",
     {
       self$prepare_map()
       
-      if (private$zoom == "alaska" || private$zoom == "hawaii") {
+      if (identical(private$zoom, "alaska") || identical(private$zoom, "hawaii")) {
         choro = self$render_helper(self$choropleth.df, self$scale_name, self$theme_clean()) + ggtitle(self$title)
         if (self$add_state_outline)
         {
