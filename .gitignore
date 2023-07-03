@@ -3,3 +3,6 @@
 .Rhistory
 .RData
 .idea
+inst/doc
+/doc/
+/Meta/

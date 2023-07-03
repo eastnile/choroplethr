@@ -36,7 +36,10 @@ Imports:
 Suggests:
     testthat,
     choroplethrMaps,
-    choroplethrAdmin1 (>= 1.1.0)
+    choroplethrAdmin1 (>= 1.1.0),
+    knitr,
+    rmarkdown,
+    scales
 Depends:
     R (>= 3.5.0),
     acs
@@ -61,5 +64,6 @@ Collate:
     'state.R'
     'tract.R'
     'utils.R'
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
+VignetteBuilder: knitr
