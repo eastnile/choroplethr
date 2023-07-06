@@ -30,7 +30,7 @@ Note that the Census API currently only provides ACS data from 2010 onwards.
 Here are some tips for getting started with ACS data:
 
 1. Browse the [list of questions](https://www.census.gov/programs-surveys/acs/about/forms-and-instructions.html) the ACS asks.  
-1.  Learn the [difference](http://www.census.gov/programs-surveys/acs/guidance/estimates.html) between the 1, 3 and 5 year estimates.
+1.  Learn the [difference](https://www.census.gov/programs-surveys/acs/guidance/estimates.html) between the 1, 3 and 5 year estimates.
 2. Visit [data.census.gov](https://data.census.gov/) to select a table you wish to visualize. You will likely be surprised at just how much data is available.  Here are some popular tables to gets you started:
     + B01003: total population
     + B01002: median age by sex
