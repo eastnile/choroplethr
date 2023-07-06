@@ -1,15 +1,14 @@
 <!--
 %\VignetteEngine{knitr}
-%\VignetteIndexEntry{h) Creating Your Own Maps}
+%\VignetteIndexEntry{f) Creating Your Own Maps}
 -->
 
 Creating Your Own Maps
 ===
 
-choroplethr uses object oriented programming to support users creating choropleths with arbitrary maps. If you are interested in this functionality then I recommend you read two articles before proceeding:
+choroplethr uses object oriented programming to support users creating choropleths with arbitrary maps. If you are interested in this functionality then I recommend you take my (now free) full-length video course [Shapefiles for R Programmers](https://ari-lamsteins-courses.thinkific.com/courses/shapefiles-for-r-programmers).
 
- * [Mapmaking for R Programmers](https://github.com/trulia/choroplethr/wiki/Mapmaking-for-R-Programmers). In this page I discuss the basics of acquiring and manipulating shapefiles, as well as importing them into R. If you are interested in creating your own maps, then you should become familiar with this information first.
- * [Introduction to R6 Classes](http://rpubs.com/wch/24456). choroplethr uses R6 to implement object-oriented programming. Any map you create should inherit from the base `Choropleth` class. You should understand the basics of what this means.
+The example below assumes you have already read a shapefile into R and wish to connect it to Choroplethr. Note that this example assumes you have some familiarity with [R6](https://r6.r-lib.org/index.html), the Object-Oriented systme that choroplethr uses.
 
 ## The Choropleth base class
 
@@ -73,4 +72,4 @@ Using the base Choropleth gives you a lot of functionality for free:
 * Error checking on input.
 * Ability to zoom in on a subset of regions with the `zoom` parameter.
 * Ability to explore the data visually with the `num_colors` parameter.
-* Easy labelling of the title and legend with the `title` and `legend` parameters.
+* Easy labeling of the title and legend with the `title` and `legend` parameters.

@@ -8,7 +8,7 @@ Country Choropleths
 
 You can create a choropleth of Countries with the function `country_choropleth`:
 
-```{r hold=TRUE}
+```{r message=FALSE}
 library(choroplethr)
 
 ?df_pop_country
@@ -52,7 +52,7 @@ country_choropleth(df_pop_country,
 
 # Advanced Options
 
-Any customization outside the optional parameters presented above will require you to create a `StateChoropleth` object.  choroplethr uses [R6](https://github.com/r-lib/R6) to take advantage of object-oriented programming.  Here is an example of using the `ggplot2_scale` on the base Choropleth object to customize the palette used.
+Any customization outside the optional parameters presented above will require you to create a `StateChoropleth` object.  choroplethr uses [R6](https://r6.r-lib.org/index.html) to take advantage of object-oriented programming.  Here is an example of using the `ggplot2_scale` on the base Choropleth object to customize the palette used.
 
 
 ```{r}

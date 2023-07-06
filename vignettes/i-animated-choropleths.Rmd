@@ -1,6 +1,6 @@
 <!--
   %\VignetteEngine{knitr}
-%\VignetteIndexEntry{g) Animated Choropleths}
+%\VignetteIndexEntry{i) Animated Choropleths}
 -->
   
 Animated Choropleths
@@ -11,7 +11,7 @@ Animated Choropleths
 ### Example: Historical US Presidential Election Results
 choroplethr ships with an example dataset of all US Presidential Election returns. This data is in the variable `df_president_ts`.
 
-```{r}
+```{r message=FALSE}
 library(choroplethr)
 
 ?df_president_ts

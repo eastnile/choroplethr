@@ -1,10 +1,10 @@
 <!--
   %\VignetteEngine{knitr}
-%\VignetteIndexEntry{i) Creating Administrative Level 1 Maps}
+%\VignetteIndexEntry{e) Administrative Level 1 Choropleths}
  \usepackage[utf8]{inputenc}
 -->
 
-Creating Administrative Level 1 Maps
+Administrative Level 1 Choropleths
 ===
 
 "Administrative Level 1" is the generic term for the largest subnational administrative unit of a country. This unit has different names depending on the country. For example, in the USA Admin 1 units are called "states", but in Japan they are called "prefectures". choroplethr ships with an Admin 1 map of all countries of the world, and supports creating choropleths of these maps. To learn more about the map type the following:
@@ -16,7 +16,7 @@ library(choroplethrAdmin1)
 
 This vignette walks thru an example of using choroplethr to create an Admin 1 choropleth of Japan. The data we will use is 2010 population estimates from the Japanese Census Bureau:
 
-```{r}
+```{r message=FALSE}
 library(choroplethr)
 ?df_japan_census
 data(df_japan_census)

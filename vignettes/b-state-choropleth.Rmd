@@ -8,7 +8,7 @@ US State Chropleths
 
 You can create a choropleth of US States with the function `state_choropleth`:
 
-```{r hold=TRUE}
+```{r message=FALSE}
 library(choroplethr)
 
 ?df_pop_state
@@ -50,7 +50,7 @@ state_choropleth(df_pop_state,
 
 # Advanced Options
 
-Any customization outside the optional parameters presented above will require you to create a `StateChoropleth` object.  choroplethr uses [R6](https://github.com/r-lib/R6) to take advantage of object-oriented programming.  Here is an example of using the `ggplot2_scale` variable on the base Choropleth object to customize the palette used.
+Any customization outside the optional parameters presented above will require you to create a `StateChoropleth` object.  choroplethr uses [R6](https://r6.r-lib.org/index.html) to take advantage of object-oriented programming.  Here is an example of using the `ggplot2_scale` variable on the base Choropleth object to customize the palette used.
 
 This dataset is the 2012 US Presidential Election results. Normally in this map Democratic states appear blue and Republican states appear red.
 
@@ -68,7 +68,7 @@ choro$render()
 
 For additional options on the `StateChoropleth` object, such as removing the state labels, please see the choroplethr [source code](https://github.com/arilamstein/choroplethr).
 
-**Note:** Care must be taken when manually setting the scale on `StateChoropleth` objects. In particular, choroplethr uses ggplot2 custom annotations to render Alaska and Hawaii as insets. This means that the scales of the insets and the main map will only be the same if you do the following
+**Note:** Care must be taken when manually setting the scale on `StateChoropleth` objects. In particular, choroplethr uses ggplot2 custom annotations to render Alaska and Hawaii as insets. This means that the scales of the insets and the main map will only be the same if you do the following:
 
 1. for discrete scales, pass `drop=FALSE` to the scale (as above).
 2. for continuous scales, pass `limits` which encompass the minimum and maximum values for the entire dataset.

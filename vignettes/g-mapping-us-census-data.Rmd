@@ -1,26 +1,26 @@
 <!--
   %\VignetteEngine{knitr}
-%\VignetteIndexEntry{e) Mapping Census Data}
+%\VignetteIndexEntry{g) Mapping Census Data}
 -->
   
 Mapping US Census Data
 ========================================================
   
-choroplethr provides native support for creating choropleths from US Census data. Note that the Census Bureau has many datasets; currently choroplethr only works with data from the [American Community Survey (ACS)](https://www.census.gov/programs-surveys/acs/). Internally it uses the acs package to get the data.  
+choroplethr provides native support for creating choropleths from US Census data. Note that the Census Bureau has many datasets; currently choroplethr only works with data from the American Community Survey (ACS). Below is an overview of Choroplethr's functionality for working with ACS data. To learn more please take the free course [Mapping Census Bureau Data in R with Choroplethr](https://www.census.gov/data/academy/courses/choroplethr.html). 
 
-choroplethr has four functions for working with ACS data:
+Choroplethr has three functions for working with ACS data:
 
 1. `?get_acs_data`
-1. `?state_choroplethr_acs` 
-2. `?county_choropleth_acs`
+2. `?state_choroplethr_acs` 
+3. `?county_choropleth_acs`
 
 ## Census API Key
 
 To use these functions you must get and install a Census API. It is free and you can get one [here](http://api.census.gov/data/key_signup.html). Then type the following from R:
 
 ```
-library(acs); 
-api.key.install('<your census api key>');
+library(acs)
+api.key.install('<your census api key>')
 ```
 
 Note that the Census API currently only provides ACS data from 2010 onwards.
