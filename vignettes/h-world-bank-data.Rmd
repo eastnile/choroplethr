@@ -1,5 +1,5 @@
 <!--
-%\VignetteEngine{knitr}
+%\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{h) Mapping World Bank Data}
 -->
 
