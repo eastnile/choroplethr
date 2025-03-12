@@ -30,11 +30,38 @@ if (base::getRversion() >= "2.15.1") {
 #' # continuous scale, zooming in on New York, New Jersey and Connecticut
 #' state_choropleth_acs("B19301", num_colors=1, zoom=c("new york", "new jersey", "connecticut"))
 #' }
-#' @importFrom acs acs.fetch geography estimate geo.make
-state_choropleth_acs = function(tableId, endyear=2011, span=5, num_colors=7, zoom=NULL)
+#' @importFrom tidycensus load_variables get_acs
+state_choropleth_acs = function(tableId, variable = NULL, endyear=2011, span=5, num_colors=7, 
+                                zoom = NULL, title = NULL,
+                                census_api_key = NULL)
 {
-  acs.data = get_acs_data(tableId, "state", endyear, span)
-  state_choropleth(acs.data[['df']], acs.data[['title']], "", num_colors, zoom)
+  if (F) {
+    tableId = "C02003"
+    variable = 'C02003_018'
+    endyear = 2011
+    span = 5
+    map = ''
+    dataset = 'acs5'
+    num_colors = 5
+    zoom = NULL
+    title = NULL
+  }
+
+  acs_out = process_acs_request(tableId = tableId, variable = variable, 
+                                geography = 'state', year = endyear,
+                                span = span, census_api_key = census_api_key)
+  
+  if (is.null(title)) {
+    title = acs_out$map_title
+  } 
+  
+  # Subset for our map
+  df = acs_out$acs_data[, c('NAME', 'estimate')]
+  names(df) = c('region', 'value')
+  df$region = tolower(df$region)
+  df$value = as.numeric(df$value)
+  df = df[df$region != 'puerto rico', ]
+  state_choropleth(df = df, title = title, num_colors = num_colors, zoom = zoom)
 }
 
 #' Create a US County choropleth from ACS data
@@ -78,14 +105,44 @@ state_choropleth_acs = function(tableId, endyear=2011, span=5, num_colors=7, zoo
 #'   select(region)
 #' county_choropleth_acs("B19301", num_colors=1, county_zoom=nyc_county_fips$region)
 #' }
-#' @importFrom acs acs.fetch geography estimate geo.make
-county_choropleth_acs = function(tableId, endyear=2011, span=5, num_colors=7, state_zoom=NULL, county_zoom=NULL)
+#' @importFrom tidycensus load_variables get_acs
+county_choropleth_acs = function(tableId, variable = NULL, endyear=2011, span=5, 
+                                 num_colors=7, state_zoom=NULL, county_zoom=NULL, census_api_key = NULL)
 {
-  acs.data = get_acs_data(tableId, "county", endyear, span)
-  county_choropleth(acs.data[['df']], acs.data[['title']], "", num_colors, state_zoom, county_zoom)
+  
+  if (F) {
+    tableId = "B19301"
+    variable = NULL
+    endyear = 2011
+    span = 5
+    map = ''
+    dataset = 'acs5'
+    num_colors = 5
+    county_zoom = NULL
+    title = NULL
+  }
+  
+  acs_out = process_acs_request(tableId = tableId, variable = variable, 
+                                geography = 'county', year = endyear,
+                                span = span, census_api_key = census_api_key)
+  
+  if (is.null(title)) {
+    title = acs_out$map_title
+  } 
+  
+  # Subset for our map
+  df = acs_out$acs_data
+  df$GEOID = as.numeric(df$GEOID)
+  df = df[, c('GEOID', 'estimate')]
+  names(df) = c('region', 'value')
+  df$value = as.numeric(df$value)
+  county_choropleth(df = df, title = title, num_colors = num_colors, county_zoom = county_zoom)
 }
 
+
+
 #' Returns a list representing American Community Survey (ACS) estimates
+#' #' THIS FUNCTION IS DEPRECIATED; USE TIDYCENSUS TO QUERY ACS DATA INSTEAD
 #'
 #' Given a map, ACS tableId, endyear and span. Prompts user for the column id if there 
 #' are multiple tables. The first element of the list is a data.frame with estimates. 
@@ -103,7 +160,6 @@ county_choropleth_acs = function(tableId, endyear=2011, span=5, num_colors=7, st
 #' @param include_moe Whether to include the 90 percent margin of error. 
 #' @export
 #' @seealso http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS, which lists all ACS Surveys.
-#' @importFrom acs acs.fetch geography estimate geo.make
 #' @examples
 #' \dontrun{
 #' library(Hmisc) # for cut2
@@ -119,6 +175,7 @@ county_choropleth_acs = function(tableId, endyear=2011, span=5, num_colors=7, st
 #' }
 get_acs_data = function(tableId, map, endyear=2012, span=5, column_idx=-1, include_moe=FALSE)
 {
+  warning('This function is depreciated; please use tidycensus to query ACS data instead.')
   acs.data   = acs.fetch(geography=make_geo(map), table.number = tableId, col.names = "pretty", endyear = endyear, span = span)
   if (column_idx == -1) {
     column_idx = get_column_idx(acs.data, tableId) # some tables have multiple columns 
@@ -128,8 +185,10 @@ get_acs_data = function(tableId, map, endyear=2012, span=5, column_idx=-1, inclu
   list(df=df, title=title) # need to return 2 values here
 }
 
+# DEPRECIATED 
 get_tract_acs_data = function(tracts, tableId, endyear=2012, span=5, column_idx=-1, include_moe=FALSE)
 {
+  warning('This function is depreciated; please use tidycensus to query ACS data instead.')
   acs.data = acs.fetch(geography    = tracts, 
                        table.number = tableId,
                        col.names    = "pretty", 
@@ -144,6 +203,7 @@ get_tract_acs_data = function(tracts, tableId, endyear=2012, span=5, column_idx=
   list(df=df, title=title) # need to return 2 values here
 }
 
+# DEPRECIATED 
 # support multiple column tables
 #' @importFrom utils menu
 get_column_idx = function(acs.data, tableId)
@@ -158,6 +218,7 @@ get_column_idx = function(acs.data, tableId)
   column_idx
 }
 
+# DEPRECIATED
 make_geo = function(map)
 {
   stopifnot(map %in% c("state", "county", "zip"))
@@ -170,13 +231,14 @@ make_geo = function(map)
   }
 }
 
+# DEPRECIATED
 # the acs package returns data as a custom S4 object. But we need the data as a data.frame.
 # this is tricky for a few reasons. one of which is that acs.data is an S4 object.
 # another is that each map (state, county and zip) has a different naming convention for regions
 # another is that the census data needs to be clipped to the map (e.g. remove puerto rico)
-#' @importFrom acs standard.error
 convert_acs_obj_to_df = function(map, acs.data, column_idx, include_moe) 
 {
+  warning('This function is depreciated; please use tidycensus to query ACS data instead.')
   stopifnot(map %in% c("state", "county", "zip", "tract"))
   
   if (map == "state") {
@@ -265,3 +327,56 @@ convert_acs_obj_to_df = function(map, acs.data, column_idx, include_moe)
   }
   
 }
+
+
+process_acs_request = function(tableId, variable, geography, year, span, census_api_key) {
+  if (F) {
+    tableId = "C02003"
+    variable = 'C02003_018'
+    year = 2011
+    span = 5
+    geography = 'state'
+    dataset = 'acs5'
+  }
+  
+  if (length(tableId) > 1| length(variable) > 1) {
+    stop('Only a single tableId or variable can be requested at one time.')
+  }
+  
+  span_lookup = c('1' = 'acs1', '3' = 'acs3', '5' = 'acs5')
+  dataset = span_lookup[as.character(span)]
+  allvars = tidycensus::load_variables(year = year, dataset = dataset, cache = T)
+  
+  # Case 1: User specifies variable but not tableId
+  if (is.null(tableId) & !is.null(variable)) { 
+    if(!variable %in% allvars$name) {
+      stop(paste0('The requested variable was not found in the ', dataset, ' dataset.'))
+    } 
+    acs_df = as.data.frame(tidycensus::get_acs(geography = "state", variable = variable, year = 2012, cache_table = F))
+  }
+  
+  # Case 2: User specifies tableId
+  if (!is.null(tableId)) { 
+    acs_df = as.data.frame(tidycensus::get_acs(geography = geography, table = tableId, year = year, cache_table = F))
+    table_varnames = unique(acs_df$variable)
+    # If user also specifies a variable, check that the variable is actually inside the table.
+    if (!is.null(variable)) { 
+      if (!variable %in% table_varnames) {
+        stop(paste0('The requested variable name was not found in the requested acs_table. The requested table contains the following variables: ', paste0(table_varnames, collapse = ', ')))
+      }
+    } else { # If no variable is specified, insist that that table only has a single variable.
+      if (length(table_varnames) > 1) {
+        stop(paste0('The requested table contains more than one variable; please specify the desired variable. The variables available in the table are: ', paste0(table_varnames, collapse = ', ')))
+      }
+      variable = table_varnames
+    }
+  }
+  stopifnot(c('GEOID', 'NAME', 'variable', 'estimate') %in% names(acs_df))
+  acs_df = acs_df[acs_df$variable == variable,]
+  var_label = allvars[allvars$name == 'C02003_001', 'label'][[1]]
+  var_label = gsub('!!', ' ', var_label)
+  var_concept = allvars[allvars$name == 'C02003_001', 'concept'][[1]]
+  map_title = paste(var_concept, var_label)
+  return(list(acs_data = acs_df, map_title = map_title))
+}
+

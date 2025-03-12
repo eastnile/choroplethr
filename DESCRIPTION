@@ -39,7 +39,7 @@ Suggests:
     choroplethrAdmin1 (>= 1.1.0),
 Depends:
     R (>= 3.5.0),
-    acs
+    tidycensus
 Collate: 
     'acs.R'
     'choropleth.R'
@@ -61,5 +61,5 @@ Collate:
     'state.R'
     'tract.R'
     'utils.R'
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Encoding: UTF-8

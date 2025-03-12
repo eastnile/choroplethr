@@ -31,6 +31,15 @@ if (base::getRversion() >= "2.15.1") {
 #' }
 get_state_demographics = function(endyear=2013, span=5)
 {  
+  span_lookup = c('1' = 'acs1', '3' = 'acs3', '5' = 'acs5')
+  dataset = span_lookup[as.character(span)]
+  allvars = load_variables(year = 2013, dataset = 'acs5')
+  
+  acs_df = get_acs(geography = 'state', variable = 'B00001_001', year = endyear, dataset = dataset)
+
+  ### NOT FINISHED
+  allvars[allvars$name =='B03002_001',]
+  
   state_geo = acs::geo.make(state = "*")
   race.data = acs::acs.fetch(geography    = state_geo, 
                              table.number = "B03002", 

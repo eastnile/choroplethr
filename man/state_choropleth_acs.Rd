@@ -6,10 +6,13 @@
 \usage{
 state_choropleth_acs(
   tableId,
+  variable = NULL,
   endyear = 2011,
   span = 5,
   num_colors = 7,
-  zoom = NULL
+  zoom = NULL,
+  title = NULL,
+  census_api_key = NULL
 )
 }
 \arguments{

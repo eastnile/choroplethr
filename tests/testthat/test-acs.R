@@ -1,3 +1,4 @@
+library(testthat)
 context("test the vaious _acs functions")
 
 # "B19301" is table for median income
