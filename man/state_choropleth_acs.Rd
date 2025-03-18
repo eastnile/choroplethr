@@ -5,52 +5,44 @@
 \title{Create a US State choropleth from ACS data}
 \usage{
 state_choropleth_acs(
-  tableId,
-  variable = NULL,
-  endyear = 2011,
+  variable,
+  tableId = NULL,
+  endyear = NULL,
   span = 5,
-  num_colors = 7,
-  zoom = NULL,
   title = NULL,
-  census_api_key = NULL
+  census_api_key = NULL,
+  ...
 )
 }
 \arguments{
-\item{tableId}{The id of an ACS table}
+\item{variable}{The variable you wish to plot. A list of available census 
+variables can be obtained using tidycensus::load_variables()}
 
-\item{endyear}{The end year of the survey to use.  See acs.fetch (?acs.fetch) and http://1.usa.gov/1geFSSj for details.}
+\item{tableId}{Alternatively, you may specify the ACS table you wish to plot. 
+If the table has more than one variable inside it, you must also specify the 
+variable you wish to plot.}
 
-\item{span}{The span of time to use.  See acs.fetch and http://1.usa.gov/1geFSSj for details.}
+\item{endyear}{The end year of the survey to use.}
 
-\item{num_colors}{The number of colors on the map. A value of 1 
-will use a continuous scale. A value in [2, 9] will use that many colors.}
+\item{span}{Either 1, 3, or 5, the ACS vintage you wish to use.}
 
-\item{zoom}{An optional list of states to zoom in on. Must come from the "name" column in
-?state.regions.}
+\item{title}{A title for the plot; if not specified, a title will assigned based on the variable.}
+
+\item{census_api_key}{Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html}
+
+\item{...}{Other arguments passed to state_choropleth; see ?state_choropleth()}
 }
 \value{
 A choropleth.
 }
 \description{
-Creates a choropleth of US States using the US Census' American Community Survey (ACS) data.  
-Requires the acs package to be installed, and a Census API Key to be set with 
-the acs's api.key.install function.  Census API keys can be obtained at http://www.census.gov/developers/tos/key_request.html.
+Creates a choropleth of US counties using the US Census' American Community Survey (ACS) data.  
+Requires the tidycensus package to be installed.
 }
 \examples{
 \dontrun{
-# median income, default parameters
-state_choropleth_acs("B19301")
+# Create a state choropleth for median household income*zooming in on New York, New Jersey and Connecticut
+state_choropleth_acs(variable = "B19013_001", endyear = 2011, num_colors=1, zoom=c("new york", "new jersey", "connecticut"))
+}
 
-# continuous scale, zooming in on New York, New Jersey and Connecticut
-state_choropleth_acs("B19301", num_colors=1, zoom=c("new york", "new jersey", "connecticut"))
-}
-}
-\references{
-Uses the acs package created by Ezra Haber Glenn.
-}
-\seealso{
-\code{api.key.install} in the acs package which sets an Census API key for the acs library
-
-http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS 
-which contains a list of all ACS surveys.
 }

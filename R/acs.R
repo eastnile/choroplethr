@@ -4,50 +4,34 @@ if (base::getRversion() >= "2.15.1") {
 
 #' Create a US State choropleth from ACS data
 #' 
-#' Creates a choropleth of US States using the US Census' American Community Survey (ACS) data.  
-#' Requires the acs package to be installed, and a Census API Key to be set with 
-#' the acs's api.key.install function.  Census API keys can be obtained at http://www.census.gov/developers/tos/key_request.html.
-#'
-#' @param tableId The id of an ACS table
-#' @param endyear The end year of the survey to use.  See acs.fetch (?acs.fetch) and http://1.usa.gov/1geFSSj for details.
-#' @param span The span of time to use.  See acs.fetch and http://1.usa.gov/1geFSSj for details.
-#' @param num_colors The number of colors on the map. A value of 1 
-#' will use a continuous scale. A value in [2, 9] will use that many colors. 
-#' @param zoom An optional list of states to zoom in on. Must come from the "name" column in
-#' ?state.regions.
+#' Creates a choropleth of US counties using the US Census' American Community Survey (ACS) data.  
+#' Requires the tidycensus package to be installed.
+#' @param variable The variable you wish to plot. A list of available census 
+#' variables can be obtained using tidycensus::load_variables()
+#' @param tableId Alternatively, you may specify the ACS table you wish to plot. 
+#' If the table has more than one variable inside it, you must also specify the 
+#' variable you wish to plot.
+#' @param endyear The end year of the survey to use.
+#' @param span Either 1, 3, or 5, the ACS vintage you wish to use.
+#' @param title A title for the plot; if not specified, a title will assigned based on the variable.
+#' @param census_api_key Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html
+#' @param ... Other arguments passed to state_choropleth; see ?state_choropleth()
 #' @return A choropleth.
-#' 
-#' @seealso \code{api.key.install} in the acs package which sets an Census API key for the acs library
-#' @seealso http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS 
-#' which contains a list of all ACS surveys.
-#' @references Uses the acs package created by Ezra Haber Glenn.
+
 #' @export
 #' @examples
 #' \dontrun{
-#' # median income, default parameters
-#' state_choropleth_acs("B19301")
-#' 
-#' # continuous scale, zooming in on New York, New Jersey and Connecticut
-#' state_choropleth_acs("B19301", num_colors=1, zoom=c("new york", "new jersey", "connecticut"))
-#' }
+#' # Create a state choropleth for median household income*zooming in on New York, New Jersey and Connecticut
+#'state_choropleth_acs(variable = "B19013_001", endyear = 2011, num_colors=1, 
+#'zoom=c("new york", "new jersey", "connecticut"))
+#'}
+#'
 #' @importFrom tidycensus load_variables get_acs
-state_choropleth_acs = function(tableId, variable = NULL, endyear=2011, span=5, num_colors=7, 
-                                zoom = NULL, title = NULL,
-                                census_api_key = NULL)
+state_choropleth_acs = function(variable, tableId = NULL, endyear=NULL, span=5, title = NULL, 
+                                census_api_key = NULL,
+                                ...)
 {
-  if (F) {
-    tableId = "C02003"
-    variable = 'C02003_018'
-    endyear = 2011
-    span = 5
-    map = ''
-    dataset = 'acs5'
-    num_colors = 5
-    zoom = NULL
-    title = NULL
-  }
-
-  acs_out = process_acs_request(tableId = tableId, variable = variable, 
+  acs_out = process_acs_request(variable = variable, tableId = tableId, 
                                 geography = 'state', year = endyear,
                                 span = span, census_api_key = census_api_key)
   
@@ -61,68 +45,39 @@ state_choropleth_acs = function(tableId, variable = NULL, endyear=2011, span=5, 
   df$region = tolower(df$region)
   df$value = as.numeric(df$value)
   df = df[df$region != 'puerto rico', ]
-  state_choropleth(df = df, title = title, num_colors = num_colors, zoom = zoom)
+  state_choropleth(df = df, title = title, ...)
 }
 
 #' Create a US County choropleth from ACS data
 #' 
-#' Creates a US County choropleth using the US Census' American Community Survey (ACS) data.  
-#' Requires the acs package to be installed, and a Census API Key to be set with 
-#' the acs's api.key.install function.  Census API keys can be obtained at http://www.census.gov/developers/tos/key_request.html.
-#'
-#' @param tableId The id of an ACS table
-#' @param endyear The end year of the survey to use.  See acs.fetch (?acs.fetch) and http://1.usa.gov/1geFSSj for details.
-#' @param span The span of time to use.  See acs.fetch and http://1.usa.gov/1geFSSj for details.
-#' @param num_colors The number of colors on the map. A value of 1 
-#' will use a continuous scale. A value in [2, 9] will use that many colors. 
-#' @param state_zoom An optional vector of states to zoom in on. Elements of this vector must exactly 
-#' match the names of states as they appear in the "region" column of ?state.regions.
-#' @param county_zoom An optional vector of counties to zoom in on. Elements of this vector must exactly 
-#' match the names of counties as they appear in the "region" column of ?county.regions.
+#' Creates a choropleth of US States using the US Census' American Community Survey (ACS) data.  
+#' Requires the tidycensus package to be installed.
+#' @param variable The variable you wish to plot. A list of available census 
+#' variables can be obtained using tidycensus::load_variables()
+#' @param tableId Alternatively, you may specify the ACS table you wish to plot. 
+#' If the table has more than one variable inside it, you must also specify the 
+#' variable you wish to plot.
+#' @param endyear The end year of the survey to use.
+#' @param span Either 1, 3, or 5, the ACS vintage you wish to use.
+#' @param title A title for the plot; if not specified, a title will assigned based on the variable.
+#' @param census_api_key Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html
+#' @param ... Other arguments passed to county_choropleth; see ?county_choropleth()
 #' @return A choropleth.
-#' 
-#' @seealso \code{api.key.install} in the acs package which sets an Census API key for the acs library
-#' @seealso http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS 
-#' which contains a list of all ACS surveys.
-#' @references Uses the acs package created by Ezra Haber Glenn.
+
 #' @export
 #' @examples
 #' \dontrun{
-#' # median income, all counties in US
-#' county_choropleth_acs("B19301")
-#' 
-#' # continuous scale, zooing in on all counties in New York, New Jersey and Connecticut
-#' county_choropleth_acs("B19301", num_colors=1, state_zoom=c("new york", "new jersey", "connecticut"))
-#' 
-#' # zooming in on the 5 counties (boroughs) that make up New York City
-#' library(dplyr)
-#' library(choroplethrMaps)
-#' data(county.regions)
-#'
-#' nyc_county_names=c("kings", "bronx", "new york", "queens", "richmond")
-#' nyc_county_fips = county.regions %>%
-#'   filter(state.name=="new york" & county.name %in% nyc_county_names) %>%
-#'   select(region)
-#' county_choropleth_acs("B19301", num_colors=1, county_zoom=nyc_county_fips$region)
+#' #  Median household income, zooming in on all counties in New York, New Jersey and Connecticut
+#' county_choropleth_acs(variable = "B19013_001", num_colors=1, 
+#' state_zoom=c("new york", "new jersey", "connecticut"))
 #' }
+#' 
+
 #' @importFrom tidycensus load_variables get_acs
-county_choropleth_acs = function(tableId, variable = NULL, endyear=2011, span=5, 
-                                 num_colors=7, state_zoom=NULL, county_zoom=NULL, census_api_key = NULL)
+county_choropleth_acs = function(variable = NULL, tableId = NULL, endyear=NULL, span=5, 
+                                 title = NULL, census_api_key = NULL, ...)
 {
-  
-  if (F) {
-    tableId = "B19301"
-    variable = NULL
-    endyear = 2011
-    span = 5
-    map = ''
-    dataset = 'acs5'
-    num_colors = 5
-    county_zoom = NULL
-    title = NULL
-  }
-  
-  acs_out = process_acs_request(tableId = tableId, variable = variable, 
+  acs_out = process_acs_request(variable = variable, tableId = tableId,
                                 geography = 'county', year = endyear,
                                 span = span, census_api_key = census_api_key)
   
@@ -136,13 +91,62 @@ county_choropleth_acs = function(tableId, variable = NULL, endyear=2011, span=5,
   df = df[, c('GEOID', 'estimate')]
   names(df) = c('region', 'value')
   df$value = as.numeric(df$value)
-  county_choropleth(df = df, title = title, num_colors = num_colors, county_zoom = county_zoom)
+  county_choropleth(df = df, title = title, ...)
+}
+
+
+process_acs_request = function(variable, tableId , geography, year, span, census_api_key) {
+  if (is.null(year)) {
+    stop('Must specify endyear')
+  }
+  if (is.null(tableId) & is.null(variable)) {
+    stop('Must specify either tableId or variable')
+  }
+  if (length(tableId) > 1| length(variable) > 1) {
+    stop('Only a single tableId or variable can be requested at one time.')
+  }
+  
+  span_lookup = c('1' = 'acs1', '3' = 'acs3', '5' = 'acs5')
+  dataset = span_lookup[as.character(span)]
+  allvars = tidycensus::load_variables(year = year, dataset = dataset, cache = T)
+  
+  # Case 1: User specifies variable but not tableId
+  if (is.null(tableId) & !is.null(variable)) { 
+    if(!variable %in% allvars$name) {
+      stop(paste0('The requested variable was not found in the ', dataset, ' dataset.'))
+    } 
+    acs_df = as.data.frame(tidycensus::get_acs(geography = geography, variable = variable, year = year, cache_table = F))
+  }
+  
+  # Case 2: User specifies tableId
+  if (!is.null(tableId)) { 
+    acs_df = as.data.frame(tidycensus::get_acs(geography = geography, table = tableId, year = year, cache_table = F))
+    table_varnames = unique(acs_df$variable)
+    # If user also specifies a variable, check that the variable is actually inside the table.
+    if (!is.null(variable)) { 
+      if (!variable %in% table_varnames) {
+        stop(paste0('The requested variable name was not found in the requested acs_table. The requested table contains the following variables: ', paste0(table_varnames, collapse = ', ')))
+      }
+    } else { # If no variable is specified, insist that that table only has a single variable.
+      if (length(table_varnames) > 1) {
+        stop(paste0('The requested table contains more than one variable; please specify the desired variable. The variables available in the table are: ', paste0(table_varnames, collapse = ', ')))
+      }
+      variable = table_varnames
+    }
+  }
+  stopifnot(c('GEOID', 'NAME', 'variable', 'estimate') %in% names(acs_df))
+  acs_df = acs_df[acs_df$variable == variable,]
+  var_label = allvars[allvars$name == variable, 'label'][[1]]
+  var_label = gsub('!!', ' ', var_label)
+  var_concept = allvars[allvars$name == variable, 'concept'][[1]]
+  map_title = paste(var_concept, var_label)
+  return(list(acs_data = acs_df, map_title = map_title))
 }
 
 
 
 #' Returns a list representing American Community Survey (ACS) estimates
-#' #' THIS FUNCTION IS DEPRECIATED; USE TIDYCENSUS TO QUERY ACS DATA INSTEAD
+#' THIS FUNCTION IS DEPRECIATED; USE TIDYCENSUS TO QUERY ACS DATA INSTEAD
 #'
 #' Given a map, ACS tableId, endyear and span. Prompts user for the column id if there 
 #' are multiple tables. The first element of the list is a data.frame with estimates. 
@@ -326,57 +330,5 @@ convert_acs_obj_to_df = function(map, acs.data, column_idx, include_moe)
     }
   }
   
-}
-
-
-process_acs_request = function(tableId, variable, geography, year, span, census_api_key) {
-  if (F) {
-    tableId = "C02003"
-    variable = 'C02003_018'
-    year = 2011
-    span = 5
-    geography = 'state'
-    dataset = 'acs5'
-  }
-  
-  if (length(tableId) > 1| length(variable) > 1) {
-    stop('Only a single tableId or variable can be requested at one time.')
-  }
-  
-  span_lookup = c('1' = 'acs1', '3' = 'acs3', '5' = 'acs5')
-  dataset = span_lookup[as.character(span)]
-  allvars = tidycensus::load_variables(year = year, dataset = dataset, cache = T)
-  
-  # Case 1: User specifies variable but not tableId
-  if (is.null(tableId) & !is.null(variable)) { 
-    if(!variable %in% allvars$name) {
-      stop(paste0('The requested variable was not found in the ', dataset, ' dataset.'))
-    } 
-    acs_df = as.data.frame(tidycensus::get_acs(geography = "state", variable = variable, year = 2012, cache_table = F))
-  }
-  
-  # Case 2: User specifies tableId
-  if (!is.null(tableId)) { 
-    acs_df = as.data.frame(tidycensus::get_acs(geography = geography, table = tableId, year = year, cache_table = F))
-    table_varnames = unique(acs_df$variable)
-    # If user also specifies a variable, check that the variable is actually inside the table.
-    if (!is.null(variable)) { 
-      if (!variable %in% table_varnames) {
-        stop(paste0('The requested variable name was not found in the requested acs_table. The requested table contains the following variables: ', paste0(table_varnames, collapse = ', ')))
-      }
-    } else { # If no variable is specified, insist that that table only has a single variable.
-      if (length(table_varnames) > 1) {
-        stop(paste0('The requested table contains more than one variable; please specify the desired variable. The variables available in the table are: ', paste0(table_varnames, collapse = ', ')))
-      }
-      variable = table_varnames
-    }
-  }
-  stopifnot(c('GEOID', 'NAME', 'variable', 'estimate') %in% names(acs_df))
-  acs_df = acs_df[acs_df$variable == variable,]
-  var_label = allvars[allvars$name == 'C02003_001', 'label'][[1]]
-  var_label = gsub('!!', ' ', var_label)
-  var_concept = allvars[allvars$name == 'C02003_001', 'concept'][[1]]
-  map_title = paste(var_concept, var_label)
-  return(list(acs_data = acs_df, map_title = map_title))
 }
 

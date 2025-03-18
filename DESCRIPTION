@@ -31,8 +31,7 @@ Imports:
     gridExtra,
     xml2,
     rvest,
-    tidyr,
-    tidycensus
+    tidyr
 Suggests:
     testthat,
     choroplethrMaps,
@@ -54,12 +53,10 @@ Collate:
     'data.R'
     'get_congress_116_party_data.R'
     'get_congressional_demographics.R'
-    'get_county_demographics.R'
-    'get_state_demograhpics.R'
-    'get_tract_demographics.R'
+    'get_usa_demographics.R'
     'startup_messages.R'
     'state.R'
     'tract.R'
     'utils.R'
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Encoding: UTF-8

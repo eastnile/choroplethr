@@ -3,7 +3,7 @@
 \name{get_acs_data}
 \alias{get_acs_data}
 \title{Returns a list representing American Community Survey (ACS) estimates
-#' THIS FUNCTION IS DEPRECIATED; USE TIDYCENSUS TO QUERY ACS DATA INSTEAD}
+THIS FUNCTION IS DEPRECIATED; USE TIDYCENSUS TO QUERY ACS DATA INSTEAD}
 \usage{
 get_acs_data(
   tableId,
