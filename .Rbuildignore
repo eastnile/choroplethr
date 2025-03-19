@@ -9,3 +9,4 @@ wiki-images
 ^cran-comments\.md$
 ^doc$
 ^Meta$
+^dev$
