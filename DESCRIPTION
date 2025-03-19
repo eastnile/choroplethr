@@ -8,13 +8,14 @@ Description: Choropleths are thematic maps where geographic regions, such as
     choropleths. 3. Providing a framework for creating choropleths from
     arbitrary shapefiles. 4. Overlaying those maps over reference maps from
     Google Maps. 
-Version: 3.7.3
+Version: 4.0.0
 Authors@R: c(
     person("Ari", "Lamstein", , "ari@lamsteinconsulting.com", c("aut", "cre")),
+    person("Zhaochen", "He", , "zhaochen.he@cnu.edu", role = "aut"),
     person("Brian", "Johnson", , role = "ctb"),
     person("Trulia, Inc.", role = c("cph"))
     )
-Maintainer: Ari Lamstein <ari@lamsteinconsulting.com>
+Maintainer: Zhaochen He <zhaocehn.he@cnu.edu>
 URL: www.choroplethr.com
 Copyright: Trulia, Inc.
 License: BSD_3_clause + file LICENSE
@@ -31,14 +32,14 @@ Imports:
     gridExtra,
     xml2,
     rvest,
-    tidyr
+    tidyr,
+    tidycensus
 Suggests:
     testthat,
     choroplethrMaps,
     choroplethrAdmin1 (>= 1.1.0),
 Depends:
-    R (>= 3.5.0),
-    tidycensus
+    R (>= 3.5.0)
 Collate: 
     'acs.R'
     'choropleth.R'

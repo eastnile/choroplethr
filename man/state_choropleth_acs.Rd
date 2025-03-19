@@ -5,9 +5,10 @@
 \title{Create a US State choropleth from ACS data}
 \usage{
 state_choropleth_acs(
-  variable,
+  variable = NULL,
   tableId = NULL,
-  endyear = NULL,
+  column_idx = NULL,
+  endyear,
   span = 5,
   title = NULL,
   census_api_key = NULL,
@@ -20,13 +21,15 @@ variables can be obtained using tidycensus::load_variables()}
 
 \item{tableId}{Alternatively, you may specify the ACS table you wish to plot. 
 If the table has more than one variable inside it, you must also specify the 
-variable you wish to plot.}
+index of the column you wish to plot.}
+
+\item{column_idx}{The index of the desired column within the table.}
 
 \item{endyear}{The end year of the survey to use.}
 
 \item{span}{Either 1, 3, or 5, the ACS vintage you wish to use.}
 
-\item{title}{A title for the plot; if not specified, a title will assigned based on the variable.}
+\item{title}{A title for the plot; if not specified, a title will be assigned based on the variable.}
 
 \item{census_api_key}{Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html}
 
@@ -36,13 +39,14 @@ variable you wish to plot.}
 A choropleth.
 }
 \description{
-Creates a choropleth of US counties using the US Census' American Community Survey (ACS) data.  
-Requires the tidycensus package to be installed.
+Creates a choropleth of US states using the US Census' American Community Survey (ACS) data.
 }
 \examples{
 \dontrun{
-# Create a state choropleth for median household income*zooming in on New York, New Jersey and Connecticut
-state_choropleth_acs(variable = "B19013_001", endyear = 2011, num_colors=1, zoom=c("new york", "new jersey", "connecticut"))
+# Create a state choropleth for median household income zooming in 
+on New York, New Jersey and Connecticut
+state_choropleth_acs(variable = "B19013_001", endyear = 2011, num_colors=1, 
+zoom=c("new york", "new jersey", "connecticut"))
 }
 
 }
