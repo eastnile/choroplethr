@@ -4,264 +4,167 @@ if (base::getRversion() >= "2.15.1") {
 
 #' Create a US State choropleth from ACS data
 #' 
-#' Creates a choropleth of US States using the US Census' American Community Survey (ACS) data.  
-#' Requires the acs package to be installed, and a Census API Key to be set with 
-#' the acs's api.key.install function.  Census API keys can be obtained at http://www.census.gov/developers/tos/key_request.html.
-#'
-#' @param tableId The id of an ACS table
-#' @param endyear The end year of the survey to use.  See acs.fetch (?acs.fetch) and http://1.usa.gov/1geFSSj for details.
-#' @param span The span of time to use.  See acs.fetch and http://1.usa.gov/1geFSSj for details.
-#' @param num_colors The number of colors on the map. A value of 1 
-#' will use a continuous scale. A value in [2, 9] will use that many colors. 
-#' @param zoom An optional list of states to zoom in on. Must come from the "name" column in
-#' ?state.regions.
+#' Creates a choropleth of US states using the US Census' American Community Survey (ACS) data.  
+#' @param variable The variable you wish to plot. A list of available census 
+#' variables can be obtained using tidycensus::load_variables()
+#' @param tableId Alternatively, you may specify the ACS table you wish to plot. 
+#' If the table has more than one variable inside it, you must also specify the 
+#' index of the column you wish to plot.
+#' @param column_idx The index of the desired column within the table.
+#' @param endyear The end year of the survey to use.
+#' @param span Either 1, 3, or 5, the ACS vintage you wish to use.
+#' @param title A title for the plot; if not specified, a title will be assigned based on the variable.
+#' @param census_api_key Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html
+#' @param ... Other arguments passed to state_choropleth; see ?state_choropleth()
 #' @return A choropleth.
-#' 
-#' @seealso \code{api.key.install} in the acs package which sets an Census API key for the acs library
-#' @seealso http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS 
-#' which contains a list of all ACS surveys.
-#' @references Uses the acs package created by Ezra Haber Glenn.
+
 #' @export
 #' @examples
 #' \dontrun{
-#' # median income, default parameters
-#' state_choropleth_acs("B19301")
-#' 
-#' # continuous scale, zooming in on New York, New Jersey and Connecticut
-#' state_choropleth_acs("B19301", num_colors=1, zoom=c("new york", "new jersey", "connecticut"))
-#' }
-#' @importFrom acs acs.fetch geography estimate geo.make
-state_choropleth_acs = function(tableId, endyear=2011, span=5, num_colors=7, zoom=NULL)
+#' # Create a state choropleth for median household income zooming in 
+#' on New York, New Jersey and Connecticut
+#' state_choropleth_acs(variable = "B19013_001", endyear = 2011, num_colors=1, 
+#' zoom=c("new york", "new jersey", "connecticut"))
+#'}
+#'
+#' @importFrom tidycensus load_variables get_acs
+state_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = NULL,
+                                endyear, span = 5, title = NULL, 
+                                census_api_key = NULL,
+                                ...)
 {
-  acs.data = get_acs_data(tableId, "state", endyear, span)
-  state_choropleth(acs.data[['df']], acs.data[['title']], "", num_colors, zoom)
+  acs_out = get_acs_data(variable = variable, tableId = tableId, column_idx = column_idx,
+                         map = 'state', endyear = endyear,
+                         span = span, census_api_key = census_api_key)
+  
+  if (is.null(title)) {
+    title = acs_out$title
+  } 
+  
+  # Subset for our map
+  df = acs_out$df[, c('NAME', 'estimate')]
+  names(df) = c('region', 'value')
+  df$region = tolower(df$region)
+  df$value = as.numeric(df$value)
+  df = df[df$region != 'puerto rico', ]
+  state_choropleth(df = df, title = title, ...)
 }
 
 #' Create a US County choropleth from ACS data
 #' 
-#' Creates a US County choropleth using the US Census' American Community Survey (ACS) data.  
-#' Requires the acs package to be installed, and a Census API Key to be set with 
-#' the acs's api.key.install function.  Census API keys can be obtained at http://www.census.gov/developers/tos/key_request.html.
-#'
-#' @param tableId The id of an ACS table
-#' @param endyear The end year of the survey to use.  See acs.fetch (?acs.fetch) and http://1.usa.gov/1geFSSj for details.
-#' @param span The span of time to use.  See acs.fetch and http://1.usa.gov/1geFSSj for details.
-#' @param num_colors The number of colors on the map. A value of 1 
-#' will use a continuous scale. A value in [2, 9] will use that many colors. 
-#' @param state_zoom An optional vector of states to zoom in on. Elements of this vector must exactly 
-#' match the names of states as they appear in the "region" column of ?state.regions.
-#' @param county_zoom An optional vector of counties to zoom in on. Elements of this vector must exactly 
-#' match the names of counties as they appear in the "region" column of ?county.regions.
+#' Creates a choropleth of US counties using the US Census' American Community Survey (ACS) data.  
+#' @param variable The variable you wish to plot. A list of available census 
+#' variables can be obtained using tidycensus::load_variables()
+#' @param tableId Alternatively, you may specify the ACS table you wish to plot. 
+#' If the table has more than one variable inside it, you must also specify the 
+#' index of the column you wish to plot.
+#' @param column_idx The index of the desired column within the table.
+#' @param endyear The end year of the survey to use.
+#' @param span Either 1, 3, or 5, the ACS vintage you wish to use.
+#' @param title A title for the plot; if not specified, a title will be assigned based on the variable.
+#' @param census_api_key Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html
+#' @param ... Other arguments passed to county_choropleth; see ?county_choropleth()
 #' @return A choropleth.
-#' 
-#' @seealso \code{api.key.install} in the acs package which sets an Census API key for the acs library
-#' @seealso http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS 
-#' which contains a list of all ACS surveys.
-#' @references Uses the acs package created by Ezra Haber Glenn.
+
 #' @export
 #' @examples
 #' \dontrun{
-#' # median income, all counties in US
-#' county_choropleth_acs("B19301")
-#' 
-#' # continuous scale, zooing in on all counties in New York, New Jersey and Connecticut
-#' county_choropleth_acs("B19301", num_colors=1, state_zoom=c("new york", "new jersey", "connecticut"))
-#' 
-#' # zooming in on the 5 counties (boroughs) that make up New York City
-#' library(dplyr)
-#' library(choroplethrMaps)
-#' data(county.regions)
-#'
-#' nyc_county_names=c("kings", "bronx", "new york", "queens", "richmond")
-#' nyc_county_fips = county.regions %>%
-#'   filter(state.name=="new york" & county.name %in% nyc_county_names) %>%
-#'   select(region)
-#' county_choropleth_acs("B19301", num_colors=1, county_zoom=nyc_county_fips$region)
+#' #  Median household income, zooming in on all counties in New York, New Jersey and Connecticut
+#' county_choropleth_acs(variable = "B19013_001", num_colors=1, 
+#' state_zoom=c("new york", "new jersey", "connecticut"))
 #' }
-#' @importFrom acs acs.fetch geography estimate geo.make
-county_choropleth_acs = function(tableId, endyear=2011, span=5, num_colors=7, state_zoom=NULL, county_zoom=NULL)
+#' @importFrom tidycensus load_variables get_acs
+county_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = NULL,
+                                 endyear, span = 5, title = NULL, 
+                                 census_api_key = NULL, ...)
 {
-  acs.data = get_acs_data(tableId, "county", endyear, span)
-  county_choropleth(acs.data[['df']], acs.data[['title']], "", num_colors, state_zoom, county_zoom)
+  acs_out = get_acs_data(variable = variable, tableId = tableId, column_idx = column_idx,
+                         map = 'county', endyear = endyear,
+                         span = span, census_api_key = census_api_key)
+  
+  if (is.null(title)) {
+    title = acs_out$title
+  } 
+  
+  # Subset for our map
+  df = acs_out$df
+  df$GEOID = as.numeric(df$GEOID)
+  df = df[, c('GEOID', 'estimate')]
+  names(df) = c('region', 'value')
+  df$value = as.numeric(df$value)
+  county_choropleth(df = df, title = title, ...)
 }
 
-#' Returns a list representing American Community Survey (ACS) estimates
-#'
-#' Given a map, ACS tableId, endyear and span. Prompts user for the column id if there 
-#' are multiple tables. The first element of the list is a data.frame with estimates. 
-#' The second element is the ACS title of the column.
-#' Requires the acs package to be installed, and a Census API Key to be set with the 
-#' acs's api.key.install function.  Census API keys can be obtained at http://api.census.gov/data/key_signup.html.
-#'
-#' @param tableId The id of an ACS table
-#' @param map The map you want to use. Must be one of "state", "county" or "zip".
-#' @param endyear The end year of the survey to use.  See acs.fetch (?acs.fetch) and http://1.usa.gov/1geFSSj for details.
-#' @param span The span of time to use.  See acs.fetch and http://1.usa.gov/1geFSSj for details.
-#' on the same longitude and latitude map to scale. This variable is only checked when the "states" variable is equal to all 50 states.
-#' @param column_idx The optional column id of the table to use. If not specified and the table has multiple columns,
-#' you will be prompted for a column id.
-#' @param include_moe Whether to include the 90 percent margin of error. 
+#' Use tidycensus to obtain the data needed to create a choropleth map.
+#' @param variable The variable you wish to plot. A list of available census 
+#' variables can be obtained using tidycensus::load_variables()
+#' @param tableId Alternatively, you may specify the ACS table you wish to plot. 
+#' If the table has more than one variable inside it, you must also specify the 
+#' index of the column you wish to plot.
+#' @param column_idx The index of the desired column within the table.
+#' @param endyear The end year of the survey to use.
+#' @param map The type map you wish to create; either 'state', 'county', 'zip', or 'tract'
+#' @param span Either 1, 3, or 5, the ACS vintage you wish to use.
+#' @param census_api_key Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html
+#' @param include_moe Whether to include the 90 percent margin of error.
 #' @export
-#' @seealso http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS, which lists all ACS Surveys.
-#' @importFrom acs acs.fetch geography estimate geo.make
-#' @examples
-#' \dontrun{
-#' library(Hmisc) # for cut2
-#' # States with greater than 1M residents
-#' df       = get_acs_data("B01003", "state")[[1]] # population
-#' df$value = cut2(df$value, cuts=c(0,1000000,Inf))
-#' state_choropleth(df, title="States with a population over 1M", legend="Population")
-#'
-#' # Counties with greater than or greater than 1M residents
-#' df       = get_acs_data("B01003", "county")[[1]] # population
-#' df$value = cut2(df$value, cuts=c(0,1000000,Inf))
-#' county_choropleth(df, title="Counties with a population over 1M", legend="Population")
-#' }
-get_acs_data = function(tableId, map, endyear=2012, span=5, column_idx=-1, include_moe=FALSE)
-{
-  acs.data   = acs.fetch(geography=make_geo(map), table.number = tableId, col.names = "pretty", endyear = endyear, span = span)
-  if (column_idx == -1) {
-    column_idx = get_column_idx(acs.data, tableId) # some tables have multiple columns 
-  }
-  title      = acs.data@acs.colnames[column_idx] 
-  df         = convert_acs_obj_to_df(map, acs.data, column_idx, include_moe) # choroplethr requires a df
-  list(df=df, title=title) # need to return 2 values here
-}
+#' @importFrom tidycensus load_variables get_acs
+get_acs_data = function(variable = NULL, tableId = NULL, column_idx = NULL, 
+                        map, endyear, span, census_api_key, include_moe = FALSE) {
 
-get_tract_acs_data = function(tracts, tableId, endyear=2012, span=5, column_idx=-1, include_moe=FALSE)
-{
-  acs.data = acs.fetch(geography    = tracts, 
-                       table.number = tableId,
-                       col.names    = "pretty", 
-                       endyear      = endyear, 
-                       span         = span)
+  if (is.null(tableId) & is.null(variable)) {
+    stop('Must specify either tableId or variable')
+  }
   
-  if (column_idx == -1) {
-    column_idx = get_column_idx(acs.data, tableId) # some tables have multiple columns 
+  if (!is.null(tableId) & !is.null(variable)) {
+    stop('Must specify either tableId or variable but not both')
   }
-  title      = acs.data@acs.colnames[column_idx] 
-  df         = convert_acs_obj_to_df("tract", acs.data, column_idx, include_moe) # choroplethr requires a df
-  list(df=df, title=title) # need to return 2 values here
-}
-
-# support multiple column tables
-#' @importFrom utils menu
-get_column_idx = function(acs.data, tableId)
-{
-  column_idx = 1
-  if (length(acs.data@acs.colnames) > 1)
-  {
-    num_cols   = length(acs.data@acs.colnames)
-    title      = paste0("Table ", tableId, " has ", num_cols, " columns.  Please choose which column to render:")
-    column_idx = menu(acs.data@acs.colnames, title=title)
-  }
-  column_idx
-}
-
-make_geo = function(map)
-{
-  stopifnot(map %in% c("state", "county", "zip"))
-  if (map == "state") {
-    geo.make(state = "*")
-  } else if (map == "county") {
-    geo.make(state = "*", county = "*")
-  } else {
-    geo.make(zip.code = "*")
-  }
-}
-
-# the acs package returns data as a custom S4 object. But we need the data as a data.frame.
-# this is tricky for a few reasons. one of which is that acs.data is an S4 object.
-# another is that each map (state, county and zip) has a different naming convention for regions
-# another is that the census data needs to be clipped to the map (e.g. remove puerto rico)
-#' @importFrom acs standard.error
-convert_acs_obj_to_df = function(map, acs.data, column_idx, include_moe) 
-{
-  stopifnot(map %in% c("state", "county", "zip", "tract"))
   
-  if (map == "state") {
-    # create a data.frame of (region, value) pairs
-    region = tolower(geography(acs.data)$NAME) 
-    region = as.character(region)
-    value  = as.numeric(estimate(acs.data[, column_idx]))
-    df     = data.frame(region = region, value = value)
-    
-    if (include_moe)
-    {
-      df$margin.of.error = 1.645 * as.numeric(standard.error(acs.data[, column_idx])) 
-    }
-    
-    # subset for our map
-    df[df$region != "puerto rico", ]
-
-  } else if (map == "county") {
-    # create a data.frame of (region, value) pairs
-    # create fips code
-    region = paste(as.character(acs.data@geography$state), 
-                   acs.data@geography$county, 
-                   sep = "")
-    region = as.numeric(region)
-    value  = as.numeric(estimate(acs.data[, column_idx]))
-    df     = data.frame(region = region, value = value)
-    
-    if (include_moe)
-    {
-      df$margin.of.error = 1.645 * as.numeric(standard.error(acs.data[, column_idx])) 
-    }
-    
-    # remove state fips code 72, which is Puerto Rico, which we don't map
-    df[df$region < 72000 | df$region > 72999, ]  
-    
-  } else if (map == "zip") {
-    # create a data.frame of (region, value) pairs
-    region = geography(acs.data)$zipcodetabulationarea
-    region = as.character(region)
-    value  = as.numeric(estimate(acs.data[, column_idx]))
-    df     = data.frame(region = region, value = value)
-    
-    if (include_moe)
-    {
-      df$margin.of.error = 1.645 * as.numeric(standard.error(acs.data[, column_idx])) 
-    }
-
-    # clipping is done in the choroplethrZip package, because that's where the region definitions are
-    df
-  } else if (map == "tract") {
-    df = data.frame(state  = geography(acs.data)$state,   # integer
-                    county = geography(acs.data)$county,  # integer
-                    tract  = geography(acs.data)$tract,   # character
-                    value  = as.numeric(estimate(acs.data[,column_idx])))
-    
-    if (include_moe)
-    {
-      df$margin.of.error = 1.645 * as.numeric(standard.error(acs.data[, column_idx])) 
-    }    
-    
-    # county fips code must be 5 chars
-    # 2 chars for the state (i.e. leading "0")
-    df$state = as.character(df$state)
-    df$state = paste0("0", df$state)
-    # 3 chars for the county - i.e. leading "0" or leading "00"
-    df$county = as.character(df$county)
-    for (i in 1:nrow(df))
-    {
-      if (nchar(df[i, "county"]) == 1) {
-        df[i, "county"] = paste0("00", df[i, "county"])
-      } else if (nchar(df[i, "county"]) == 2) {
-        df[i, "county"] = paste0("0", df[i, "county"])
-      }
+  if (length(tableId) > 1 | length(variable) > 1) {
+    stop('Only a single tableId or variable can be requested at one time.')
+  }
+  
+  span_lookup = c('1' = 'acs1', '3' = 'acs3', '5' = 'acs5')
+  dataset = span_lookup[as.character(span)]
+  allvars = as.data.frame(tidycensus::load_variables(year = endyear, dataset = dataset, cache = TRUE))
+  
+  # Case 1: User specifies variable
+  if (!is.null(variable)) { 
+    if(!variable %in% allvars$name) {
+      stop(paste0('The requested variable was not found in the ', dataset, ' dataset.'))
     } 
-    
-    # now concat with the tract id
-    df$region = paste0(df$state, df$county, df$tract)
-    
-    # only include relevant columns
-    if (include_moe)
-    {
-      df[, c("region", "value", "margin.of.error")] # only return (region, value) pairs
-    } else {
-      df[, c("region", "value")]
-    }
+    acs_df = as.data.frame(tidycensus::get_acs(geography = map, variable = variable, year = endyear, cache_table = FALSE))
   }
   
+  # Case 2: User specifies tableId
+  if (!is.null(tableId)) { 
+    acs_df = as.data.frame(tidycensus::get_acs(geography = map, table = tableId, year = endyear, cache_table = FALSE))
+    table_varnames = unique(acs_df$variable)
+    nvar = length(table_varnames)
+    # If user specifies column_idx, use this column assuming it exists.
+    if (!is.null(column_idx)) {
+      if (column_idx <= nvar) {
+        variable = table_varnames[column_idx]
+      } else {
+        stop(paste0('Column ', column_idx, ' was requested but the table only contains ', nvar, ' columns.'))
+      }
+    # If no column is specified, insist that that table only has a single variable.
+    } else {
+      if (length(table_varnames) > 1) {
+        stop('The requested table contains more than one column; please specify the desired column with column_idx.')
+      } 
+      variable = table_varnames
+    }
+  }
+  stopifnot(c('GEOID', 'NAME', 'variable', 'estimate') %in% names(acs_df))
+  acs_df = acs_df[acs_df$variable == variable,]
+  if(!include_moe & !is.null(acs_df$moe)) {
+    acs_df$moe = NULL
+  }
+  var_label = allvars[allvars$name == variable, 'label'][[1]]
+  var_label = gsub('!!', ' ', var_label)
+  var_concept = allvars[allvars$name == variable, 'concept'][[1]]
+  map_title = paste(var_concept, var_label)
+  return(list(df = acs_df, title = map_title))
 }
+

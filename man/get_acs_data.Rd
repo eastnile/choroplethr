@@ -2,53 +2,39 @@
 % Please edit documentation in R/acs.R
 \name{get_acs_data}
 \alias{get_acs_data}
-\title{Returns a list representing American Community Survey (ACS) estimates}
+\title{Use tidycensus to obtain the data needed to create a choropleth map.}
 \usage{
 get_acs_data(
-  tableId,
+  variable = NULL,
+  tableId = NULL,
+  column_idx = NULL,
   map,
-  endyear = 2012,
-  span = 5,
-  column_idx = -1,
+  endyear,
+  span,
+  census_api_key,
   include_moe = FALSE
 )
 }
 \arguments{
-\item{tableId}{The id of an ACS table}
+\item{variable}{The variable you wish to plot. A list of available census 
+variables can be obtained using tidycensus::load_variables()}
 
-\item{map}{The map you want to use. Must be one of "state", "county" or "zip".}
+\item{tableId}{Alternatively, you may specify the ACS table you wish to plot. 
+If the table has more than one variable inside it, you must also specify the 
+index of the column you wish to plot.}
 
-\item{endyear}{The end year of the survey to use.  See acs.fetch (?acs.fetch) and http://1.usa.gov/1geFSSj for details.}
+\item{column_idx}{The index of the desired column within the table.}
 
-\item{span}{The span of time to use.  See acs.fetch and http://1.usa.gov/1geFSSj for details.
-on the same longitude and latitude map to scale. This variable is only checked when the "states" variable is equal to all 50 states.}
+\item{map}{The type map you wish to create; either 'state', 'county', 'zip', or 'tract'}
 
-\item{column_idx}{The optional column id of the table to use. If not specified and the table has multiple columns,
-you will be prompted for a column id.}
+\item{endyear}{The end year of the survey to use.}
+
+\item{span}{Either 1, 3, or 5, the ACS vintage you wish to use.}
+
+\item{census_api_key}{Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html}
 
 \item{include_moe}{Whether to include the 90 percent margin of error.}
 }
 \description{
-Given a map, ACS tableId, endyear and span. Prompts user for the column id if there 
-are multiple tables. The first element of the list is a data.frame with estimates. 
-The second element is the ACS title of the column.
-Requires the acs package to be installed, and a Census API Key to be set with the 
-acs's api.key.install function.  Census API keys can be obtained at http://api.census.gov/data/key_signup.html.
-}
-\examples{
-\dontrun{
-library(Hmisc) # for cut2
-# States with greater than 1M residents
-df       = get_acs_data("B01003", "state")[[1]] # population
-df$value = cut2(df$value, cuts=c(0,1000000,Inf))
-state_choropleth(df, title="States with a population over 1M", legend="Population")
-
-# Counties with greater than or greater than 1M residents
-df       = get_acs_data("B01003", "county")[[1]] # population
-df$value = cut2(df$value, cuts=c(0,1000000,Inf))
-county_choropleth(df, title="Counties with a population over 1M", legend="Population")
-}
-}
-\seealso{
-http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS, which lists all ACS Surveys.
+Use tidycensus to obtain the data needed to create a choropleth map.
 }

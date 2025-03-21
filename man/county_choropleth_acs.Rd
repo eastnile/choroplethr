@@ -5,64 +5,46 @@
 \title{Create a US County choropleth from ACS data}
 \usage{
 county_choropleth_acs(
-  tableId,
-  endyear = 2011,
+  variable = NULL,
+  tableId = NULL,
+  column_idx = NULL,
+  endyear,
   span = 5,
-  num_colors = 7,
-  state_zoom = NULL,
-  county_zoom = NULL
+  title = NULL,
+  census_api_key = NULL,
+  ...
 )
 }
 \arguments{
-\item{tableId}{The id of an ACS table}
+\item{variable}{The variable you wish to plot. A list of available census 
+variables can be obtained using tidycensus::load_variables()}
 
-\item{endyear}{The end year of the survey to use.  See acs.fetch (?acs.fetch) and http://1.usa.gov/1geFSSj for details.}
+\item{tableId}{Alternatively, you may specify the ACS table you wish to plot. 
+If the table has more than one variable inside it, you must also specify the 
+index of the column you wish to plot.}
 
-\item{span}{The span of time to use.  See acs.fetch and http://1.usa.gov/1geFSSj for details.}
+\item{column_idx}{The index of the desired column within the table.}
 
-\item{num_colors}{The number of colors on the map. A value of 1 
-will use a continuous scale. A value in [2, 9] will use that many colors.}
+\item{endyear}{The end year of the survey to use.}
 
-\item{state_zoom}{An optional vector of states to zoom in on. Elements of this vector must exactly 
-match the names of states as they appear in the "region" column of ?state.regions.}
+\item{span}{Either 1, 3, or 5, the ACS vintage you wish to use.}
 
-\item{county_zoom}{An optional vector of counties to zoom in on. Elements of this vector must exactly 
-match the names of counties as they appear in the "region" column of ?county.regions.}
+\item{title}{A title for the plot; if not specified, a title will be assigned based on the variable.}
+
+\item{census_api_key}{Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html}
+
+\item{...}{Other arguments passed to county_choropleth; see ?county_choropleth()}
 }
 \value{
 A choropleth.
 }
 \description{
-Creates a US County choropleth using the US Census' American Community Survey (ACS) data.  
-Requires the acs package to be installed, and a Census API Key to be set with 
-the acs's api.key.install function.  Census API keys can be obtained at http://www.census.gov/developers/tos/key_request.html.
+Creates a choropleth of US counties using the US Census' American Community Survey (ACS) data.
 }
 \examples{
 \dontrun{
-# median income, all counties in US
-county_choropleth_acs("B19301")
-
-# continuous scale, zooing in on all counties in New York, New Jersey and Connecticut
-county_choropleth_acs("B19301", num_colors=1, state_zoom=c("new york", "new jersey", "connecticut"))
-
-# zooming in on the 5 counties (boroughs) that make up New York City
-library(dplyr)
-library(choroplethrMaps)
-data(county.regions)
-
-nyc_county_names=c("kings", "bronx", "new york", "queens", "richmond")
-nyc_county_fips = county.regions \%>\%
-  filter(state.name=="new york" & county.name \%in\% nyc_county_names) \%>\%
-  select(region)
-county_choropleth_acs("B19301", num_colors=1, county_zoom=nyc_county_fips$region)
+#  Median household income, zooming in on all counties in New York, New Jersey and Connecticut
+county_choropleth_acs(variable = "B19013_001", num_colors=1, 
+state_zoom=c("new york", "new jersey", "connecticut"))
 }
-}
-\references{
-Uses the acs package created by Ezra Haber Glenn.
-}
-\seealso{
-\code{api.key.install} in the acs package which sets an Census API key for the acs library
-
-http://factfinder2.census.gov/faces/help/jsf/pages/metadata.xhtml?lang=en&type=survey&id=survey.en.ACS_ACS 
-which contains a list of all ACS surveys.
 }
