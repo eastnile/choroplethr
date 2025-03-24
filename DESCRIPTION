@@ -55,7 +55,6 @@ Collate:
     'get_congress_116_party_data.R'
     'get_congressional_demographics.R'
     'get_usa_demographics.R'
-    'startup_messages.R'
     'state.R'
     'tract.R'
     'utils.R'
