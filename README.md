@@ -1,3 +1,7 @@
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/arilamstein/choroplethr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/arilamstein/choroplethr/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 # Choroplethr
 
 Choroplethr simplifies the creation of choropleth maps in R. Choropleths are thematic maps where geographic regions, such as states, are colored according to some metric, such as the number of people who live in that state. Choroplethr simplifies this process by
@@ -8,7 +12,7 @@ Choroplethr simplifies the creation of choropleth maps in R. Choropleths are the
 
 ## Documentation
 
-Documentation for choroplethr can be found [Choroplethr.com](http://www.Choroplethr.com).
+Documentation for choroplethr can be found [here](https://github.com/arilamstein/choroplethr).
 
 ## Technical Support
 
