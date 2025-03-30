@@ -26,14 +26,14 @@ get_state_demographics = function(endyear=2013, span=5)
   span_lookup = c('1' = 'acs1', '3' = 'acs3', '5' = 'acs5')
   dataset = span_lookup[as.character(span)]
   acs_df = tidycensus::get_acs(geography = 'state', 
-                               variable = c('B00001_001', 'B19013_001'), 
+                               variable = c('B01003_001', 'B19013_001'), 
                                year = endyear, dataset = dataset, output = 'wide')
   acs_df = acs_df[, c(2, 3, 5)]
-  names(acs_df) = c('region', 'medianHHIncome', 'population')
+  names(acs_df) = c('region', 'population', 'median_hh_income')
   acs_df$region = tolower(acs_df$region)
   data(state.regions, package="choroplethrMaps", envir=environment())
-  acs_df = acs_df[acs_df$region %in% state.regions$region, ]
-  return(acs_df)
+  df = dplyr::left_join(state.regions['region'], acs_df, by = 'region')
+  return(df)
 }
 
 
@@ -58,14 +58,15 @@ get_county_demographics = function(endyear=2013, span=5)
 {  
   span_lookup = c('1' = 'acs1', '3' = 'acs3', '5' = 'acs5')
   dataset = span_lookup[as.character(span)]
-  acs_df = tidycensus::get_acs(geography = 'county', variable = c('B00001_001', 'B19013_001'), 
+  acs_df = tidycensus::get_acs(geography = 'county', 
+                               variable = c('B01003_001', 'B19013_001'), 
                                year = endyear, dataset = dataset, output = 'wide')
   acs_df = acs_df[, c(1, 3, 5)]
-  names(acs_df) = c('region', 'medianHHIncome', 'population')
-  acs_df$region = as.numeric(acs_df$region)
+  names(acs_df) = c('region', 'population', 'median_hh_income')
+  acs_df$region = as.integer(acs_df$region)
   data(county.regions, package="choroplethrMaps", envir=environment())
-  acs_df = acs_df[acs_df$region %in% county.regions$region, ]
-  return(acs_df)
+  df = dplyr::left_join(county.regions['region'], acs_df, by = 'region')
+  return(df)
 }
 
 #' Get a handful of demographic variables on Census Tracts in a State from the US Census Bureau as a data.frame.
@@ -95,10 +96,10 @@ get_tract_demographics = function(state_name, county_fips = NULL, endyear=2013, 
   span_lookup = c('1' = 'acs1', '3' = 'acs3', '5' = 'acs5')
   dataset = span_lookup[as.character(span)]
   acs_df = tidycensus::get_acs(geography = 'tract', state = state_name, county=county_fips,
-                                             variable = c('B00001_001', 'B19013_001'), 
-                                             year = endyear, dataset = dataset, output = 'wide')
+                               variable = c('B01003_001', 'B19013_001'), 
+                               year = endyear, dataset = dataset, output = 'wide')
   acs_df = acs_df[, c(1, 3, 5)]
-  names(acs_df) = c('region', 'medianHHIncome', 'population')
-  acs_df$region = as.numeric(acs_df$region)
+  names(acs_df) = c('region', 'population', 'median_hh_income')
+  acs_df = acs_df[order(acs_df$region), ]
   return(acs_df)
 }
