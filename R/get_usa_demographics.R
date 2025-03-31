@@ -18,7 +18,7 @@ if (base::getRversion() >= "2.15.1") {
 #' 
 #' # A choropleth map shows the location of the values.
 #' # Set the 'value' column to be the column we want to render.
-#' df$value = df$medianHHIncome
+#' df$value = df$median_hh_income
 #' state_choropleth(df)
 #' }
 get_state_demographics = function(endyear=2013, span=5)
@@ -51,7 +51,7 @@ get_state_demographics = function(endyear=2013, span=5)
 
 #' # A choropleth map shows the location of the values.
 #' # Set the 'value' column to be the column we want to render.
-#' df$value = df$medianHHIncome
+#' df$value = df$median_hh_income
 #' county_choropleth(df)
 #' }
 get_county_demographics = function(endyear=2013, span=5)
@@ -81,7 +81,7 @@ get_county_demographics = function(endyear=2013, span=5)
 #' \dontrun{
 #' # 36061 is the FIPS code for Manhatttan (technically "New York County"), NY.
 #' df = get_tract_demographics("new york", 36061)
-#' df$value = df$medianHHIncome
+#' df$value = df$median_hh_income
 #' tract_choropleth(df, "new york", county_zoom = 36061) 
 #' }
 #' @importFrom stringr str_sub
