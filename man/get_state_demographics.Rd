@@ -22,7 +22,7 @@ df = get_state_demographics(endyear=2010, span=5)
 
 # A choropleth map shows the location of the values.
 # Set the 'value' column to be the column we want to render.
-df$value = df$medianHHIncome
+df$value = df$median_hh_income
 state_choropleth(df)
 }
 }
