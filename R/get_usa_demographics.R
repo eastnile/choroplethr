@@ -32,8 +32,8 @@ get_state_demographics = function(endyear=2013, span=5)
   names(acs_df) = c('region', 'population', 'median_hh_income')
   acs_df$region = tolower(acs_df$region)
   data(state.regions, package="choroplethrMaps", envir=environment())
-  df = dplyr::left_join(state.regions['region'], acs_df, by = 'region')
-  return(df)
+  acs_df = acs_df[acs_df$region %in% state.regions$region, ]
+  return(acs_df)
 }
 
 
@@ -65,8 +65,8 @@ get_county_demographics = function(endyear=2013, span=5)
   names(acs_df) = c('region', 'population', 'median_hh_income')
   acs_df$region = as.integer(acs_df$region)
   data(county.regions, package="choroplethrMaps", envir=environment())
-  df = dplyr::left_join(county.regions['region'], acs_df, by = 'region')
-  return(df)
+  acs_df = acs_df[acs_df$region %in% county.regions$region, ]
+  return(acs_df)
 }
 
 #' Get a handful of demographic variables on Census Tracts in a State from the US Census Bureau as a data.frame.
@@ -101,5 +101,6 @@ get_tract_demographics = function(state_name, county_fips = NULL, endyear=2013, 
   acs_df = acs_df[, c(1, 3, 5)]
   names(acs_df) = c('region', 'population', 'median_hh_income')
   acs_df = acs_df[order(acs_df$region), ]
+  acs_df$region = as.numeric(acs_df$region)
   return(acs_df)
 }
