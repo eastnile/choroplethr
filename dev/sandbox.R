@@ -1,20 +1,14 @@
-library(choroplethrMaps)
-library(tidycensus)
+# library(choroplethrMaps)
+# library(tidycensus)
 devtools::load_all()
 
+data("df_state_demographics")
+names(df_state_demographics)[2] = 'value'
 
-state.regions
-county.regions
+st_zoom = df_state_demographics$region[1:10]
+st_zoom = 'alaska'
 
-
-choroplethr::df_japan_census
-
-z = get_state_demographics(2019,5)
-z = get_county_demographics(2019,5)
-z = get_tract_demographics(state_name = 'AL', endyear = 2019, span = 5)
-
-get_acs_data(variable = 'B19013_001', column_idx = NULL, 
-                    map = 'county', endyear = 2012, span = 5) 
-
-state_choropleth_acs(variable = "B19013_001", endyear = 2012, num_colors=1, zoom=c("new york", "new jersey", "connecticut"))
-county_choropleth_acs(variable = "B19013_001", endyear = 2012, num_colors=1, state_zoom=c("new york", "new jersey", "connecticut"))
+state_choropleth(df = df_state_demographics, zoom = st_zoom)
+z = StateChoropleth$new(df_state_demographics) 
+z$set_zoom(st_zoom)
+z2 = z$render()

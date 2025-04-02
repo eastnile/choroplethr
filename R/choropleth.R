@@ -83,8 +83,9 @@ Choropleth = R6Class("Choropleth",
     render = function() 
     {
       self$prepare_map()
-      
+
       if ("sf" %in% class(self$choropleth.df)) {
+        browser()
         ggplot(self$choropleth.df) +
           self$ggplot_sf +
           self$get_scale() +
@@ -92,6 +93,7 @@ Choropleth = R6Class("Choropleth",
           ggtitle(self$title) +
           self$projection_sf
       } else {
+        browser()
         ggplot(self$choropleth.df, aes(long, lat, group = group)) +
           self$ggplot_polygon + 
           self$get_scale() +

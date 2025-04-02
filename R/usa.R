@@ -19,14 +19,16 @@ USAChoropleth = R6Class("USAChoropleth",
     # render the map, with AK and HI as insets
     render = function()
     {
+      # browser()
       self$prepare_map()
       
       if (identical(private$zoom, "alaska") || identical(private$zoom, "hawaii")) {
         choro = self$render_helper(self$choropleth.df, self$scale_name, self$theme_clean()) + ggtitle(self$title)
-        if (self$add_state_outline)
-        {
-          choro + self$render_state_outline(private$zoom)
-        }        
+        if (self$add_state_outline) {
+          return(choro + self$render_state_outline(private$zoom))
+        } else {
+          return(choro)
+        }
       } else {
         # remove AK and HI from the "real" df
         continental.df = self$choropleth.df[!self$choropleth.df$state %in% c("alaska", "hawaii"), ]
@@ -65,8 +67,8 @@ USAChoropleth = R6Class("USAChoropleth",
           ret = ret + annotation_custom(grobTree(hawaii.grob), xmin=-107.5, xmax=-102.5, ymin=25, ymax=27.5)
         }
         
-        ret +
-          ggtitle(self$title)
+        return(ret +
+          ggtitle(self$title))
       }
     },
     
