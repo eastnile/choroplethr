@@ -10,5 +10,9 @@ st_zoom = 'alaska'
 
 state_choropleth(df = df_state_demographics, zoom = st_zoom)
 z = StateChoropleth$new(df_state_demographics) 
+sfdf = z$map.df
+
+
+
 z$set_zoom(st_zoom)
 z2 = z$render()

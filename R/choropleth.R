@@ -32,17 +32,28 @@ Choropleth = R6Class("Choropleth",
     # a choropleth map is defined by these two variables
     # a data.frame of a map
     # a data.frame that expresses values for regions of each map
-    initialize = function(map.df, user.df)
+    initialize = function(map.df, user.df, geoid.name, value.name)
     {
+      if (F) {
+        geoid.name = 'region'
+        value.name = 'total_population'
+        library(choroplethrMaps)
+        data(state.regions)
+        data(state.map)
+        data(df_state_demographics)
+        map.df = state.map
+        user.df = df_state_demographics
+        self = list()
+      }
       stopifnot(is.data.frame(map.df))
-      stopifnot("region" %in% colnames(map.df))
+      # stopifnot("region" %in% colnames(map.df))
       self$map.df = map.df
       
       # all input, regardless of map, is just a bunch of (region, value) pairs
-      stopifnot(is.data.frame(user.df))
-      stopifnot(c("region", "value") %in% colnames(user.df))
+      #stopifnot(is.data.frame(user.df))
+      #stopifnot(c("region", "value") %in% colnames(user.df))
       self$user.df = user.df
-      self$user.df = self$user.df[, c("region", "value")]
+      self$user.df = self$user.df[, c(geoid.name, value.name)]
       
       stopifnot(anyDuplicated(self$user.df$region) == 0)
       
@@ -57,15 +68,17 @@ Choropleth = R6Class("Choropleth",
       
       # if the user's data contains values which are not on the map, 
       # then emit a warning if appropriate
-      if (self$warn)
-      {
-        all_regions = unique(self$map.df$region)
-        user_regions = unique(self$user.df$region)
-        invalid_regions = setdiff(user_regions, all_regions)
-        if (length(invalid_regions) > 0)
+      if (F) { # Move to bind()
+        if (self$warn)
         {
-          invalid_regions = paste(invalid_regions, collapse = ", ")
-          warning(paste0("Your data.frame contains the following regions which are not mappable: ", invalid_regions))
+          all_regions = unique(self$map.df$region)
+          user_regions = unique(self$user.df$region)
+          invalid_regions = setdiff(user_regions, all_regions)
+          if (length(invalid_regions) > 0)
+          {
+            invalid_regions = paste(invalid_regions, collapse = ", ")
+            warning(paste0("Your data.frame contains the following regions which are not mappable: ", invalid_regions))
+          }
         }
       }
       
@@ -183,6 +196,14 @@ Choropleth = R6Class("Choropleth",
     },
     
     # support e.g. users just viewing states on the west coast
+    prep_user_df = function(user.df, ref.regions, geoid.name, value.name) {
+      if(F) {
+        ref.regions = readRDS('dev/st_regions.rds')
+      }
+      
+      
+    }
+    
     clip = function() {
       stopifnot(!is.null(private$zoom))
       
