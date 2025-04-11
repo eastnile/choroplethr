@@ -37,7 +37,7 @@ the choroplethrMaps package for a data.frame that can help you coerce your regio
 into the required format.
 }
 \examples{
-\dontrun{
+\donttest{
 # default parameters
 data(df_pop_state)
 state_choropleth(df_pop_state, 

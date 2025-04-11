@@ -32,7 +32,7 @@ A choropleth.
 Create a country-level choropleth using data from the World Bank's World Development Indicators (WDI)
 }
 \examples{
-\dontrun{
+\donttest{
 # See http://data.worldbank.org/indicator/SP.POP.TOTL
 choroplethr_wdi(code="SP.POP.TOTL", year=2012, title="2012 Population Estimates", num_colors=1)
 

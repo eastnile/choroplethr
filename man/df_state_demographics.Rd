@@ -11,7 +11,7 @@ data(df_state_demographics)
 A data.frame containing demographic statistics for each state plus the District of Columbia.
 }
 \examples{
-\dontrun{
+\donttest{
 library(choroplethr)
 data(df_state_demographics)
 

@@ -17,7 +17,7 @@ df1$value to df2$value. Result is in the new "value" column, and rounded to two
 digits.
 }
 \examples{
-\dontrun{
+\donttest{
 # load median age estimates from 2010 and 2015
 data(df_state_age_2010)
 data(df_state_age_2015)

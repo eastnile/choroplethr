@@ -1,5 +1,5 @@
 Package: choroplethr
-Title: Simplify the Creation of Choropleth Maps in R
+Title: Simplify the Creation of Choropleth Maps
 Description: Choropleths are thematic maps where geographic regions, such as
     states, are colored according to some metric, such as the number of people
     who live in that state. This package simplifies this process by 1.
@@ -7,7 +7,7 @@ Description: Choropleths are thematic maps where geographic regions, such as
     Providing data and API connections to interesting data sources for making
     choropleths. 3. Providing a framework for creating choropleths from
     arbitrary shapefiles. 4. Overlaying those maps over reference maps from
-    Google Maps. 
+    'Google Maps'. 
 Version: 4.0.0
 Authors@R: c(
     person("Ari", "Lamstein", , "ari@lamsteinconsulting.com", "aut"),

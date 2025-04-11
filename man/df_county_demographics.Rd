@@ -11,7 +11,7 @@ data(df_county_demographics)
 A data.frame containing demographic statistics for each county in the United States.
 }
 \examples{
-\dontrun{
+\donttest{
 library(choroplethr)
 data(df_county_demographics)
 

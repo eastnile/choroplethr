@@ -119,7 +119,7 @@ NULL
 #' @keywords data
 #' @usage data(df_state_demographics)
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(choroplethr)
 #' data(df_state_demographics)
 #' 
@@ -144,7 +144,7 @@ NULL
 #' @keywords data
 #' @usage data(df_county_demographics)
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(choroplethr)
 #' data(df_county_demographics)
 #' 

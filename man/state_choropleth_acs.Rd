@@ -42,9 +42,9 @@ A choropleth.
 Creates a choropleth of US states using the US Census' American Community Survey (ACS) data.
 }
 \examples{
-\dontrun{
+\donttest{
 # Create a state choropleth for median household income zooming in 
-on New York, New Jersey and Connecticut
+# on New York, New Jersey and Connecticut
 state_choropleth_acs(variable = "B19013_001", endyear = 2011, num_colors=1, 
 zoom=c("new york", "new jersey", "connecticut"))
 }

@@ -13,7 +13,7 @@ if (base::getRversion() >= "2.15.1") {
 #' ?country.regions.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # See http://data.worldbank.org/indicator/SP.POP.TOTL
 #' choroplethr_wdi(code="SP.POP.TOTL", year=2012, title="2012 Population Estimates", num_colors=1)
 #'

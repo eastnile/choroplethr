@@ -41,7 +41,7 @@ in the choroplethrMaps package for an object which can help you coerce your regi
 into the required format.
 }
 \examples{
-\dontrun{
+\donttest{
 # default parameters
 data(df_pop_county)
 county_choropleth(df_pop_county, 

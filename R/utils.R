@@ -8,7 +8,7 @@
 #' @param df2 A dataframe with columns named "region" and "value"
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # load median age estimates from 2010 and 2015
 #' data(df_state_age_2010)
 #' data(df_state_age_2015)

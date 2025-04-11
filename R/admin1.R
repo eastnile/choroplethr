@@ -43,7 +43,7 @@ Admin1Choropleth = R6Class("Admin1Choropleth",
 #' match the names of regions as they appear in the "region" column of ?admin1.regions.
 #' @param reference_map If true, render the choropleth over a reference map from Google Maps.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' 
 #' library(choroplethrAdmin1)
 #' 

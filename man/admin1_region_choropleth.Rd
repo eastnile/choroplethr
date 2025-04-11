@@ -38,7 +38,7 @@ The map used comes from ?admin1.map in the choroplethrAdmin1 package. See ?get_a
 and ?get_admin_regions in the choroplethrAdmin1 package for help with the spelling of regions.
 }
 \examples{
-\dontrun{
+\donttest{
 
 library(choroplethrAdmin1)
 

@@ -71,7 +71,7 @@ CountyChoropleth = R6Class("CountyChoropleth",
 #' @param reference_map If true, render the choropleth over a reference map from Google Maps.
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # default parameters
 #' data(df_pop_county)
 #' county_choropleth(df_pop_county, 

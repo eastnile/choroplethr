@@ -25,7 +25,7 @@ The data comes from the American Community Survey (ACS). The variables are total
 and median household income.
 }
 \examples{
-\dontrun{
+\donttest{
 # 36061 is the FIPS code for Manhatttan (technically "New York County"), NY.
 df = get_tract_demographics("new york", 36061)
 df$value = df$median_hh_income
