@@ -12,6 +12,9 @@ Choropleth = R6Class("Choropleth",
     user.df        = NULL, # input from user
     map.df         = NULL, # geometry of the map
     choropleth.df  = NULL, # result of binding user data with our map data
+    geoid.name = NULL,
+    geoid.type = NULL,
+    value.name = NULL,
             
     title          = "",    # title for map
     legend         = "",    # title for legend
@@ -32,9 +35,10 @@ Choropleth = R6Class("Choropleth",
     # a choropleth map is defined by these two variables
     # a data.frame of a map
     # a data.frame that expresses values for regions of each map
-    initialize = function(map.df, user.df, geoid.name, value.name)
+    initialize = function(map.df, user.df, ref.regions, geoid.name, geoid.type, value.name)
     {
       if (F) {
+        geoid.type = 'auto'
         geoid.name = 'region'
         value.name = 'total_population'
         library(choroplethrMaps)
@@ -45,17 +49,16 @@ Choropleth = R6Class("Choropleth",
         user.df = df_state_demographics
         self = list()
       }
-      stopifnot(is.data.frame(user.df))
+      stopifnot('data.frame'%in%class(user.df))
       stopifnot(length(geoid.name) == 1)
       stopifnot(length(value.name) == 1)
       stopifnot(class(geoid.name) == 'character')
       stopifnot(class(value.name) == 'character')
+      browser()
+      user.df = self$prep_user_df(user.df = user.df, ref.regions = ref.regions, geoid.name = geoid.name,
+                             geoid.type = geoid.type, value.name = value.name)
+      
 
-      user.df = user.df[, c(geoid.name, value.name)]
-      self$map.df = map.df
-      self$user.df = user.df
-      self$geoid.name = geoid.name
-      self$value.name = value.name
       
       
       # things like insets won't color properly if they are characters, and not factors
@@ -66,24 +69,14 @@ Choropleth = R6Class("Choropleth",
       
       # initialize the map to the max zoom - i.e. all regions
       self$set_zoom(NULL)
+      self$map.df = map.df
+      self$user.df = user.df
+      self$geoid.name = geoid.name
+      self$value.name = value.name
       
       # if the user's data contains values which are not on the map, 
       # then emit a warning if appropriate
-      if (F) { # Move to check_user_df)
-        if (self$warn)
-        {
-          all_regions = unique(self$map.df$region)
-          user_regions = unique(self$user.df$region)
-          invalid_regions = setdiff(user_regions, all_regions)
-          if (length(invalid_regions) > 0)
-          {
-            invalid_regions = paste(invalid_regions, collapse = ", ")
-            warning(paste0("Your data.frame contains the following regions which are not mappable: ", invalid_regions))
-          }
-        }
-      }
-      
-      prep_user_df(user.df = user.df, ref.regions = ref.regions, geoid.type = geoid.type, value.name = value.name)
+
       
       # as of ggplot v2.1.0, R6 class variables cannot be assigned to ggplot2 objects
       # in the class declaration. Doing so will break binary builds, so assign them
@@ -101,7 +94,7 @@ Choropleth = R6Class("Choropleth",
       self$prepare_map()
 
       if ("sf" %in% class(self$choropleth.df)) {
-        browser()
+        #browser()
         ggplot(self$choropleth.df) +
           self$ggplot_sf +
           self$get_scale() +
@@ -200,25 +193,29 @@ Choropleth = R6Class("Choropleth",
     
     prep_user_df = function(user.df, ref.regions, geoid.name, geoid.type = 'auto', value.name) {
       if(F) {
+        data(df_state_demographics)
+        data(state.regions)
         user.df = df_state_demographics
         user.df$region[user.df$region=='alabama'] = 'galabama'
         ref.regions = readRDS('dev/st_regions.rds')
         geoid.name = 'region'
         geoid.type = 'auto'
         geoid.type = 'name.lower'
-        value.name = 'value'
+        value.name = 'total_population'
       }
-      if (anyDuplicated(user.df[, geoid_name]) != 0) {
+      browser()
+      user.df = user.df[, c(geoid.name, value.name)]
+      browser()
+      if (anyDuplicated(user.df[, geoid.name]) != 0) {
         stop(paste0("Duplicates detected. The variable '", geoid.name, "' must uniquely identify observations in the data to be plotted"))
       }
-      if (geoid.type == 'auto') {
+      if (geoid.type == 'auto') { # Establish which geoid is being used in user dataset
         unmatched = list()
-        n_unmatched = list()
+        n_unmatched = numeric()
         for (name in names(ref.regions)) {
           unmatched[[name]] = user.df[, geoid.name][!user.df[, geoid.name] %in% ref.regions[, name]]
-          n_unmatched[[name]] = length(unmatched[[name]])
+          n_unmatched[name] = length(unmatched[[name]])
         }
-        n_unmatched = unlist(n_unmatched)
         geoid.type = names(n_unmatched)[which.min(n_unmatched)] # if there's a tie it pick the first one
         geoid.unmatched = unmatched[[geoid.type]]
       } else {
@@ -230,7 +227,7 @@ Choropleth = R6Class("Choropleth",
       user.df.clean = user.df[!user.df[, geoid.name]%in%geoid.unmatched, c(geoid.name, value.name)]
       names(user.df.clean) = c('region', 'value')
       return(user.df.clean)
-    }
+    },
     
     # support e.g. users just viewing states on the west coast
     clip = function() {

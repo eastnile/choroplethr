@@ -9,7 +9,8 @@ StateChoropleth = R6Class("StateChoropleth",
     show_labels = TRUE,
     
     # initialize with us state map
-    initialize = function(user.df)
+    initialize = function(user.df, geoid.name = geoid.name, ref.regions = ref.regions, 
+                          geoid.type = geoid.type, value.name = value.name)
     {
       if (!requireNamespace("choroplethrMaps", quietly = TRUE)) {
         stop("Package choroplethrMaps is needed for this function to work. Please install it.", call. = FALSE)
@@ -17,7 +18,8 @@ StateChoropleth = R6Class("StateChoropleth",
 
       data(state.map, package="choroplethrMaps", envir=environment())
       state.map$state = state.map$region
-      super$initialize(state.map, user.df)
+      super$initialize(map.df = state.map, user.df = user.df, ref.regions = readRDS('dev/st_regions.rds'), geoid.name = geoid.name, 
+                       geoid.type = geoid.type, value.name = value.name)
       
       if (private$has_invalid_regions)
       {
@@ -108,9 +110,11 @@ StateChoropleth = R6Class("StateChoropleth",
 #' @importFrom ggplot2 ggplot aes geom_polygon scale_fill_brewer ggtitle theme theme_grey element_blank geom_text
 #' @importFrom ggplot2 scale_fill_continuous scale_colour_brewer
 #' @importFrom grid unit
-state_choropleth = function(df, title="", legend="", num_colors=7, zoom=NULL, reference_map = FALSE)
+state_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', value.name = 'value',
+                            title="", legend="", num_colors=7, zoom=NULL, reference_map = FALSE)
 {
-  c = StateChoropleth$new(df)
+  c = StateChoropleth$new(user.df = df, geoid.name = geoid.name, 
+                          geoid.type = geoid.type, value.name = value.name)
   c$title  = title
   c$legend = legend
   c$set_num_colors(num_colors)

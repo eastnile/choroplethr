@@ -8,10 +8,12 @@ USAChoropleth = R6Class("USAChoropleth",
   
   public = list(
     add_state_outline = FALSE,
-    
-    initialize = function(map.df, user.df)
+
+    initialize = function(map.df, user.df, ref.regions = ref.regions, geoid.name = geoid.name, 
+                          geoid.type = geoid.type, value.name = value.name)
     {
-      super$initialize(map.df, user.df)
+      super$initialize(map.df, user.df, geoid.name = geoid.name, ref.regions = ref.regions,
+                       geoid.type = geoid.type, value.name = value.name)
       # need a state field for doing insets of AK and HI
       stopifnot("state" %in% colnames(map.df)) 
     },
