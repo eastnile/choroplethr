@@ -44,7 +44,6 @@ Collate:
     'choropleth.R'
     'admin1.R'
     'admin1_region.R'
-    'choroplethr_animate.R'
     'choroplethr_wdi.R'
     'country.R'
     'usa.R'
