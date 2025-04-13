@@ -66,7 +66,7 @@ state_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = NU
 #' @examples
 #' \donttest{
 #' #  Median household income, zooming in on all counties in New York, New Jersey and Connecticut
-#' county_choropleth_acs(variable = "B19013_001", num_colors=1, 
+#' county_choropleth_acs(variable = "B19013_001", num_colors=1, endyear = 2011,
 #' state_zoom=c("new york", "new jersey", "connecticut"))
 #' }
 #' @importFrom tidycensus load_variables get_acs

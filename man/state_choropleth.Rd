@@ -44,14 +44,6 @@ state_choropleth(df_pop_state,
                  title  = "US 2012 State Population Estimates", 
                  legend = "Population")
 
-# choropleth over reference map of continental usa
-data(continental_us_states)
-state_choropleth(df_pop_state, 
-                 title         = "US 2012 State Population Estimates",
-                 legend        = "Population",
-                 zoom          = continental_us_states, 
-                 reference_map = TRUE)
-
 # continuous scale and zoom
 data(df_pop_state)
 state_choropleth(df_pop_state, 

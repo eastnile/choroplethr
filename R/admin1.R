@@ -66,14 +66,6 @@ Admin1Choropleth = R6Class("Admin1Choropleth",
 #'                    "Population", 
 #'                    1, 
 #'                    kansai)
-#'                    
-#' admin1_choropleth("japan", 
-#'                    df_japan_census, 
-#'                    "2010 Japan Population Estimates", 
-#'                    "Population", 
-#'                    1, 
-#'                    kansai,
-#'                    reference_map = TRUE)
 #' }
 #' @export
 #' @importFrom Hmisc cut2

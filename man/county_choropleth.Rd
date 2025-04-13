@@ -47,13 +47,6 @@ data(df_pop_county)
 county_choropleth(df_pop_county, 
                   title  = "US 2012 County Population Estimates", 
                   legend = "Population")
-                  
-# zoom in on california and add a reference map
-county_choropleth(df_pop_county, 
-                  title         = "California County Population Estimates", 
-                  legend        = "Population",
-                  state_zoom    = "california",
-                  reference_map = TRUE)
 
 # continuous scale 
 data(df_pop_county)
