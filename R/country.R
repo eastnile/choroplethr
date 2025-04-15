@@ -8,14 +8,16 @@ CountryChoropleth = R6Class("CountryChoropleth",
   public = list(
     
     # initialize with a world map
-    initialize = function(user.df)
+    initialize = function(user.df, geoid.name = geoid.name, geoid.type = geoid.type, value.name = value.name)
     {
       if (!requireNamespace("choroplethrMaps", quietly = TRUE)) {
         stop("Package choroplethrMaps is needed for this function to work. Please install it.", call. = FALSE)
       }
-
       data(country.map, package="choroplethrMaps", envir=environment())
-      super$initialize(country.map, user.df)
+      browser()
+      super$initialize(map.df = country.map, user.df = user.df, ref.regions = readRDS('dev/country_regions.rds'),
+                       geoid.name = geoid.name, geoid.type = geoid.type, value.name = value.name)
+      
       
       if (private$has_invalid_regions)
       {
@@ -60,9 +62,12 @@ CountryChoropleth = R6Class("CountryChoropleth",
 #' @importFrom ggplot2 ggplot aes geom_polygon scale_fill_brewer ggtitle theme theme_grey element_blank geom_text
 #' @importFrom ggplot2 scale_fill_continuous scale_colour_brewer ggplotGrob annotation_custom 
 #' @importFrom grid unit grobTree
-country_choropleth = function(df, title="", legend="", num_colors=7, zoom=NULL)
+
+country_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', value.name = 'value',
+                              title="", legend="", num_colors=7, zoom=NULL)
 {
-  c = CountryChoropleth$new(df)
+  c = CountryChoropleth$new(user.df = df, geoid.name = geoid.name, 
+                            geoid.type = geoid.type, value.name = value.name)
   c$title  = title
   c$legend = legend
   c$set_num_colors(num_colors)

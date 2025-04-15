@@ -11,6 +11,7 @@ Choropleth = R6Class("Choropleth",
     # the key objects for this class
     user.df        = NULL, # input from user
     map.df         = NULL, # geometry of the map
+    map.df.name = NULL,
     choropleth.df  = NULL, # result of binding user data with our map data
     geoid.name = NULL,
     geoid.type = NULL,
@@ -35,7 +36,8 @@ Choropleth = R6Class("Choropleth",
     # a choropleth map is defined by these two variables
     # a data.frame of a map
     # a data.frame that expresses values for regions of each map
-    initialize = function(map.df, user.df, ref.regions, geoid.name, geoid.type, value.name)
+    initialize = function(map.df, map.df.name = NULL, user.df, 
+                          ref.regions, geoid.name, geoid.type, value.name)
     {
       if (F) {
         geoid.type = 'auto'
@@ -55,9 +57,10 @@ Choropleth = R6Class("Choropleth",
       stopifnot(class(geoid.name) == 'character')
       stopifnot(class(value.name) == 'character')
       browser()
-      user.df = self$prep_user_df(user.df = user.df, ref.regions = ref.regions, geoid.name = geoid.name,
-                             geoid.type = geoid.type, value.name = value.name)
-      
+      self$user.df = self$prep_user_df(user.df = user.df, ref.regions = ref.regions, geoid.name = geoid.name,
+                             geoid.type = geoid.type, value.name = value.name)$user.df.prepped
+      self$geoid.type = self$prep_user_df(user.df = user.df, ref.regions = ref.regions, geoid.name = geoid.name,
+                                          geoid.type = geoid.type, value.name = value.name)$geoid.type
 
       
       
@@ -203,9 +206,7 @@ Choropleth = R6Class("Choropleth",
         geoid.type = 'name.lower'
         value.name = 'total_population'
       }
-      browser()
       user.df = user.df[, c(geoid.name, value.name)]
-      browser()
       if (anyDuplicated(user.df[, geoid.name]) != 0) {
         stop(paste0("Duplicates detected. The variable '", geoid.name, "' must uniquely identify observations in the data to be plotted"))
       }
@@ -226,7 +227,7 @@ Choropleth = R6Class("Choropleth",
       }
       user.df.clean = user.df[!user.df[, geoid.name]%in%geoid.unmatched, c(geoid.name, value.name)]
       names(user.df.clean) = c('region', 'value')
-      return(user.df.clean)
+      return(list(user.df.prepped = user.df.clean, geoid.type = geoid.type))
     },
     
     # support e.g. users just viewing states on the west coast
@@ -281,6 +282,7 @@ Choropleth = R6Class("Choropleth",
     #' @importFrom ggplot2 scale_fill_gradient2
     get_scale = function()
     {
+      browser()
       if (!is.null(self$ggplot_scale)) 
       {
         self$ggplot_scale

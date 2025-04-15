@@ -9,8 +9,7 @@ StateChoropleth = R6Class("StateChoropleth",
     show_labels = TRUE,
     
     # initialize with us state map
-    initialize = function(user.df, geoid.name = geoid.name, ref.regions = ref.regions, 
-                          geoid.type = geoid.type, value.name = value.name)
+    initialize = function(user.df, geoid.name = geoid.name, geoid.type = geoid.type, value.name = value.name)
     {
       if (!requireNamespace("choroplethrMaps", quietly = TRUE)) {
         stop("Package choroplethrMaps is needed for this function to work. Please install it.", call. = FALSE)
@@ -18,7 +17,9 @@ StateChoropleth = R6Class("StateChoropleth",
 
       data(state.map, package="choroplethrMaps", envir=environment())
       state.map$state = state.map$region
-      super$initialize(map.df = state.map, user.df = user.df, ref.regions = readRDS('dev/st_regions.rds'), geoid.name = geoid.name, 
+      browser()
+      super$initialize(map.df = state.map, user.df = user.df, ref.regions = readRDS('dev/st_regions.rds'), 
+                       geoid.name = geoid.name, 
                        geoid.type = geoid.type, value.name = value.name)
       
       if (private$has_invalid_regions)
