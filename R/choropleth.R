@@ -16,6 +16,7 @@ Choropleth = R6Class("Choropleth",
     geoid.name = NULL,
     geoid.type = NULL,
     value.name = NULL,
+    scale = NULL,
             
     title          = "",    # title for map
     legend         = "",    # title for legend
@@ -80,6 +81,7 @@ Choropleth = R6Class("Choropleth",
       # if the user's data contains values which are not on the map, 
       # then emit a warning if appropriate
 
+      self$scale = self$get_scale()
       
       # as of ggplot v2.1.0, R6 class variables cannot be assigned to ggplot2 objects
       # in the class declaration. Doing so will break binary builds, so assign them
@@ -245,7 +247,7 @@ Choropleth = R6Class("Choropleth",
     discretize = function() 
     {
       if (is.numeric(self$user.df$value) && private$num_colors > 1) {
-        
+        browser()
         # if cut2 uses scientific notation,  our attempt to put in commas will fail
         scipen_orig = getOption("scipen")
         options(scipen=999)
@@ -302,9 +304,9 @@ Choropleth = R6Class("Choropleth",
         # by default, scale_fill_continuous uses a light value for high values and a dark value for low values
         # however, this is the opposite of how choropleths are normally colored (see wikipedia)
         # these low and high values are from the 7 color brewer blue scale (see colorbrewer.org)
-        scale_fill_continuous(self$legend, low="#eff3ff", high="#084594", na.value="black", limits=c(min_value, max_value))
+        return(scale_fill_continuous(self$legend, low="#eff3ff", high="#084594", na.value="black", limits=c(min_value, max_value)))
       } else {
-        scale_fill_brewer(self$legend, drop=FALSE, na.value="black")        
+        return(scale_fill_brewer(self$legend, drop=FALSE, na.value="black"))        
       }
     },
     
