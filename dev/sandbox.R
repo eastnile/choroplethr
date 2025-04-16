@@ -7,6 +7,7 @@ devtools::load_all()
 # 
 # st_zoom = df_state_demographics$region[1:10]
 # st_zoom = 'alaska'
+<<<<<<< HEAD
 # 
 # data("df_pop_country")
 
@@ -15,6 +16,9 @@ devtools::load_all()
 
 country_choropleth(df = df_pop_country)
 
+=======
+
+>>>>>>> eastnile/varname_freedom
 state_choropleth(df = df_state_demographics, value.name = 'median_rent')
 state_choropleth(df = df_state_demographics, zoom = st_zoom)
 z = StateChoropleth$new(df_state_demographics) 
