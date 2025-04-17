@@ -7,21 +7,20 @@ devtools::load_all()
 # 
 # st_zoom = df_state_demographics$region[1:10]
 # st_zoom = 'alaska'
-<<<<<<< HEAD
+
 # 
-# data("df_pop_country")
+data("df_pop_country")
 
 # data('country.regions')
 # saveRDS(country.regions, 'dev/country_regions.rds')
 
+df_pop_country$value = ifelse(df_pop_country$value>1000000, 'a', 'b')
+
 country_choropleth(df = df_pop_country)
 
-=======
-
->>>>>>> eastnile/varname_freedom
-state_choropleth(df = df_state_demographics, value.name = 'median_rent')
-state_choropleth(df = df_state_demographics, zoom = st_zoom)
-z = StateChoropleth$new(df_state_demographics) 
-sfdf = z$map.df
-z$set_zoom(st_zoom)
-z2 = z$render()
+# state_choropleth(df = df_state_demographics, value.name = 'median_rent')
+# state_choropleth(df = df_state_demographics, zoom = st_zoom)
+# z = StateChoropleth$new(df_state_demographics) 
+# sfdf = z$map.df
+# z$set_zoom(st_zoom)
+# z2 = z$render()
