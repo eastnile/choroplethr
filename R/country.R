@@ -36,10 +36,17 @@ CountryChoropleth = R6Class("CountryChoropleth",
 #' the "region" column must exactly match how regions are named in the "region" column in ?country.map.
 #' @param title An optional title for the map.  
 #' @param legend An optional name for the legend.  
-#' @param num_colors The number of colors to use on the map.  A value of 0 uses 
-#' a divergent scale (useful for visualizing negative and positive numbers), A 
-#' value of 1 uses a continuous scale (useful for visualizing outliers), and a 
-#' value in [2, 9] will use that many quantiles. 
+#' @param colors A vector specifying the colors to be used if the plotted value is a character 
+#' or factor. These colors can be specified using R's color terms as given in ?colors, or as a
+#' hex value like that returned from rgb(). The number of colors must match the number of unique
+#' values in the variable to be plotted.
+#' 
+#'  
+#' @param num_colors When plotting numeric data, the number of colors to use on the map.  
+#' A value of 0 uses a divergent scale (useful for visualizing negative and positive numbers), a 
+#' value of 1 uses a continuous scale (useful for visualizing outliers), and a value greater than
+#' one will divide the data into that many quantiles and shade each a different color.
+#' 
 #' @param zoom An optional vector of countries to zoom in on. Elements of this vector must exactly 
 #' match the names of countries as they appear in the "region" column of ?country.regions
 #' @examples
@@ -64,7 +71,10 @@ CountryChoropleth = R6Class("CountryChoropleth",
 #' @importFrom grid unit grobTree
 
 country_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', value.name = 'value',
-                              title="", legend="", num_colors=7, zoom=NULL)
+                              title="", legend="", 
+                              colors = NULL, num_colors=7, 
+                              color_max = '#084594', color_min = '#eff3ff', na.color = '',
+                              zoom=NULL)
 {
   c = CountryChoropleth$new(user.df = df, geoid.name = geoid.name, 
                             geoid.type = geoid.type, value.name = value.name)

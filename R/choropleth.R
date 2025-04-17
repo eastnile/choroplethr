@@ -16,7 +16,11 @@ Choropleth = R6Class("Choropleth",
     geoid.name = NULL,
     geoid.type = NULL,
     value.name = NULL,
-            
+    scale = NULL,
+    user_value_factor_or_string = NULL,
+    value_was_discretized = NULL,
+    nlevels = NULL,
+    user.colors = NULL,
     title          = "",    # title for map
     legend         = "",    # title for legend
     warn           = TRUE,  # warn user on clipped or missing values                      
@@ -57,29 +61,42 @@ Choropleth = R6Class("Choropleth",
       stopifnot(class(geoid.name) == 'character')
       stopifnot(class(value.name) == 'character')
       browser()
-      self$user.df = self$prep_user_df(user.df = user.df, ref.regions = ref.regions, geoid.name = geoid.name,
-                             geoid.type = geoid.type, value.name = value.name)$user.df.prepped
-      self$geoid.type = self$prep_user_df(user.df = user.df, ref.regions = ref.regions, geoid.name = geoid.name,
-                                          geoid.type = geoid.type, value.name = value.name)$geoid.type
+      self$prep_user_df(user.df = user.df, ref.regions = ref.regions, 
+                        geoid.name = geoid.name,
+                        geoid.type = geoid.type, 
+                        value.name = value.name)
+      # self$user.df = self$prep_user_df(user.df = user.df, ref.regions = ref.regions, geoid.name = geoid.name,
+      #                        geoid.type = geoid.type, value.name = value.name)$user.df.prepped
+      # self$geoid.type = self$prep_user_df(user.df = user.df, ref.regions = ref.regions, geoid.name = geoid.name,
+      #                                     geoid.type = geoid.type, value.name = value.name)$geoid.type
 
       
-      
       # things like insets won't color properly if they are characters, and not factors
-      if (is.character(self$user.df$value))
-      {
+      browser()
+      if (is.factor(user.df$value)) {
+        self$user_value_factor_or_string = TRUE
+        self$nlevels = length(levels(self$user.df$value))
+      } else if (is.character(user.df$value)) {
+        self$user_value_factor_or_string = TRUE
         self$user.df$value = as.factor(self$user.df$value)
+        self$nlevels = length(levels(self$user.df$value))
+        print(paste0('The variable to be plotted is a character and will be converted to factor with ', self$nlevels, ' levels before plotting.'))
+      } else if (is.numeric(user.df$value)) {
+        self$user_value_factor_or_string = FALSE
+      } else {
+        stop('The variable to be plotted must be a numeric, a factor, or a character.')
       }
       
       # initialize the map to the max zoom - i.e. all regions
       self$set_zoom(NULL)
       self$map.df = map.df
-      self$user.df = user.df
       self$geoid.name = geoid.name
       self$value.name = value.name
       
       # if the user's data contains values which are not on the map, 
       # then emit a warning if appropriate
 
+      # self$scale = self$get_scale()
       
       # as of ggplot v2.1.0, R6 class variables cannot be assigned to ggplot2 objects
       # in the class declaration. Doing so will break binary builds, so assign them
@@ -227,7 +244,9 @@ Choropleth = R6Class("Choropleth",
       }
       user.df.clean = user.df[!user.df[, geoid.name]%in%geoid.unmatched, c(geoid.name, value.name)]
       names(user.df.clean) = c('region', 'value')
-      return(list(user.df.prepped = user.df.clean, geoid.type = geoid.type))
+      self$user.df = user.df.clean
+      self$geoid.type = geoid.type
+      # return(list(user.df.prepped = user.df.clean, geoid.type = geoid.type))
     },
     
     # support e.g. users just viewing states on the west coast
@@ -244,15 +263,34 @@ Choropleth = R6Class("Choropleth",
     #' @importFrom Hmisc cut2    
     discretize = function() 
     {
-      if (is.numeric(self$user.df$value) && private$num_colors > 1) {
-        
-        # if cut2 uses scientific notation,  our attempt to put in commas will fail
-        scipen_orig = getOption("scipen")
+      if (!self$user_value_factor_or_string && private$num_colors > 1) {
+        # if non-cont. scale is requested (e.i, num colors > 1), discretize the value to be plotted and convert it to a factor 
+        browser()
+        scipen_orig = getOption("scipen") # Remove scientific notation
         options(scipen=999)
-        self$user.df$value = cut2(self$user.df$value, g = private$num_colors)
+        x = self$user.df$value
+        x_cut = Hmisc::cut2(x, g = private$num_colors, m = 1, minmax = T)
+        labelgood = character()
+        for (i in seq_along(levels(x_cut))) {
+          # i = 1
+          str = levels(x_cut)[i]
+          strsplit = unlist(stringr::str_split(str, pattern = ','))
+          if (length(strsplit) == 1) {
+            labelgood[i] = str
+          } else {
+            left = stringr::str_replace_all(strsplit[1], "[\\[\\]\\(\\)]", "")
+            right = stringr::str_replace_all(strsplit[2], "[\\[\\]\\(\\)]", "")
+            labelgood[i] = paste0(left, ' to <', right)
+          }
+        }
+        browser()
+        stopifnot(length(labelgood) == length(levels(x_cut)))
+        levels(x_cut) = labelgood
         options(scipen=scipen_orig)
-        
-        levels(self$user.df$value) = sapply(levels(self$user.df$value), self$format_levels)
+        stopifnot(length(self$user.df$value) == length(x_cut))
+        self$user.df$value = x_cut
+        self$value_was_discretized = TRUE
+        self$nlevels = length(levels(self$user.df$value))
       }
     },
     
@@ -280,31 +318,54 @@ Choropleth = R6Class("Choropleth",
     },
 
     #' @importFrom ggplot2 scale_fill_gradient2
-    get_scale = function()
+    get_scale = function(color_min = '#eff3ff', color_max = '#084594', color_mid = '', 
+                         midpoint = median(self$choropleth.df$value, na.rm = T), na.value = 'black')
     {
       browser()
-      if (!is.null(self$ggplot_scale)) 
+      if (!is.null(self$ggplot_scale)) # case 1: ggplot_scale passed to function (may depreciate later)
       {
         self$ggplot_scale
-      } else if (private$num_colors == 0) {
-        min_value = min(self$choropleth.df$value, na.rm = TRUE)
-        max_value = max(self$choropleth.df$value, na.rm = TRUE)
-        stopifnot(!is.na(min_value) && !is.na(max_value))
+      } else if (!is.null(self$user.colors)) { # case 2: user specifies set of colors
+        if (!self$user_value_factor_or_string) {
+          stop('User specified colors can only be used with a factor variable.')
+        }
+        if (length(self$user.colors) != self$nlevels) {
+          stop('The number of colors specified in user.colors must match the number of categories in the value to be plotted.')
+        }
+        return(scale_color_manual(values = mycolors))
+      } else if (private$num_colors == 0) { # case 3: continuous diverging scale
+        browser()
+        # min_value = min(self$choropleth.df$value, na.rm = TRUE)
+        # max_value = max(self$choropleth.df$value, na.rm = TRUE)
+        # stopifnot(!is.na(min_value) && !is.na(max_value))
 
-        scale_fill_gradient2(self$legend, na.value = "black", limits = c(min_value, max_value))
+        scale_fill_gradient(self$legend, na.value = "black", low = color_min, high = color_max)
 
-      } else if (private$num_colors == 1) {
+      } else if (private$num_colors == 1) { # case 4: continuous converging scale
+        color_min = ifelse(is.null(color_min), '#eff3ff', color_min)
+        color_max = ifelse(is.null(color_min), '#084594', color_max)
         
-        min_value = min(self$choropleth.df$value, na.rm = TRUE)
-        max_value = max(self$choropleth.df$value, na.rm = TRUE)
-        stopifnot(!is.na(min_value) && !is.na(max_value))
+
 
         # by default, scale_fill_continuous uses a light value for high values and a dark value for low values
         # however, this is the opposite of how choropleths are normally colored (see wikipedia)
         # these low and high values are from the 7 color brewer blue scale (see colorbrewer.org)
-        scale_fill_continuous(self$legend, low="#eff3ff", high="#084594", na.value="black", limits=c(min_value, max_value))
-      } else {
-        scale_fill_brewer(self$legend, drop=FALSE, na.value="black")        
+        #return(scale_fill_continuous(self$legend, low="#eff3ff", high="#084594", na.value="black", limits=c(min_value, max_value)))
+        return(ggplot2::scale_fill_gradient(self$legend, na.value = "black", low = color_min, high = color_max))
+        
+      } else if (!self$user_value_factor_or_string) { # Case 5: Continuous user input but with discretized values
+        browser()
+        stopifnot(class(self$user.df$value) == 'factor') 
+        stopifnot(!is.null(self$nlevels))
+        if (self$nlevels != private$num_colors) {
+          warning('After making the plotted value discrete, the number of categories differed from the num_colors requested.')
+        }
+        mycolors = colorRampPalette(c(min, max))(self$nlevels)
+        return(scale_fill_manual(values = mycolors, na.value = na.value, drop = F))       
+      } else { # user variable was a factor or character
+        stopifnot(class(self$user.df$value) == 'factor') 
+        stopifnot(!is.null(self$nlevels))
+        return(scale_fill_brewer(self$legend, drop=FALSE, na.value="black", type = 'qual'))        
       }
     },
     
