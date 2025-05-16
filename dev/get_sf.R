@@ -1,5 +1,6 @@
 library(choroplethrMaps)
 library(rnaturalearth)
+library(sf)
 # preloaded maps in coroplethrMaps
 data(package = 'choroplethrMaps')
 data(country.map)
@@ -40,14 +41,46 @@ world <- ne_countries(scale = "small", returnclass = "sf")
 
 # This one is more complicated
 
-world = st_drop_geometry(world)
+world_meta = st_drop_geometry(world)
 
-?duplicated
+duplicated = unlist(lapply(world_meta,  function(x){sum(duplicated(x))}))
+nonalpha = unlist(lapply(world_meta, function(x) {sum(grepl("[^A-Za-z0-9 -]", x))}))
 
-duplicated = unlist(lapply(world,  function(x){sum(duplicated(x))}))
-nonalpha = unlist(lapply(world, function(x) {sum(grepl("[^A-Za-z0-9 -]", x))}))
+summary = data.frame(var = names(world_meta), ndup = duplicated, nonalpha = nonalpha)
+summary$id_maybe = ifelse(summary$ndup == 0 & summary$nonalpha == 0, 1, 0)
+id_maybe = summary$var[summary$id_maybe == 1]
 
-meta = data.frame(var = names(world), ndup = unlist(lapply(world,  function(x){sum(duplicated(x))})),
-                  nonalpha =  unlist(lapply(world, function(x) {sum(grepl("[^A-Za-z0-9 -]", x))})))
+#View(world_meta[, id_maybe])
+world_meta$chk1 = ifelse(world_meta$admin != world_meta$geounit, 1, 0)
+#View(world_meta[, c('admin', 'geounit', 'chk1')]) # admin and geounit differ only for tanzania
 
-meta$id_maybe = ifelse(meta$ndup == 0 & meta$nonalpha == 0, 1, 0)
+world_meta_good = world_meta[, c('admin', 'adm0_a3', 'iso_a2', 'continent')]
+names(world_meta_good) = c('name.proper', 'iso_a3', 'iso_a2', 'continent')
+
+# adm0_a3 is an internal code used by natural earth; it differs from the iso_a3 variable in natrual earth as follows:
+# France has a code (FRA)
+# Norway has a code (NOR)
+# Northern Cyprus (CYN), Somaliland (SOL), and Kosovo (KOS) have codes.
+
+# iso_a2 is included because it is common, with the following changes compared to the iso_a2 variable in natural earth:
+# France has a code (FR)
+# Norway has a code (NO)
+# Northern Cyprus, Somaliland, and Kosovo are missing.
+# Taiwan is coded TW instead of CN-TW
+
+world_meta_good$iso_a2[world_meta_good$iso_a3 == "FRA"] = 'FR'
+world_meta_good$iso_a2[world_meta_good$iso_a3 == "NOR"] = 'NO'
+world_meta_good$iso_a2[world_meta_good$iso_a3 == "CYN"] = NA
+world_meta_good$iso_a2[world_meta_good$iso_a3 == "SOL"] = NA
+world_meta_good$iso_a2[world_meta_good$iso_a3 == "KOS"] = NA
+
+world_meta_good$name.lower = tolower(world_meta_good$name.proper)
+
+
+saveRDS(world_meta_good, 'dev/regions_country.rds')
+
+world_good = world[, c('adm0_a3')]
+names(world_good) = c('iso_a3', 'geometry')
+
+saveRDS(world_good, 'dev/sf_country.rds')
+

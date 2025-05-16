@@ -6,24 +6,35 @@
 CountryChoropleth = R6Class("CountryChoropleth",
   inherit = Choropleth,
   public = list(
-    
+    map.df = readRDS('dev/sf_country.rds'),
+    map.df.name = 'country.map',
+    ref.regions = readRDS('dev/regions_country.rds'),
+    ref.regions.name = 'country.regions',
+    geoid.all = c('name.proper', 'name.lower', 'iso_a3', 'iso_a2'),
+    geoid.main = 'iso_a3',
+    mercator.default.limits = c(-80,85)
+
     # initialize with a world map
-    initialize = function(user.df, geoid.name = geoid.name, geoid.type = geoid.type, value.name = value.name)
-    {
-      if (!requireNamespace("choroplethrMaps", quietly = TRUE)) {
-        stop("Package choroplethrMaps is needed for this function to work. Please install it.", call. = FALSE)
-      }
-      data(country.map, package="choroplethrMaps", envir=environment())
-      browser()
-      super$initialize(map.df = country.map, user.df = user.df, ref.regions = readRDS('dev/country_regions.rds'),
-                       geoid.name = geoid.name, geoid.type = geoid.type, value.name = value.name)
-      
-      
-      if (private$has_invalid_regions)
-      {
-        warning("Please see ?country.regions for a list of mappable regions")
-      }
-    }
+    # initialize = function(user.df, geoid.name = geoid.name, 
+    #                       geoid.type = geoid.type, value.name = value.name)
+    # {
+    #   if (!requireNamespace("choroplethrMaps", quietly = TRUE)) {
+    #     stop("Package choroplethrMaps is needed for this function to work. Please install it.", call. = FALSE)
+    #   }
+    #   data(country.map, package="choroplethrMaps", envir=environment())
+    #   browser()
+    #   super$initialize(map.df = self$map.df, 
+    #                    ref.regions = self$ref.regions,
+    #                    user.df = user.df,
+    #                    geoid.name = geoid.name, geoid.type = geoid.type, value.name = value.name)
+    #   
+    #   
+    #   if (private$has_invalid_regions)
+    #   {
+    #     warning("Please see ?country.regions for a list of mappable regions")
+    #   }
+    # }
+    
   )
 )
 
@@ -70,17 +81,62 @@ CountryChoropleth = R6Class("CountryChoropleth",
 #' @importFrom ggplot2 scale_fill_continuous scale_colour_brewer ggplotGrob annotation_custom 
 #' @importFrom grid unit grobTree
 
-country_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', value.name = 'value',
+country_choropleth = function(df, geoid.name = 'region', geoid.type = NULL, value.name = 'value',
                               title="", legend="", 
                               colors = NULL, num_colors=7, 
                               color_max = '#084594', color_min = '#eff3ff', na.color = '',
-                              zoom=NULL)
+                              continent_zoom = NULL,
+                              zoom = NULL,
+                              exclude = NULL,
+                              limits_lat = NULL,
+                              limits_long = NULL,
+                              projection = 'cartesian',
+                              return = 'ggplot')
 {
+  browser()
   c = CountryChoropleth$new(user.df = df, geoid.name = geoid.name, 
                             geoid.type = geoid.type, value.name = value.name)
+  
+  browser()
   c$title  = title
   c$legend = legend
-  c$set_num_colors(num_colors)
-  c$set_zoom(zoom)
-  c$render()
+  #c$set_num_colors(num_colors)
+  
+  
+  
+  if (!is.null(continent_zoom)) {
+    #stopifnot(length(continent_zoom) == 1)
+    stopifnot(all(continent_zoom %in% unique(c$ref.regions$continent)))
+    zoom = c$ref.regions[c$ref.regions$continent %in% continent_zoom, c$geoid.type]
+  }
+  # 
+  # if(!is.null(zoom)) {
+  #   c$set_zoom(zoom = zoom, exclude = exclude)
+  # }
+  # 
+  browser()
+  c$prepare_map(include = zoom, exclude = exclude, nlvls = 5)
+  # projection_list = list(cartesian = coord_sf(crs = 4326, ylim = limits_lat, xlim = limits_long),
+  #                        mercator = coord_sf(crs = 3857, 
+  #                                            ylim=ifelse(is.null(limits_lat), list(c(-80,85)), limits_lat)[[1]], 
+  #                                            xlim = limits_long,
+  #                                            default_crs = 4326),
+  #                        robinson = coord_sf(crs = '+proj=robin', default_crs = 4326, ylim = limits_lat, xlim = limits_long),
+  #                        test = c$get_albers_proj(c$choropleth.df, default_crs = 4326, ylim = limits_lat, xlim = limits_long))
+  # c$projection_sf = projection_list[[projection]]
+
+  browser()
+  if (return == 'plot') {
+    return(c$render(projection = coord_sf(crs = 4326, ylim = limits_lat, xlim = limits_long), 
+                    user.colors = NULL,
+                    color_max = color_max,
+                    color_min = color_min))
+  } else if (return == 'sf') {
+    c$prepare_map()
+    return(c$choropleth.df)
+  } else if (return == 'R6obj') {
+    return(c) 
+  } else {
+    stop("return must be 'plot' or 'sf'.")
+  }
 }
