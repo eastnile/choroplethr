@@ -3,6 +3,8 @@
 devtools::load_all() 
 
 # data("df_state_demographics")
+# 
+# state_choropleth(df_state_demographics, value.name = 'total_population')
 # names(df_state_demographics)[2] = 'value'
 # 
 # st_zoom = df_state_demographics$region[1:10]
@@ -10,12 +12,9 @@ devtools::load_all()
 
 # 
 data("df_pop_country")
-
-#df_pop_country$value = ifelse(df_pop_country$value>1000000000, df_pop_country$value, -1*df_pop_country$value)
-
-country_choropleth(df = df_pop_country, num_colors = 5, projection = 'robinson', 
-                   continent_zoom = c('Europe'),
-                   zoom = 'france',
+country_choropleth(df = df_pop_country, num_colors = 5, projection = 'robinson',
+                   # continent = c('Oceania'),
+                   zoom = NULL,
                    # zoom=c("united states of america", "canada", "mexico", "australia"),
                    return = 'plot')
 # tester$choropleth.df

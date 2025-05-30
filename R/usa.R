@@ -5,25 +5,26 @@
 #' @include choropleth.R
 USAChoropleth = R6Class("USAChoropleth",
   inherit = Choropleth,
-  
+
   public = list(
     add_state_outline = FALSE,
-
-    initialize = function(map.df, user.df, ref.regions = ref.regions, geoid.name = geoid.name, 
-                          geoid.type = geoid.type, value.name = value.name)
-    {
-      browser()
-      super$initialize(map.df = map.df, user.df = user.df, geoid.name = geoid.name, ref.regions = ref.regions,
-                       geoid.type = geoid.type, value.name = value.name)
-      # need a state field for doing insets of AK and HI
-      stopifnot("state" %in% colnames(map.df)) 
-    },
+    mercator.default.limits = c(-80,85),
+    # initialize = function(map.df, user.df, ref.regions = ref.regions, geoid.name = geoid.name,
+    #                       geoid.type = geoid.type, value.name = value.name)
+    # {
+    #   browser()
+    #   super$initialize(map.df = map.df, user.df = user.df, geoid.name = geoid.name, ref.regions = ref.regions,
+    #                    geoid.type = geoid.type, value.name = value.name)
+    #   # need a state field for doing insets of AK and HI
+    #   stopifnot("state" %in% colnames(map.df))
+    # },
     
     # render the map, with AK and HI as insets
-    render = function()
+    render = function(...)
     {
-      # browser()
-      self$prepare_map()
+      print('hello')
+      browser()
+      #self$prepare_map()
       
       if (identical(private$zoom, "alaska") || identical(private$zoom, "hawaii")) {
         choro = self$render_helper(self$choropleth.df, self$scale_name, self$theme_clean()) + ggtitle(self$title)
@@ -33,9 +34,18 @@ USAChoropleth = R6Class("USAChoropleth",
           return(choro)
         }
       } else {
+        
+        # first, get scale for whole map
+        
+        self$get_scale()
+        
+        browser()
         # remove AK and HI from the "real" df
-        continental.df = self$choropleth.df[!self$choropleth.df$state %in% c("alaska", "hawaii"), ]
-        continental.ggplot = self$render_helper(continental.df, self$scale_name, self$theme_clean()) + ggtitle(self$title)
+        continental.df = self$choropleth.df[!self$choropleth.df$state.abb %in% c("AK", "HI"), ]
+        #test = super$render(choropleth.df = continental.df, ...)
+        
+        
+        #continental.ggplot = self$render_helper(continental.df, self$scale_name, self$theme_clean()) + ggtitle(self$title)
         if (self$add_state_outline)
         {
           continental.regions = subset(private$zoom, private$zoom!="alaska" & private$zoom!="hawaii")

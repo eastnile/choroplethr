@@ -3,46 +3,13 @@
 #' @importFrom dplyr left_join
 #' @include usa.R
 StateChoropleth = R6Class("StateChoropleth",
-  inherit = USAChoropleth,
-  
+  inherit = Choropleth,
   public = list(
-    show_labels = TRUE,
-    
-    # initialize with us state map
-    initialize = function(user.df, geoid.name = geoid.name, geoid.type = geoid.type, value.name = value.name)
-    {
-      if (!requireNamespace("choroplethrMaps", quietly = TRUE)) {
-        stop("Package choroplethrMaps is needed for this function to work. Please install it.", call. = FALSE)
-      }
-
-      data(state.map, package="choroplethrMaps", envir=environment())
-      state.map$state = state.map$region
-      browser()
-      super$initialize(map.df = state.map, user.df = user.df, ref.regions = readRDS('dev/st_regions.rds'), 
-                       geoid.name = geoid.name, 
-                       geoid.type = geoid.type, value.name = value.name)
-      
-      if (private$has_invalid_regions)
-      {
-        warning("Please see ?state.regions for a list of mappable regions")
-      }
-    },
-    
-    render = function()
-    {
-      choropleth = super$render()
-      
-      # by default, add labels for the lower 48 states
-      if (self$show_labels) {
-        df_state_labels = data.frame(long = state.center$x, lat = state.center$y, name=tolower(state.name), label = state.abb)
-        df_state_labels = df_state_labels[!df_state_labels$name %in% c("alaska", "hawaii"), ]
-        df_state_labels = df_state_labels[df_state_labels$name %in% private$zoom, ]
-
-        choropleth = choropleth + geom_text(data = df_state_labels, aes(long, lat, label = label, group = NULL), color = 'black')
-      }
-      
-      choropleth
-    }
+    map.df = readRDS('dev/sf_state.rds'),
+    map.df.name = 'state.map',
+    ref.regions = readRDS('dev/regions_state.rds'),
+    ref.regions.name = 'state.regions',
+    geoid.all = c('name.proper', 'name.lower', 'state.abb', 'fips.character', 'fips.numeric')
   )
 )
 
@@ -111,22 +78,33 @@ StateChoropleth = R6Class("StateChoropleth",
 #' @importFrom ggplot2 ggplot aes geom_polygon scale_fill_brewer ggtitle theme theme_grey element_blank geom_text
 #' @importFrom ggplot2 scale_fill_continuous scale_colour_brewer
 #' @importFrom grid unit
-state_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', value.name = 'value',
-                            title="", legend="", num_colors=7, zoom=NULL, reference_map = FALSE)
-{
+#' @importFrom patchwork inset_element plot_layout
+#' 
+
+state_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', value.name = 'value', 
+         num_colors = 7, color.max = NULL, color.min = NULL, na.color = 'grey', nbreaks = 5, custom.colors = NULL,
+         zoom = NULL, projection = 'albers', 
+         border_color = 'grey15', border_thickness = 0.2,
+         background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE,
+         label = NULL, label_text_size = 3, label_text_color = 'black', label_box_color = 'white', ggrepel_options = NULL,
+         legend = NULL, legend_position = 'right', title = NULL, return = 'plot') {
+  
   c = StateChoropleth$new(user.df = df, geoid.name = geoid.name, 
-                          geoid.type = geoid.type, value.name = value.name)
-  c$title  = title
-  c$legend = legend
-  c$set_num_colors(num_colors)
+                          geoid.type = geoid.type, value.name = value.name, num_colors = num_colors)
+  contus = setdiff(c$ref.regions$state.abb, c('AK', 'HI'))
   c$set_zoom(zoom)
-  if (reference_map) {
-    if (is.null(zoom))
-    {
-      stop("Reference maps do not currently work with maps that have insets, such as maps of the 50 US States.")
-    }
-    c$render_with_reference_map()
-  } else {
-    c$render()
+  ggscale = c$get_ggscale(custom.colors = custom.colors, color.max = color.max, color.min = color.min, 
+                          na.color = na.color, nbreaks = nbreaks)
+  if (return == 'sf') {
+    return(c$choropleth.df)
   }
+  plot = c$render(choropleth.df =  c$choropleth.df, 
+                   ggscale = ggscale, projection = projection, reproject = FALSE,
+                   ignore_latlon = TRUE,
+                   border_color = border_color, border_thickness = border_thickness,
+                   background_color = background_color, gridlines = gridlines, latlon_ticks = latlon_ticks, 
+                   label = label, label_text_size = label_text_size, label_text_color = label_text_color, label_box_color = label_box_color,
+                   ggrepel_options = ggrepel_options,
+                   legend = legend, legend_position = legend_position, title = title)
+  return(plot)
 }

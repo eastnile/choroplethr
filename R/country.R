@@ -10,33 +10,8 @@ CountryChoropleth = R6Class("CountryChoropleth",
     map.df.name = 'country.map',
     ref.regions = readRDS('dev/regions_country.rds'),
     ref.regions.name = 'country.regions',
-    geoid.all = c('name.proper', 'name.lower', 'iso_a3', 'iso_a2'),
-    geoid.main = 'iso_a3',
-    mercator.default.limits = c(-80,85)
-
-    # initialize with a world map
-    # initialize = function(user.df, geoid.name = geoid.name, 
-    #                       geoid.type = geoid.type, value.name = value.name)
-    # {
-    #   if (!requireNamespace("choroplethrMaps", quietly = TRUE)) {
-    #     stop("Package choroplethrMaps is needed for this function to work. Please install it.", call. = FALSE)
-    #   }
-    #   data(country.map, package="choroplethrMaps", envir=environment())
-    #   browser()
-    #   super$initialize(map.df = self$map.df, 
-    #                    ref.regions = self$ref.regions,
-    #                    user.df = user.df,
-    #                    geoid.name = geoid.name, geoid.type = geoid.type, value.name = value.name)
-    #   
-    #   
-    #   if (private$has_invalid_regions)
-    #   {
-    #     warning("Please see ?country.regions for a list of mappable regions")
-    #   }
-    # }
-    
+    geoid.all = c('name.proper', 'name.lower', 'iso_a3', 'iso_a2'))
   )
-)
 
 #' Create a country-level choropleth
 #' 
@@ -81,62 +56,64 @@ CountryChoropleth = R6Class("CountryChoropleth",
 #' @importFrom ggplot2 scale_fill_continuous scale_colour_brewer ggplotGrob annotation_custom 
 #' @importFrom grid unit grobTree
 
-country_choropleth = function(df, geoid.name = 'region', geoid.type = NULL, value.name = 'value',
-                              title="", legend="", 
-                              colors = NULL, num_colors=7, 
-                              color_max = '#084594', color_min = '#eff3ff', na.color = '',
-                              continent_zoom = NULL,
-                              zoom = NULL,
-                              exclude = NULL,
-                              limits_lat = NULL,
-                              limits_long = NULL,
-                              projection = 'cartesian',
-                              return = 'ggplot')
+country_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', value.name = 'value',
+                              num_colors = 7, color.max = NULL, color.min = NULL, na.color = 'grey', nbreaks = 5, custom.colors = NULL,
+                              zoom = NULL, continent_zoom = NULL, 
+                              projection = 'cartesian', limits_lat = NULL, limits_lon = NULL, reproject = TRUE,
+                              border_color = 'grey15', border_thickness = 0.2,
+                              background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE,
+                              label = NULL, label_text_size = 3, label_text_color = 'black', label_box_color = 'white', ggrepel_options = NULL,
+                              legend = NULL, legend_position = 'right', title = NULL, return = 'plot')
+                              
+  
 {
-  browser()
-  c = CountryChoropleth$new(user.df = df, geoid.name = geoid.name, 
-                            geoid.type = geoid.type, value.name = value.name)
+  #browser()
+  c = CountryChoropleth$new(user.df = df, geoid.name = geoid.name, geoid.type = geoid.type, value.name = value.name, 
+                            num_colors = num_colors)
   
-  browser()
-  c$title  = title
-  c$legend = legend
-  #c$set_num_colors(num_colors)
-  
-  
-  
+  zoom_cont = NULL
   if (!is.null(continent_zoom)) {
-    #stopifnot(length(continent_zoom) == 1)
+    stopifnot(length(continent_zoom) == 1)
     stopifnot(all(continent_zoom %in% unique(c$ref.regions$continent)))
-    zoom = c$ref.regions[c$ref.regions$continent %in% continent_zoom, c$geoid.type]
+    zoom_cont = c$ref.regions[c$ref.regions$continent %in% continent_zoom, c$geoid.type]
+    if (is.null(limits_lat)) {
+      limits_lat = continent_latlon[[continent_zoom]]$limits_lat
+    }
+    if (is.null(limits_lon)) {
+      limits_lon = continent_latlon[[continent_zoom]]$limits_lon
+    }
+    c$set_zoom(intersect(zoom, zoom_cont))
+  } else {
+    c$set_zoom(zoom)
   }
-  # 
-  # if(!is.null(zoom)) {
-  #   c$set_zoom(zoom = zoom, exclude = exclude)
-  # }
-  # 
-  browser()
-  c$prepare_map(include = zoom, exclude = exclude, nlvls = 5)
-  # projection_list = list(cartesian = coord_sf(crs = 4326, ylim = limits_lat, xlim = limits_long),
-  #                        mercator = coord_sf(crs = 3857, 
-  #                                            ylim=ifelse(is.null(limits_lat), list(c(-80,85)), limits_lat)[[1]], 
-  #                                            xlim = limits_long,
-  #                                            default_crs = 4326),
-  #                        robinson = coord_sf(crs = '+proj=robin', default_crs = 4326, ylim = limits_lat, xlim = limits_long),
-  #                        test = c$get_albers_proj(c$choropleth.df, default_crs = 4326, ylim = limits_lat, xlim = limits_long))
-  # c$projection_sf = projection_list[[projection]]
-
-  browser()
+  ggscale = c$get_ggscale(custom.colors = custom.colors, color.max = color.max, color.min = color.min, 
+                          na.color = na.color, nbreaks = nbreaks)
+  
   if (return == 'plot') {
-    return(c$render(projection = coord_sf(crs = 4326, ylim = limits_lat, xlim = limits_long), 
-                    user.colors = NULL,
-                    color_max = color_max,
-                    color_min = color_min))
+
+    c$render(ggscale = ggscale, 
+             projection = projection, limits_lat = limits_lat, limits_lon = limits_lon, reproject = reproject,
+             border_color = border_color, border_thickness = border_thickness,
+             background_color = background_color, gridlines = gridlines, latlon_ticks = latlon_ticks,
+             label = label, label_text_size = label_text_size, label_text_color = label_text_color, 
+             label_box_color = label_box_color, ggrepel_options = ggrepel_options,
+             legend = legend, legend_position = legend_position, title = title)
   } else if (return == 'sf') {
-    c$prepare_map()
     return(c$choropleth.df)
-  } else if (return == 'R6obj') {
-    return(c) 
   } else {
     stop("return must be 'plot' or 'sf'.")
   }
 }
+
+continent_latlon = list()
+continent_latlon[['Europe']] = list(limits_lat= c(34,72), limits_lon = c(-17,45))
+continent_latlon[['Asia']] = list(limits_lat= c(-10,58), limits_lon = c(32,155))
+continent_latlon[['Africa']] = list(limits_lat= c(-37,39), limits_lon = c(-19,53))
+continent_latlon[['Oceania']] = list(limits_lat= c(-48, -1), limits_lon = c(112,182))
+continent_latlon[['North America']] = list(limits_lat= c(6, 79), limits_lon = c(-170,-48))
+continent_latlon[['South America']] = list(limits_lat= c(-58, 14), limits_lon = c(-83,-32))
+
+# continents = c('Africa', 'Asia', 'Europe', 'North America', 'Oceania', 'South America')
+# ymin = c()
+
+

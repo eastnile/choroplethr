@@ -118,10 +118,7 @@ NULL
 #' ?get_state_demographics. 
 #' @keywords data
 #' @usage data(df_state_demographics)
-#' @examples
-#' \dontrun{
-#' library(choroplethr)
-#' data(df_state_demographics)
+
 #' 
 #' # examine the 2013, 5-year state percent hispanic estimates as a boxplot and choropleth
 #'
@@ -215,4 +212,13 @@ NULL
 #' ?get_congressional_district_demographics 
 #' @keywords data
 #' @usage data(df_congress116_demographics)
+NULL
+
+#' A data.frame containing population estimates for Countries in 2012.   
+#'
+#' @name df_country_demographics
+#' @docType data
+#' @references Data from rnaturalearth::ne_countries(); https://www.naturalearthdata.com/
+#' @keywords data
+#' @usage data(df_country_demographics)
 NULL

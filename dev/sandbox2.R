@@ -1,3 +1,10 @@
+library(urbnmapr)
+states_sf <- get_urbn_map("states", sf = TRUE)
+ggplot(states_sf) +
+  geom_sf(fill = "grey", color = "white")
+
+
+
 library(sf)
 library(ggplot2)
 library(dplyr)
