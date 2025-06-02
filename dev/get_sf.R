@@ -10,7 +10,7 @@ data(county.map)
 data(state.regions)
 data(country.regions)
 
-## US States ----
+## 1. US States ----
 state_sf = states(cb = TRUE, year = 2024)
 state_sf = shift_geometry(state_sf, geoid_column = 'GEOID', position = 'below')
 state_sf <- st_transform(state_sf, 4326)
@@ -39,7 +39,7 @@ saveRDS(state_sf, 'dev/sf_state.rds')
 state_sf_meta = st_drop_geometry(state_sf)
 saveRDS(state_sf_meta, 'dev/regions_state.rds')
 
-# Enlarge DC ----
+# Enlarge DC --
 dc = state_sf %>% filter(name.proper == "District of Columbia")
 dc_geom = st_geometry(dc)                                     # extract geometry
 scaled_dc = (dc_geom - st_centroid(dc_geom)) * 3 + st_centroid(dc_geom)
@@ -59,20 +59,52 @@ if (F) {
 sum(!st_is_valid(state_sf_dcbig))
 saveRDS(state_sf_dcbig, 'dev/sf_state_bigdc.rds')
 
-# Prep County SF Map
+
+
+# US Counties ----
 county.regions.legacy = readRDS('dev/regions_county_legacy.rds')
 county_sf = tigris::counties(cb = TRUE, year = 2024)
+county_sf = shift_geometry(county_sf, geoid_column = 'GEOID', position = 'below')
+
+
 county_sf = filter(county_sf, !STUSPS %in% c("PR", "VI", "GU", "MP", "AS"))
 stopifnot(length(table(county_sf$STUSPS))==51)
-county.regions = county_sf[, c('STATEFP', 'GEOID', 'NAMELSAD', 'STUSPS', 'STATE_NAME')]
-county.regions = st_drop_geometry(county.regions)
-names(county.regions) = c('state.fips.character', 'fips.character', 'name.proper', 'state.abb', 'state.name.proper')
-county.regions$state.fips.numeric = as.integer(county.regions$state.fips.character)
-county.regions$fips.numeric = as.integer(county.regions$fips.character)
-county.regions = county.regions[, c('fips.numeric', 'fips.character', 'name.proper', 'state.fips.numeric', 'state.fips.character', 'state.abb', 'state.name.proper')]
+
+
+county_sf <- st_transform(county_sf, 4326)
+
+
+
+alaska = county_sf[county_sf$STATE_NAME == 'Alaska', ]
+ggplot(alaska) + geom_sf() 
+
+alaska_cropped = st_crop(alaska, xmin = -122, ymin = 19, xmax = -108.5, ymax = 30)
+
+
+ggplot(alaska_cropped) + geom_sf() 
+county_sf = county_sf[county_sf$STATE_NAME != 'Alaska',]
+county_sf = rbind(county_sf, alaska_cropped)
+
+ggplot(county_sf) + geom_sf() 
+
+county_sf = county_sf[, c('STATEFP', 'GEOID', 'NAMELSAD', 'STUSPS', 'STATE_NAME', 'geometry')]
+
+names(county_sf) = c('state.fips.character', 'fips.character', 'name.proper', 'state.abb', 'state.name.proper', 'geometry')
+
+county_sf$state.fips.numeric = as.integer(county_sf$state.fips.character)
+county_sf$fips.numeric = as.integer(county_sf$fips.character)
+county_sf = county_sf[, c('fips.numeric', 'fips.character', 'name.proper', 'state.fips.numeric', 'state.fips.character', 'state.abb', 'state.name.proper', 'geometry')]
+
+county_sf = county_sf[order(county_sf$state.fips.numeric, county_sf$fips.numeric), ]
+
+sum(!st_is_valid(county_sf))
+
+saveRDS(county_sf, 'dev/sf_county.rds')
+
+county.regions = st_drop_geometry(county_sf)
 saveRDS(county.regions, 'dev/regions_county.rds')
 
-## Country SFs ----
+## 3. World  ----
 world <- ne_countries(scale = "small", returnclass = "sf")
 
 # Establish unique geoid ----

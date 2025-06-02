@@ -52,6 +52,7 @@ Collate:
     'county.R'
     'county_zoom.R'
     'data.R'
+    'func_tigris.R'
     'get_congress_116_party_data.R'
     'get_congressional_demographics.R'
     'get_usa_demographics.R'

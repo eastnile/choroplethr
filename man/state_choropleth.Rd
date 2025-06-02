@@ -6,20 +6,36 @@
 \usage{
 state_choropleth(
   df,
-  title = "",
-  legend = "",
+  geoid.name = "region",
+  geoid.type = "auto",
+  value.name = "value",
   num_colors = 7,
+  color.max = NULL,
+  color.min = NULL,
+  na.color = "grey",
+  custom.colors = NULL,
   zoom = NULL,
-  reference_map = FALSE
+  projection = "albers",
+  border_color = "grey15",
+  border_thickness = 0.2,
+  background_color = "white",
+  gridlines = FALSE,
+  latlon_ticks = FALSE,
+  label = NULL,
+  label_text_size = 2.25,
+  label_text_color = "black",
+  label_box_color = "white",
+  ggrepel_options = list(force = 0.01, box.padding = 0.15, label.padding = 0.15,
+    max.overlaps = Inf),
+  legend = NULL,
+  legend_position = "bottom",
+  title = NULL,
+  return = "plot"
 )
 }
 \arguments{
 \item{df}{A data.frame with a column named "region" and a column named "value".  Elements in 
 the "region" column must exactly match how regions are named in the "region" column in state.map.}
-
-\item{title}{An optional title for the map.}
-
-\item{legend}{An optional name for the legend.}
 
 \item{num_colors}{The number of colors to use on the map.  A value of 0 uses 
 a divergent scale (useful for visualizing negative and positive numbers), A 
@@ -28,6 +44,10 @@ value in [2, 9] will use that many quantiles.}
 
 \item{zoom}{An optional vector of states to zoom in on. Elements of this vector must exactly 
 match the names of states as they appear in the "region" column of ?state.regions.}
+
+\item{legend}{An optional name for the legend.}
+
+\item{title}{An optional title for the map.}
 
 \item{reference_map}{If true, render the choropleth over a reference map from Google Maps.}
 }

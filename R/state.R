@@ -5,7 +5,7 @@
 StateChoropleth = R6Class("StateChoropleth",
   inherit = Choropleth,
   public = list(
-    map.df = readRDS('dev/sf_state.rds'),
+    map.df = readRDS('dev/sf_state_bigdc.rds'),
     map.df.name = 'state.map',
     ref.regions = readRDS('dev/regions_state.rds'),
     ref.regions.name = 'state.regions',
@@ -77,30 +77,29 @@ StateChoropleth = R6Class("StateChoropleth",
 #' @importFrom stringr str_extract_all
 #' @importFrom ggplot2 ggplot aes geom_polygon scale_fill_brewer ggtitle theme theme_grey element_blank geom_text
 #' @importFrom ggplot2 scale_fill_continuous scale_colour_brewer
-#' @importFrom grid unit
-#' @importFrom patchwork inset_element plot_layout
-#' 
+
 
 state_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', value.name = 'value', 
-         num_colors = 7, color.max = NULL, color.min = NULL, na.color = 'grey', nbreaks = 5, custom.colors = NULL,
+         num_colors = 7, color.max = NULL, color.min = NULL, na.color = 'grey', custom.colors = NULL,
          zoom = NULL, projection = 'albers', 
          border_color = 'grey15', border_thickness = 0.2,
          background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE,
-         label = NULL, label_text_size = 3, label_text_color = 'black', label_box_color = 'white', ggrepel_options = NULL,
-         legend = NULL, legend_position = 'right', title = NULL, return = 'plot') {
+         label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white', 
+         ggrepel_options = list(force = .01, 
+                                box.padding = 0.15,
+                                label.padding = 0.15, 
+                                max.overlaps = Inf),
+         legend = NULL, legend_position = 'bottom', title = NULL, return = 'plot') {
   
   c = StateChoropleth$new(user.df = df, geoid.name = geoid.name, 
                           geoid.type = geoid.type, value.name = value.name, num_colors = num_colors)
-  contus = setdiff(c$ref.regions$state.abb, c('AK', 'HI'))
   c$set_zoom(zoom)
   ggscale = c$get_ggscale(custom.colors = custom.colors, color.max = color.max, color.min = color.min, 
-                          na.color = na.color, nbreaks = nbreaks)
+                          na.color = na.color, nbreaks = num_colors)
   if (return == 'sf') {
     return(c$choropleth.df)
   }
-  plot = c$render(choropleth.df =  c$choropleth.df, 
-                   ggscale = ggscale, projection = projection, reproject = FALSE,
-                   ignore_latlon = TRUE,
+  plot = c$render(ggscale = ggscale, projection = projection, reproject = FALSE, ignore_latlon = TRUE,
                    border_color = border_color, border_thickness = border_thickness,
                    background_color = background_color, gridlines = gridlines, latlon_ticks = latlon_ticks, 
                    label = label, label_text_size = label_text_size, label_text_color = label_text_color, label_box_color = label_box_color,

@@ -4,23 +4,59 @@
 \alias{country_choropleth}
 \title{Create a country-level choropleth}
 \usage{
-country_choropleth(df, title = "", legend = "", num_colors = 7, zoom = NULL)
+country_choropleth(
+  df,
+  geoid.name = "region",
+  geoid.type = "auto",
+  value.name = "value",
+  num_colors = 7,
+  color.max = NULL,
+  color.min = NULL,
+  na.color = "grey",
+  nbreaks = 5,
+  custom.colors = NULL,
+  zoom = NULL,
+  continent_zoom = NULL,
+  projection = "cartesian",
+  limits_lat = NULL,
+  limits_lon = NULL,
+  reproject = TRUE,
+  border_color = "grey15",
+  border_thickness = 0.2,
+  background_color = "white",
+  gridlines = FALSE,
+  latlon_ticks = FALSE,
+  label = NULL,
+  label_text_size = 3,
+  label_text_color = "black",
+  label_box_color = "white",
+  ggrepel_options = NULL,
+  legend = NULL,
+  legend_position = "right",
+  title = NULL,
+  return = "plot"
+)
 }
 \arguments{
 \item{df}{A data.frame with a column named "region" and a column named "value".  Elements in 
 the "region" column must exactly match how regions are named in the "region" column in ?country.map.}
 
-\item{title}{An optional title for the map.}
-
-\item{legend}{An optional name for the legend.}
-
-\item{num_colors}{The number of colors to use on the map.  A value of 0 uses 
-a divergent scale (useful for visualizing negative and positive numbers), A 
-value of 1 uses a continuous scale (useful for visualizing outliers), and a 
-value in [2, 9] will use that many quantiles.}
+\item{num_colors}{When plotting numeric data, the number of colors to use on the map.
+A value of 0 uses a divergent scale (useful for visualizing negative and positive numbers), a 
+value of 1 uses a continuous scale (useful for visualizing outliers), and a value greater than
+one will divide the data into that many quantiles and shade each a different color.}
 
 \item{zoom}{An optional vector of countries to zoom in on. Elements of this vector must exactly 
 match the names of countries as they appear in the "region" column of ?country.regions}
+
+\item{legend}{An optional name for the legend.}
+
+\item{title}{An optional title for the map.}
+
+\item{colors}{A vector specifying the colors to be used if the plotted value is a character 
+or factor. These colors can be specified using R's color terms as given in ?colors, or as a
+hex value like that returned from rgb(). The number of colors must match the number of unique
+values in the variable to be plotted.}
 }
 \description{
 The map used is country.map in the choroplethrMaps package. See country.regions for

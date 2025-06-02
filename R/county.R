@@ -3,50 +3,14 @@
 #' @importFrom dplyr left_join
 #' @include usa.R
 CountyChoropleth = R6Class("CountyChoropleth",
-  inherit = USAChoropleth,
-  
-  public = list(
-    # this map looks better with an outline of the states added
-    add_state_outline = TRUE, 
-    
-    # initialize with us state map
-    initialize = function(user.df)
-    {
-      if (!requireNamespace("choroplethrMaps", quietly = TRUE)) {
-        stop("Package choroplethrMaps is needed for this function to work. Please install it.", call. = FALSE)
-      }
-
-      data(county.map, package="choroplethrMaps", envir=environment())
-      data(county.regions, package="choroplethrMaps", envir=environment())
-      # USAChoropleth requires a column called "state" that has full lower case state name (e.g. "new york")
-      county.map$state = merge(county.map, county.regions, sort=FALSE, by.x="region", by.y="region")$state.name
-      super$initialize(county.map, user.df)
-      
-      # by default, show all states on the map
-      data(state.map, package="choroplethrMaps", envir=environment())
-      private$zoom = unique(state.map$region)
-      
-      if (private$has_invalid_regions)
-      {
-        warning("Please see ?county.regions for a list of mappable regions")
-      }
-      
-    },
-    
-    # user.df has county FIPS codes for regions, but subsetting happens at the state level
-    clip = function() 
-    {
-      # remove regions not on the map before doing the merge
-      data(county.regions, package="choroplethrMaps", envir=environment())
-
-      self$user.df = self$user.df[self$user.df$region %in% county.regions$region, ]
-      self$user.df$state = merge(self$user.df, county.regions, sort=FALSE, all.X=TRUE, by.x="region", by.y="region")$state.name
-      self$user.df = self$user.df[self$user.df$state %in% private$zoom, ]
-      self$user.df$state = NULL
-        
-      self$map.df  = self$map.df[self$map.df$state %in% private$zoom, ]
-    }
-  )
+                           inherit = Choropleth,
+                           public = list(
+                             map.df = readRDS('dev/sf_county.rds'),
+                             map.df.name = 'county.map',
+                             ref.regions = readRDS('dev/regions_county.rds'),
+                             ref.regions.name = 'county.regions',
+                             geoid.all =  c('fips.numeric', 'fips.character', 'name.proper')
+                           )
 )
 
 
@@ -114,40 +78,37 @@ CountyChoropleth = R6Class("CountyChoropleth",
 #' @importFrom ggplot2 ggplot aes geom_polygon scale_fill_brewer ggtitle theme theme_grey element_blank geom_text
 #' @importFrom ggplot2 scale_fill_continuous scale_colour_brewer
 #' @importFrom grid unit
-county_choropleth = function(df, title="", legend="", num_colors=7, state_zoom=NULL, county_zoom=NULL, reference_map=FALSE)
+county_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', value.name = 'value', 
+                             num_colors = 7, color.max = NULL, color.min = NULL, na.color = 'grey', custom.colors = NULL,
+                             zoom = NULL, projection = 'albers', 
+                             border_color = 'grey15', border_thickness = 0.2,
+                             background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE,
+                             label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white', 
+                             legend = NULL, legend_position = 'bottom', title = NULL, return = 'plot')
 {
-  # user can only zoom in by one of the zoom options
-  if (!is.null(state_zoom) && !is.null(county_zoom))
-  {
-    stop("You cannnot set state_zoom and county_zoom at the same time.")
-  }
 
-  if (!is.null(county_zoom))
-  {
-    c = CountyZoomChoropleth$new(df)
-    c$title  = title
-    c$legend = legend
-    c$set_num_colors(num_colors)
-    c$set_zoom(county_zoom)
-    if (reference_map) {
-      c$render_with_reference_map()
-    } else {
-      c$render()
-    }
-  } else {
-    c = CountyChoropleth$new(df)
-    c$title  = title
-    c$legend = legend
-    c$set_num_colors(num_colors)
-    c$set_zoom(state_zoom)
-    if (reference_map) {
-      if (is.null(state_zoom))
-      {
-        stop("Reference maps do not currently work with maps that have insets, such as maps of the 50 US States.")
-      }
-      c$render_with_reference_map()
-    } else {
-      c$render()
-    }
+  browser()
+  c = CountyChoropleth$new(user.df = df, geoid.name = geoid.name, 
+                          geoid.type = geoid.type, value.name = value.name, num_colors = num_colors)
+  c$set_zoom(zoom)
+  ggscale = c$get_ggscale(custom.colors = custom.colors, color.max = color.max, color.min = color.min, 
+                          na.color = na.color, nbreaks = num_colors)
+  if (return == 'sf') {
+    return(c$choropleth.df)
   }
+  plot = c$render(ggscale = ggscale, projection = projection, reproject = FALSE, ignore_latlon = TRUE,
+                  border_color = border_color, border_thickness = border_thickness,
+                  background_color = background_color, gridlines = gridlines, latlon_ticks = latlon_ticks, 
+                  label = label, label_text_size = label_text_size, label_text_color = label_text_color, label_box_color = label_box_color,
+                  ggrepel_options = ggrepel_options,
+                  legend = legend, legend_position = legend_position, title = title)
+  
+  state_map = readRDS('dev/sf_state.rds')
+  state_outline =geom_sf(color = 'black', fill = NA, size = 1)
+  
+  plot + state_outline
+  
+  geom_polygon(data=df, aes(long, lat, group = group), color = "black", fill = NA, size = 0.2);
+  
+  return(plot)
 }

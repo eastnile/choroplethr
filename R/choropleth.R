@@ -1,7 +1,8 @@
 #' The base Choropleth object.
 #' @importFrom R6 R6Class
-#' @import ggplot2
+#' @importFrom ggplot2 element_text element_rect element_blank labs scale_fill_gradient scale_fill_gradient2 guides guide_colorbar guide_legend scale_fill_manual scale_fill_brewer
 #' @import stringr
+#' @import sf
 #' @export
 Choropleth = R6Class("Choropleth", 
   public = list(
@@ -51,7 +52,7 @@ Choropleth = R6Class("Choropleth",
       # Prep user input data ----
       user.df.prepped = user.df[, c(geoid.name, value.name)]
       if (identical(geoid.type, 'auto')) { # Establish geoid if it's not specified
-        geoid.type = self$guess_geoid_type(user.regions = user.df[[geoid.name]])
+        geoid.type = self$guess_geoid_type(user.regions = user.df.prepped[[geoid.name]])
         message(paste0("geoid_type = 'auto'; the geoid ", geoid.name, " was determined to be of type: ", 
                      geoid.type, ". To see the list of allowed geoids, see ", self$ref.regions.name, "."))
       } 
@@ -76,9 +77,10 @@ Choropleth = R6Class("Choropleth",
           self$value_was_discretized = TRUE
         }
       }
-      # Bind geometries and apply zoom
+      # Bind geometries
       choropleth.df = left_join(self$map.df, user.df.prepped, by = intersect(names(self$map.df), names(user.df.prepped)))
       rownames(choropleth.df) = NULL
+      choropleth.df$render = TRUE
       stopifnot('sf' %in% class(choropleth.df))
       
       # Set attributes
@@ -88,7 +90,6 @@ Choropleth = R6Class("Choropleth",
       self$value.name = value.name
       self$choropleth.df = choropleth.df
       self$num_colors = num_colors
-
     },
     
     guess_geoid_type = function(user.regions) {
@@ -96,7 +97,7 @@ Choropleth = R6Class("Choropleth",
       unmatched = list()
       n_unmatched = numeric()
       for (name in self$geoid.all) {
-        unmatched[[name]] = user.regions[!user.regions %in% self$ref.regions[, name]]
+        unmatched[[name]] = user.regions[!user.regions %in% self$ref.regions[[name]]]
         n_unmatched[name] = length(unmatched[[name]])
       }
       geoid.type.guess = names(n_unmatched)[which.min(n_unmatched)] # if there's a tie it pick the first one
@@ -104,19 +105,20 @@ Choropleth = R6Class("Choropleth",
     },
     
     set_zoom = function(zoom) {
+      browser()
       if (is.null(zoom)) {
         return(invisible(NULL)) 
       }
       if (!all(zoom %in% self$ref.regions[, self$geoid.type])) {
         stop('The regions in zoom must be in the list of available regions (', self$ref.regions.name, ') and must match the geoid.type of the data (', self$geoid.type, ').' )
       }
-      self$choropleth.df = self$choropleth.df[self$choropleth.df[[self$geoid.type]] %in% zoom, ]
+      self$choropleth.df$render[!self$choropleth.df[[self$geoid.type]] %in% zoom] = FALSE
     },
 
     #' @importFrom ggplot2 scale_fill_gradient2
     get_ggscale = function(choropleth.df = self$choropleth.df, 
                            custom.colors, color.min, color.max, na.color, nbreaks) {
-
+      
       stopifnot(is_valid_color(c(color.min, color.max, na.color)))
       if (!is.null(custom.colors)) {
         stopifnot(is_valid_color(custom.colors))
@@ -138,8 +140,8 @@ Choropleth = R6Class("Choropleth",
           if (is.null(color.min)) {
             color.min = '#eff3ff'
           }
-          ggscale = ggplot2::scale_fill_gradient(na.value = na.color, low = color.min, high = color.max, breaks = breaks, labels = scales::label_comma(),
-                                                 guide = ggplot2::guide_colorbar(frame.colour = "black", ticks.colour = "black"))
+          ggscale = scale_fill_gradient(na.value = na.color, low = color.min, high = color.max, breaks = breaks, labels = scales::label_comma(),
+                                                 guide = guide_colorbar(frame.colour = "black", ticks.colour = "black"))
         } else {
           if (is.null(color.max)) {
             color.max = 'gold'
@@ -147,9 +149,9 @@ Choropleth = R6Class("Choropleth",
           if (is.null(color.min)) {
             color.min = 'purple4'
           }
-          ggscale = ggplot2::scale_fill_gradient2(na.value = na.color, low = color.min, high = color.max, mid = 'white', 
+          ggscale = scale_fill_gradient2(na.value = na.color, low = color.min, high = color.max, mid = 'white', 
                                                   midpoint = mid, breaks = breaks, labels = scales::label_comma(),
-                                                  guide = ggplot2::guide_colorbar(frame.colour = "black", ticks.colour = "black"))
+                                                  guide = guide_colorbar(frame.colour = "black", ticks.colour = "black"))
         }
       # II. data is a factor
       } else { 
@@ -161,7 +163,7 @@ Choropleth = R6Class("Choropleth",
             # also add: check if user's color syntax was valid
           }
           names(custom.colors) = levels(choropleth.df[[self$value.name]])
-          ggscale = ggplot2::scale_fill_manual(values = custom.colors)
+          ggscale = scale_fill_manual(values = custom.colors)
         } else {
           if (self$value_was_discretized) { # IIb. value is a discretized continuous variable
             if (is.null(color.max)) {
@@ -171,17 +173,24 @@ Choropleth = R6Class("Choropleth",
               color.min = '#eff3ff'
             }
             mycolors = colorRampPalette(c(color.min, color.max))(nlevels)
-            ggscale = ggplot2::scale_fill_manual(values = mycolors, na.value = na.color)
+            ggscale = scale_fill_manual(values = mycolors, na.value = na.color)
           } else {
             if (!is.null(color.min) | !is.null(color.max)) { # IIc. value is categorical
               warning('color_min and color_max ignored when plotting a categorical variable.')
             }
-            ggscale = ggplot2::scale_fill_brewer(self$legend, drop=FALSE, na.value = na.color, type = 'qual')   
+            ggscale = scale_fill_brewer(self$legend, drop=FALSE, na.value = na.color, type = 'qual')   
           }
         }
       }
       return(ggscale)
     },
+    
+    get_projection = function(projection = 'cartesian', limits_lat = NULL, limits_lon = NULL, 
+                              reproject = TRUE, occlude_latlon_limits = TRUE, ignore_latlon = FALSE) {
+      
+      
+    }
+    
     
     render = function(choropleth.df = self$choropleth.df, ggscale,
                       projection = 'cartesian', limits_lat = NULL, limits_lon = NULL, 
@@ -193,13 +202,12 @@ Choropleth = R6Class("Choropleth",
                       legend = NULL, legend_position = 'right', title = NULL)
     {
       #browser()
-
       if (is.null(limits_lat) & is.null(limits_lon)) { # skip reprojection of no lat/lon limits are given
         reproject = FALSE
       }
       
       # Set Projection ----
-      browser()
+      # browser()
       bbox = sf::st_bbox(choropleth.df)
       # If reproject == F, projection will be set with the whole map's bounding box, THEN the user's
       # lat/lon limit will be applied. This will simply crop the entire map to the user's desired limits,
@@ -238,9 +246,6 @@ Choropleth = R6Class("Choropleth",
         limits_lon = c(bbox['xmin'], bbox['xmax'])
         limits_lat = c(bbox['ymin'], bbox['ymax'])
       }
-      
-      bbox_from = st_bbox(c(xmin = limits_lon_clean[1], xmax = limits_lon_clean[2],
-                            ymin = limits_lat_clean[1], ymax = limits_lat_clean[2]), crs = crs_from)
 
       # -- Apply projections
       if (projection == 'cartesian') {
@@ -275,8 +280,8 @@ Choropleth = R6Class("Choropleth",
         gg_title = NULL
       }
       if (class(choropleth.df[[self$value.name]]) == 'factor') {
-        gg_guide = ggplot2::guides(fill = ggplot2::guide_legend(
-          override.aes = list(colour = "black", size = 1, linewidth = .2)  # sets think black borders on legend keys regardless of country border color/thickness
+        gg_guide = guides(fill = guide_legend(
+          override.aes = list(colour = "black", size = 1, linewidth = .2)  # sets black borders on legend key regardless of country border color
         ))
       } else {
         gg_guide = NULL
@@ -287,7 +292,7 @@ Choropleth = R6Class("Choropleth",
           stop(paste0('The requested label must be one of the allowed geoid for this map (', paste0(self$geoid.all, collapse = ', '), ')'))
         }
         arglist_main = list(data = choropleth.df,
-                            mapping = ggplot2::aes_string(label = label, geometry = 'geometry'),
+                            mapping = aes_string(label = label, geometry = 'geometry'),
                             stat = "sf_coordinates",
                             size = label_text_size,
                             color = label_text_color,
@@ -299,58 +304,21 @@ Choropleth = R6Class("Choropleth",
       }
 
       if (gridlines) {
-        gg_grid = ggplot2::element_line(color = "dark grey", size = .1)
+        gg_grid = element_line(color = "dark grey", size = .1)
       } else {
-        gg_grid = ggplot2::element_blank()
+        gg_grid = element_blank()
       }
       if (latlon_ticks) {
-        gg_axis_text = ggplot2::element_text()
-        gg_axis_tick = ggplot2::element_line()
+        gg_axis_text = element_text()
+        gg_axis_tick = element_line()
       } else {
-        gg_axis_text = ggplot2::element_blank()
-        gg_axis_tick = ggplot2::element_blank()
+        gg_axis_text = element_blank()
+        gg_axis_tick = element_blank()
       }
       # ---- Render map ----
-      browser()
+      # browser()
       if (F) {
-        limits_lat = c(-90,90)
-        limits_lon = c(-180, 180)
-        latlon = transform_latlon(limits_lat = limits_lat, limits_lon = limits_lon,
-                                  crs_from = 4326, crs_to = proj_str)
-        
-        proj_str = "+proj=aea +lat_1=37.500000 +lat_2=52.500000 +lat_0=45.000000 +lon_0=0.000000"
-        proj_str = "+proj=aea +lat_1=-46.588718 +lat_2=40.233847 +lat_0=-3.177435 +lon_0=0.000000"
-        
-        ggplot(choropleth.df) +
-          geom_sf(aes(fill = .data[[self$value.name]]), color = border_color, linewidth = border_thickness) +
-          ggscale + coord_sf(crs = proj_str, default_crs = 4326, lims_method = 'geometry_bbox')
-          
-        
-        albers_sf <- st_transform(choropleth.df, crs = proj_str)
-        
-        ggplot(albers_sf) +geom_sf() + coord_sf(default_crs = 4326, ylim = c(0, 60))
-          projection + 
-          gg_label + 
-          theme(
-            plot.title = ggplot2::element_text(hjust = 0.5),
-            panel.background = ggplot2::element_rect(fill = background_color, color = NA), 
-            panel.border = ggplot2::element_rect(color = "black", fill = NA, linewidth = 0.5),
-            # panel.grid.major = gg_grid,
-            axis.text.x = gg_axis_text,
-            legend.position = legend_position,
-            legend.title.align = 0.5,
-            legend.text.align = 0,
-            legend.background = ggplot2::element_rect(
-              fill = "white",    # background color inside the box
-              color = "black",   # border color of the box
-              linewidth = 0.25    # thickness of the border
-            )
-          )+
-          #labs(fill = ifelse(is.null(legend), self$value.name, legend))+
-          #gg_guide+
-          #guides(fill = gg_legend) +  # removes stroke around legend swatches
-          #labs(fill = guide_legend(title = "Your Title", label.hjust = 0)) +
-          gg_title
+
       }
       
       ggplot(choropleth.df) +
@@ -359,23 +327,23 @@ Choropleth = R6Class("Choropleth",
         projection + 
         gg_label + 
         theme(
-          plot.title = ggplot2::element_text(hjust = 0.5),
-          panel.background = ggplot2::element_rect(fill = background_color, color = NA), 
-          panel.border = ggplot2::element_rect(color = "black", fill = NA, linewidth = 0.5),
+          plot.title = element_text(hjust = 0.5),
+          panel.background = element_rect(fill = background_color, color = NA), 
+          panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
           panel.grid.major = gg_grid,
           axis.text = gg_axis_text,
           axis.ticks = gg_axis_tick,
-          axis.title = ggplot2::element_blank(),
+          axis.title = element_blank(),
           legend.position = legend_position,
           legend.title.align = 0.5,
           legend.text.align = 0,
-          legend.background = ggplot2::element_rect(
+          legend.background = element_rect(
             fill = "white",    # background color inside the box
             color = "black",   # border color of the box
             linewidth = 0.25    # thickness of the border
           )
         ) +
-        ggplot2::labs(fill = ifelse(is.null(legend), self$value.name, legend))+
+        labs(fill = ifelse(is.null(legend), self$value.name, legend))+
         gg_guide +
         gg_title
     }
