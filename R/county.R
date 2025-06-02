@@ -93,6 +93,9 @@ county_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', val
   c$set_zoom(zoom)
   ggscale = c$get_ggscale(custom.colors = custom.colors, color.max = color.max, color.min = color.min, 
                           na.color = na.color, nbreaks = num_colors)
+  
+  ggproj = c$get_projection(projection = projection, reproject = TRUE, ignore_latlon = TRUE)
+  
   if (return == 'sf') {
     return(c$choropleth.df)
   }

@@ -71,6 +71,7 @@ country_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', va
   c = CountryChoropleth$new(user.df = df, geoid.name = geoid.name, geoid.type = geoid.type, value.name = value.name, 
                             num_colors = num_colors)
   
+  browser()
   zoom_cont = NULL
   if (!is.null(continent_zoom)) {
     stopifnot(length(continent_zoom) == 1)
@@ -89,10 +90,17 @@ country_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', va
   ggscale = c$get_ggscale(custom.colors = custom.colors, color.max = color.max, color.min = color.min, 
                           na.color = na.color, nbreaks = nbreaks)
   
+  ggproj = c$get_projection(projection_name = projection, limits_lat = limits_lat, limits_lon = limits_lon, reproject = reproject)
+  
+  if (projection %in% c('albers', 'robinson')) {
+    occlude = TRUE 
+  } else {
+    occlude = FALSE
+  }
+  
   if (return == 'plot') {
-
-    c$render(ggscale = ggscale, 
-             projection = projection, limits_lat = limits_lat, limits_lon = limits_lon, reproject = reproject,
+    browser()
+    c$render(ggscale = ggscale, projection = ggproj, occlude_latlon_limits = occlude,
              border_color = border_color, border_thickness = border_thickness,
              background_color = background_color, gridlines = gridlines, latlon_ticks = latlon_ticks,
              label = label, label_text_size = label_text_size, label_text_color = label_text_color, 

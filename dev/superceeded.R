@@ -415,3 +415,45 @@ country_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', va
 ggdraw() +
   draw_plot(contus_map, x= 0, y = 0, width = 1, height = 1) +
   draw_plot(ak_map, x = 0, y = 0, width = .5, height = .5)
+
+transform_latlon = function(limits_lat, limits_lon, crs_from, crs_to) {
+  if (F) {
+    limits_lat = c(0, 60)
+    limits_lon = NULL
+    crs_from = 4326
+    crs_to = 5070
+  }
+  #browser()
+  if (is.null(limits_lat)) {
+    limits_lat_clean = c(0, 90)
+  } else {
+    limits_lat_clean = limits_lat
+  }
+  if (is.null(limits_lon)) {
+    limits_lon_clean = c(0, 180)
+  } else {
+    limits_lon_clean = limits_lon 
+  }
+  
+  if (identical(limits_lat_clean, c(-90, 90))) {
+    limits_lat_clean = c(-89.99, 89.99)
+  }
+  if (identical(limits_lon_clean, c(-180, 180))) {
+    limits_lon_clean = c(-179.99, 179.99)
+  }
+  bbox_from = st_bbox(c(xmin = limits_lon_clean[1], xmax = limits_lon_clean[2],
+                        ymin = limits_lat_clean[1], ymax = limits_lat_clean[2]), crs = crs_from)
+  poly = st_as_sfc(bbox_from)
+  bbox_to = st_bbox(st_transform(poly, crs_to))
+  if (is.null(limits_lat)) {
+    limits_lat_out = NULL
+  } else {
+    limits_lat_out = c(bbox_to['ymin'], bbox_to['ymax'])
+  }
+  if (is.null(limits_lon)) {
+    limits_lon_out = NULL
+  } else {
+    limits_lon_out = c(bbox_to['xmin'], bbox_to['xmax'])
+  }
+  return(list(limits_lat = limits_lat_out, limits_lon = limits_lon_out))
+}

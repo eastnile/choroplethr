@@ -105,7 +105,6 @@ Choropleth = R6Class("Choropleth",
     },
     
     set_zoom = function(zoom) {
-      browser()
       if (is.null(zoom)) {
         return(invisible(NULL)) 
       }
@@ -116,12 +115,15 @@ Choropleth = R6Class("Choropleth",
     },
 
     #' @importFrom ggplot2 scale_fill_gradient2
-    get_ggscale = function(choropleth.df = self$choropleth.df, 
+    get_ggscale = function(choropleth.df = self$choropleth.df, respect_zoom = TRUE,
                            custom.colors, color.min, color.max, na.color, nbreaks) {
-      
       stopifnot(is_valid_color(c(color.min, color.max, na.color)))
       if (!is.null(custom.colors)) {
         stopifnot(is_valid_color(custom.colors))
+      }
+      
+      if (respect_zoom) {
+        choropleth.df = choropleth.df[choropleth.df$render == TRUE,]
       }
   
       # browser()
@@ -185,29 +187,16 @@ Choropleth = R6Class("Choropleth",
       return(ggscale)
     },
     
-    get_projection = function(projection = 'cartesian', limits_lat = NULL, limits_lon = NULL, 
-                              reproject = TRUE, occlude_latlon_limits = TRUE, ignore_latlon = FALSE) {
-      
-      
-    }
-    
-    
-    render = function(choropleth.df = self$choropleth.df, ggscale,
-                      projection = 'cartesian', limits_lat = NULL, limits_lon = NULL, 
-                      reproject = TRUE, occlude_latlon_limits = TRUE, ignore_latlon = FALSE,
-                      border_color = 'black', border_thickness = 0.2,
-                      background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE, 
-                      label = NULL, label_text_size, label_text_color, label_box_color,
-                      ggrepel_options = NULL,
-                      legend = NULL, legend_position = 'right', title = NULL)
-    {
-      #browser()
+    get_projection = function(choropleth.df = self$choropleth.df, respect_zoom = TRUE,
+                              projection_name = 'cartesian',  ignore_latlon = FALSE,
+                              limits_lat = NULL, limits_lon = NULL, reproject = TRUE) {
+      if (respect_zoom) {
+        choropleth.df = choropleth.df[choropleth.df$render == TRUE,]
+      }
       if (is.null(limits_lat) & is.null(limits_lon)) { # skip reprojection of no lat/lon limits are given
         reproject = FALSE
       }
-      
-      # Set Projection ----
-      # browser()
+
       bbox = sf::st_bbox(choropleth.df)
       # If reproject == F, projection will be set with the whole map's bounding box, THEN the user's
       # lat/lon limit will be applied. This will simply crop the entire map to the user's desired limits,
@@ -228,12 +217,6 @@ Choropleth = R6Class("Choropleth",
           bbox['xmin'] = limits_lon[1]
           bbox['xmax'] = limits_lon[2]
         } 
-        if (occlude_latlon_limits) {
-          sf_use_s2(FALSE)
-          bbox_poly = st_as_sfc(expand_bbox(bbox, factor = 1.1)) # Slightly expand bbox to prevent clipping of mapped regions
-          choropleth.df = st_intersection(choropleth.df, bbox_poly) # Clip regions outside user's desired lat/lon region; prevents distant regions from getting hugely distorted and covering up nearby regions.
-          sf_use_s2(TRUE)
-        }
       }
       
       lat_1 = bbox["ymin"] + 0.25 * (bbox["ymax"] - bbox["ymin"])
@@ -241,26 +224,44 @@ Choropleth = R6Class("Choropleth",
       lat_0 = (bbox["ymin"] + bbox["ymax"]) / 2
       lon_0 = (bbox["xmin"] + bbox["xmax"]) / 2
       
-      # -- fill in lat/lon limits with bbox if they are missing (otherwise albers/robinson may throw error) --
+      # -- fill in lat/lon limits with bbox if they are missing; otherwise 
+      # albers/robinson will throw error if the entire world is being mapped for
+      # some reason. If both at & lon limits are NULL, switch to default 
+      # rendering based on bbox.
+      
       if (is.null(limits_lon)) {
         limits_lon = c(bbox['xmin'], bbox['xmax'])
+      }
+      
+      if (is.null(limits_lat)) {
         limits_lat = c(bbox['ymin'], bbox['ymax'])
       }
-
+      
+      if (is.null(limits_lon) & is.null(limits_lat)) {
+        ignore_latlon = T
+      }
       # -- Apply projections
-      if (projection == 'cartesian') {
-        projection = coord_sf(crs = 4326, ylim = limits_lat, xlim = limits_lon)
-      } else if (projection == 'mercator') {
-        limits_lat[1] = ifelse(limits_lat[1] < -75, -75, limits_lat[1])
-        projection = coord_sf(crs = 3857, default_crs = 4326,  ylim = limits_lat, xlim = limits_lon)
-      } else if (projection == 'robinson') {
+      if (projection_name == 'cartesian') {
+        if (ignore_latlon) {
+          projection = coord_sf(crs = 4326, lims_method = 'geometry_bbox')
+        } else {
+          projection = coord_sf(crs = 4326, ylim = limits_lat, xlim = limits_lon)
+        }
+      } else if (projection_name == 'mercator') {
+        if (ignore_latlon) {
+          projection = coord_sf(crs = 3857, lims_method = 'geometry_bbox')
+        } else {
+          limits_lat[1] = ifelse(limits_lat[1] < -75, -75, limits_lat[1])
+          projection = coord_sf(crs = 3857, default_crs = 4326,  ylim = limits_lat, xlim = limits_lon)
+        }
+      } else if (projection_name == 'robinson') {
         proj_str = sprintf("+proj=robin +lon_0=%.6f", lon_0)
         if (ignore_latlon) {
           projection = coord_sf(crs = proj_str, lims_method = 'geometry_bbox')
         } else {
           projection = coord_sf(crs = proj_str, default_crs = 4326, ylim = limits_lat, xlim = limits_lon)
         }
-      } else if (projection == 'albers') {
+      } else if (projection_name == 'albers') {
         proj_str = sprintf("+proj=aea +lat_1=%.6f +lat_2=%.6f +lat_0=%.6f +lon_0=%.6f",
                            lat_1, lat_2, lat_0, lon_0)
         if (ignore_latlon) {
@@ -269,16 +270,40 @@ Choropleth = R6Class("Choropleth",
           projection = coord_sf(crs = proj_str, default_crs = 4326, ylim = limits_lat, xlim = limits_lon)
         }
       } else {
-        stop("projection must be 'cartesian', 'mercator', 'robinson', or 'albers'.")
+        stop("projection_name must be 'cartesian', 'mercator', 'robinson', or 'albers'.")
       }
       
+      return(projection)
+    },
+    
+    
+    render = function(choropleth.df = self$choropleth.df, ggscale, projection, 
+                      respect_zoom = TRUE, occlude_latlon_limits = TRUE, 
+                      border_color = 'black', border_thickness = 0.2,
+                      background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE, 
+                      label = NULL, label_text_size, label_text_color, label_box_color,
+                      ggrepel_options = NULL,
+                      legend = NULL, legend_position = 'right', title = NULL)
+    {
+      if (respect_zoom) {
+        choropleth.df = choropleth.df[choropleth.df$render == TRUE,]
+      }
+
+      if (occlude_latlon_limits) {
+        limits = c(projection$limits$x[1], projection$limits$x[2], 
+                   projection$limits$y[1], projection$limits$y[2])
+        names(limits) = c('xmin', 'xmax', 'ymin', 'ymax')
+        bbox = sf::st_bbox(limits, crs = st_crs(4326))
+        
+        sf_use_s2(FALSE)
+        bbox_poly = st_as_sfc(expand_bbox(bbox, factor = 1.1)) # Slightly expand bbox to prevent clipping of mapped regions
+        choropleth.df = st_intersection(choropleth.df, bbox_poly) # Clip regions outside user's desired lat/lon region; prevents distant regions from getting hugely distorted and covering up nearby regions.
+        sf_use_s2(TRUE)
+      }
+
       
       # ---- Set other formatting options ----      
-      if (!is.null(title)) {
-        gg_title = ggtitle(title)
-      } else {
-        gg_title = NULL
-      }
+
       if (class(choropleth.df[[self$value.name]]) == 'factor') {
         gg_guide = guides(fill = guide_legend(
           override.aes = list(colour = "black", size = 1, linewidth = .2)  # sets black borders on legend key regardless of country border color
@@ -318,7 +343,8 @@ Choropleth = R6Class("Choropleth",
       # ---- Render map ----
       # browser()
       if (F) {
-
+        ggplot(choropleth.df) +
+          geom_sf(aes(fill = .data[[self$value.name]]), color = border_color, linewidth = border_thickness) + projection 
       }
       
       ggplot(choropleth.df) +
@@ -345,7 +371,7 @@ Choropleth = R6Class("Choropleth",
         ) +
         labs(fill = ifelse(is.null(legend), self$value.name, legend))+
         gg_guide +
-        gg_title
+        ggtitle(title)
     }
   )
 )
@@ -400,44 +426,3 @@ expand_bbox = function(bbox, factor = 0.2) {
   return(bbox)
 }
 
-transform_latlon = function(limits_lat, limits_lon, crs_from, crs_to) {
-  if (F) {
-    limits_lat = c(0, 60)
-    limits_lon = NULL
-    crs_from = 4326
-    crs_to = 5070
-  }
-  #browser()
-  if (is.null(limits_lat)) {
-    limits_lat_clean = c(0, 90)
-  } else {
-    limits_lat_clean = limits_lat
-  }
-  if (is.null(limits_lon)) {
-    limits_lon_clean = c(0, 180)
-  } else {
-    limits_lon_clean = limits_lon 
-  }
-
-  if (identical(limits_lat_clean, c(-90, 90))) {
-    limits_lat_clean = c(-89.99, 89.99)
-  }
-  if (identical(limits_lon_clean, c(-180, 180))) {
-    limits_lon_clean = c(-179.99, 179.99)
-  }
-  bbox_from = st_bbox(c(xmin = limits_lon_clean[1], xmax = limits_lon_clean[2],
-                        ymin = limits_lat_clean[1], ymax = limits_lat_clean[2]), crs = crs_from)
-  poly = st_as_sfc(bbox_from)
-  bbox_to = st_bbox(st_transform(poly, crs_to))
-  if (is.null(limits_lat)) {
-    limits_lat_out = NULL
-  } else {
-    limits_lat_out = c(bbox_to['ymin'], bbox_to['ymax'])
-  }
-  if (is.null(limits_lon)) {
-    limits_lon_out = NULL
-  } else {
-    limits_lon_out = c(bbox_to['xmin'], bbox_to['xmax'])
-  }
-  return(list(limits_lat = limits_lat_out, limits_lon = limits_lon_out))
-}
