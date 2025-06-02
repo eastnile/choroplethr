@@ -84,31 +84,35 @@ county_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', val
                              border_color = 'grey15', border_thickness = 0.2,
                              background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE,
                              label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white', 
-                             legend = NULL, legend_position = 'bottom', title = NULL, return = 'plot')
+                             legend = NULL, legend_position = 'bottom', title = NULL, return = 'plot',
+                             add_state_outline = TRUE)
 {
 
-  browser()
   c = CountyChoropleth$new(user.df = df, geoid.name = geoid.name, 
                           geoid.type = geoid.type, value.name = value.name, num_colors = num_colors)
   c$set_zoom(zoom)
   ggscale = c$get_ggscale(custom.colors = custom.colors, color.max = color.max, color.min = color.min, 
                           na.color = na.color, nbreaks = num_colors)
+  
+  ggproj = c$get_projection(projection = projection, reproject = TRUE, ignore_latlon = TRUE)
+  
   if (return == 'sf') {
     return(c$choropleth.df)
   }
-  plot = c$render(ggscale = ggscale, projection = projection, reproject = FALSE, ignore_latlon = TRUE,
+  plot = c$render(ggscale = ggscale, projection = ggproj, 
                   border_color = border_color, border_thickness = border_thickness,
                   background_color = background_color, gridlines = gridlines, latlon_ticks = latlon_ticks, 
                   label = label, label_text_size = label_text_size, label_text_color = label_text_color, label_box_color = label_box_color,
                   ggrepel_options = ggrepel_options,
                   legend = legend, legend_position = legend_position, title = title)
-  
-  state_map = readRDS('dev/sf_state.rds')
-  state_outline =geom_sf(color = 'black', fill = NA, size = 1)
-  
-  plot + state_outline
-  
-  geom_polygon(data=df, aes(long, lat, group = group), color = "black", fill = NA, size = 0.2);
+
+  if (add_state_outline) {
+    states_used = unique(c$choropleth.df$state.fips.numeric[c$choropleth.df$render])
+    state_map = readRDS('dev/sf_state.rds')
+    state_map = state_map[state_map$fips.numeric %in% states_used, ]
+    state_outline = geom_sf(data = state_map, color = 'black', fill = NA, linewidth = .6)
+    plot = plot + state_outline + ggproj
+  }
   
   return(plot)
 }

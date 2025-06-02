@@ -96,14 +96,15 @@ state_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', valu
   c$set_zoom(zoom)
   ggscale = c$get_ggscale(custom.colors = custom.colors, color.max = color.max, color.min = color.min, 
                           na.color = na.color, nbreaks = num_colors)
+  ggproj = c$get_projection(projection_name = projection, reproject = FALSE, ignore_latlon = TRUE)
   if (return == 'sf') {
     return(c$choropleth.df)
   }
-  plot = c$render(ggscale = ggscale, projection = projection, reproject = FALSE, ignore_latlon = TRUE,
-                   border_color = border_color, border_thickness = border_thickness,
-                   background_color = background_color, gridlines = gridlines, latlon_ticks = latlon_ticks, 
-                   label = label, label_text_size = label_text_size, label_text_color = label_text_color, label_box_color = label_box_color,
-                   ggrepel_options = ggrepel_options,
-                   legend = legend, legend_position = legend_position, title = title)
+  plot = c$render(ggscale = ggscale, projection = ggproj, 
+                  border_color = border_color, border_thickness = border_thickness,
+                  background_color = background_color, gridlines = gridlines, latlon_ticks = latlon_ticks, 
+                  label = label, label_text_size = label_text_size, label_text_color = label_text_color, label_box_color = label_box_color,
+                  ggrepel_options = ggrepel_options,
+                  legend = legend, legend_position = legend_position, title = title)
   return(plot)
 }
