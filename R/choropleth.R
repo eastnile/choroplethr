@@ -195,6 +195,7 @@ Choropleth = R6Class("Choropleth",
       }
       if (is.null(limits_lat) & is.null(limits_lon)) { # skip reprojection of no lat/lon limits are given
         reproject = FALSE
+        ignore_latlon = TRUE
       }
 
       bbox = sf::st_bbox(choropleth.df)
@@ -207,7 +208,7 @@ Choropleth = R6Class("Choropleth",
       # applying the projection. This will center the projection around the user's desired region and
       # will generally produce a better figure.
       
-      #browser()
+      browser()
       if (reproject) { 
         if (!is.null(limits_lat)) {
           bbox['ymin'] = limits_lat[1]

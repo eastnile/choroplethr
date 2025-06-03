@@ -65,6 +65,8 @@ country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'populatio
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', projection = 'cartesian', limits_lat = c(20,60), limits_lon = c(-160, -50))
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', projection = 'robinson', limits_lat = c(20,60), limits_lon = c(-160, -50), reproject = TRUE)
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', projection = 'albers', limits_lat = c(20,60), limits_lon = c(-160, -50))
+country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', projection = 'albers', limits_lat = NULL, limits_lon = c(-160, -50))
+
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', projection = 'albers', limits_lat = c(20,60), limits_lon = c(-160, -50), reproject = FALSE)
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', projection = 'albers', limits_lat = c(20,60), limits_lon = c(-160, -50), gridlines = TRUE, latlon_ticks = TRUE)
 
