@@ -211,3 +211,71 @@ NULL
 #' @keywords data
 #' @usage data(df_country_demographics)
 NULL
+
+#' An sf containing geometry data for US states
+#'
+#' @name state.map
+#' @usage data(state.map)
+#' @docType data
+#' @references obtained using tigris::states()
+NULL
+
+#' An sf containing geometry data for US states with DC enlarged
+#'
+#' @name state.map.bigdc
+#' @usage data(state.map.bigdc)
+#' @docType data
+NULL
+
+#' Supported regions for US states
+#'
+#' @name state.regions
+#' @usage data(state.regions)
+#' @docType data
+NULL
+
+#' An sf containing geometry data for US counties in 2015
+#'
+#' @name county.map.2015
+#' @usage data(county.map.2015)
+#' @docType data
+#' @references obtained using tigris::counties()
+NULL
+
+#' Supported regions for US counties in 2015
+#'
+#' @name county.regions.2015
+#' @usage data(county.regions.2024)
+#' @docType data
+NULL
+
+#' An sf containing geometry data for US counties in 2024
+#'
+#' @name county.map.2024
+#' @usage data(county.map.2024)
+#' @docType data
+#' @references obtained using tigris::counties()
+NULL
+
+#' Supported regions for US counties in 2024
+#'
+#' @name county.regions.2024
+#' @usage data(county.regions.2024)
+#' @docType data
+NULL
+
+#' An sf containing geometry data for countries the world
+#'
+#' @name country.map
+#' @usage data(country.map)
+#' @docType data
+#' @references obtained using rnatrualearth::ne_countries
+NULL
+
+#' Supported regions for world countries
+#'
+#' @name country.regions
+#' @usage data(country.regions)
+#' @docType data
+NULL
+

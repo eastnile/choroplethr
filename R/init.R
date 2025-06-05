@@ -1,0 +1,1 @@
+.cache_env.choroplethr = new.env(parent = emptyenv())

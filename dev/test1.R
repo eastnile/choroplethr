@@ -1,10 +1,19 @@
 devtools::load_all() 
+if (F) {
+  devtools::load_all() 
+  devtools::document()
+  devtools::check()
+}
 
-# Test country
-data('df_world')
+df_world = choroplethr::df_world
+df_pop_state = choroplethr::df_pop_state
+df_county_demographics = choroplethr::df_county_demographics
 
 # Baseline
+state_choropleth(df = df_pop_state, value.name = 'value', label = 'state.abb')
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population')
+county_choropleth(df = df_county_demographics, geoid.name = 'region', value.name = 'median_hh_income')
+county_choropleth(df = df_county_demographics, map_year = 2015, geoid.name = 'region', value.name = 'median_hh_income')
 
 # Categorical
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'region_type')
@@ -17,6 +26,7 @@ country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'populatio
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', num_color = 4)
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', num_color = 1)
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', num_color = 0)
+country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', num_color = 0, nbreaks = 2)
 
 # Test discretization
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', num_colors = -1) 
@@ -35,21 +45,26 @@ country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'populatio
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', num_color = 7,
                    color.min = 'red', color.max = 'green')
 
+
 # Test labels
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', label = 'jomama') # should give error
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', label = 'iso_a3')
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', label = 'iso_a3', ggrepel_options = list(label.padding = 1))
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', label = 'iso_a3', label_text_size = .5)
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', label = 'iso_a3', label_text_color = 'red')
-country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', label = 'iso_a3', label_box_color = 'lightblue')
+country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', label = 'iso_a3', label_text_color = 'red', label_box_color = 'lightblue')
 
 # Test other render features
-
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', border_color = 'red')
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', border_color = 'red', border_thickness = 2)
-country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', background_color = 'blue')
+country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', border_color = 'red', border_thickness = 2, background_color = 'blue')
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', gridlines = TRUE)
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', gridlines = TRUE, latlon_ticks = TRUE)
+
+country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', title = 'jomama')
+country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', title = 'jomama', legend = 'jomama')
+country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', title = 'jomama', legend = 'jomama', legend_position = 'bottom')
+
 
 # Test zoom
 country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population', zoom = c('jomama'))

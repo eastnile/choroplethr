@@ -2,73 +2,163 @@
 % Please edit documentation in R/admin1.R
 \name{admin1_choropleth}
 \alias{admin1_choropleth}
-\title{Create an admin1-level choropleth for a specified country}
+\title{Create a choropleth map using regional data at the sub-country level}
 \usage{
 admin1_choropleth(
-  country.name,
   df,
-  title = "",
-  legend = "",
+  geoid.name = "region",
+  geoid.type = "auto",
+  value.name = "value",
   num_colors = 7,
+  color.max = NULL,
+  color.min = NULL,
+  na.color = "grey",
+  custom.colors = NULL,
+  nbreaks = 5,
   zoom = NULL,
-  reference_map = FALSE
+  country_zoom = NULL,
+  projection = "cartesian",
+  limits_lat = NULL,
+  limits_lon = NULL,
+  reproject = TRUE,
+  whitespace = TRUE,
+  border_color = "grey15",
+  border_thickness = 0.2,
+  background_color = "white",
+  gridlines = FALSE,
+  latlon_ticks = FALSE,
+  label = NULL,
+  label_text_size = 3,
+  label_text_color = "black",
+  label_box_color = "white",
+  ggrepel_options = NULL,
+  legend = NULL,
+  legend_position = "right",
+  title = NULL,
+  return = "plot"
 )
 }
 \arguments{
-\item{country.name}{The name of the country. Must exactly match how the country is named in the "country"
-column of ?admin1.regions in the choroplethrAdmin1 package.}
+\item{df}{A dataframe containing regional data at the sub-country level for
+one or more countries.}
 
-\item{df}{A data.frame with a column named "region" and a column named "value".  Elements in 
-the "region" column must exactly match how regions are named in the "region" column in ?admin1.regions
-in the choroplethrAdmin1 package}
+\item{geoid.name}{The variable that identifies each
+administrative region}
 
-\item{title}{An optional title for the map.}
+\item{geoid.type}{How the variable given by geoid.name specifies each
+country. The allowed geoid.type are given by the columns "adm1_code",
+"diss_me", "ne_id" in the output of get_admin1_map(); use this output to
+match the names of your regions to the correct geoid. If "auto", the
+function will try to automatically determine geoid.type.}
 
-\item{legend}{An optional name for the legend.}
+\item{value.name}{The name of the variable you wish to plot.}
 
-\item{num_colors}{The number of colors on the map. A value of 1 
-will use a continuous scale. A value in [2, 9] will use that many colors.}
+\item{num_colors}{The number of colors you want in your graph when plotting
+continuous data. If num_colors > 1, the variable in question will be
+divided into quantiles and converted into a factor with that many levels.
+If num_colors = 1, a continuous color gradient will be used; if num_colors = 0,
+a diverging color gradient will be used (useful for visualizing negative
+and positive numbers).  Use color.max and color.min to control the range of
+colors displayed. num_colors is ignored when plotting categorical data.}
 
-\item{zoom}{An optional vector of regions to zoom in on. Elements of this vector must exactly 
-match the names of regions as they appear in the "region" column of ?admin1.regions.}
+\item{color.max}{The color of the highest value in your data. Ignored if the
+plotted variable is categorical.}
 
-\item{reference_map}{If true, render the choropleth over a reference map from Google Maps.}
+\item{color.min}{The color of the lowest value in your data. Ignored if the
+plotted variable is categorical.}
+
+\item{na.color}{The color you want to assign for regions with missing data}
+
+\item{custom.colors}{A vector of valid R color terms of the to use for the
+map when plotting factor variables. The length of this vector must match
+the number of levels in your factor variable, or num_colors for a
+continuous variable that will be discretized by the function, and the order
+should match the order of the levels of in your factor variable.}
+
+\item{nbreaks}{The number of breaks you wish to show in the legend when using
+a continuous color scale. Ignored if num_colors > 1.}
+
+\item{zoom}{An optional vector of regions to zoom in on, written in the same
+manner as geoid.name.}
+
+\item{country_zoom}{An optional vector of countries to zoom in on, written as
+they appear in the "adm0_a3" column of the object returned from
+get_tract_map().}
+
+\item{projection}{One of the following: "cartesian", "mercator", "robinson",
+or "albers", for equirectangular, Mercator, Robinson, and Albers Equal Area
+projections, respectively. When using the Mercator projection for world
+maps, setting limits_lon is recommended to prevent exaggeration of the size
+of Antarctica.}
+
+\item{limits_lat}{A length two vector giving the minimum and maximum latitude
+you wish to include in your map.}
+
+\item{limits_lon}{A length two vector giving the minimum and maximum
+longitude you wish to include in your map.}
+
+\item{reproject}{If TRUE, the map will be cropped and centered prior to
+applying the projection. This will generally result in a better figure when
+using the Robinson and Albers, but may lead to countries near the edge of
+the map being occluded.}
+
+\item{whitespace}{Add some blank space to the sides of your map? For some
+projections, this must be set to FALSE in order for lat/lon ticks and
+display correctly.}
+
+\item{border_color}{The color of the borders on your map}
+
+\item{border_thickness}{The thickness of the borders on your map}
+
+\item{background_color}{The background color of your map}
+
+\item{gridlines}{Should gridlines appear on your map?}
+
+\item{latlon_ticks}{Should lat/lon tick marks appear on the edge of your map?}
+
+\item{label}{The name of variable you wish to use to label your map; must be
+one of the variables that appears in the spatial dataframe just prior
+plotting (use return = 'sf' to see this dataframe), and in general, can be
+any of the allowed geoid.type. This function uses ggplot2::geom_label_repel
+to create the labels and ensure that they do not overlap.}
+
+\item{label_text_size}{The size of the text that will appear in each label}
+
+\item{label_text_color}{The color of the text that will appear in each label}
+
+\item{label_box_color}{The color of the box around each label}
+
+\item{ggrepel_options}{A list containing additional arguments to be passed to
+geom_label_repel (see ?ggplot2::geom_label_repel)}
+
+\item{legend}{A title for your legend; if NULL, value.name will be used.}
+
+\item{legend_position}{The position of your legend relative to the rest of
+the map; can be "top", "bottom", "left", or "right".}
+
+\item{title}{A title for your plot; if NULL, no title will be added.}
+
+\item{return}{If "plot", the function will return the requested map as a
+ggplot object. If "sf", the function will return the spatial dataframe used
+to draw the map (useful if you wish to customize the map yourself).}
 }
 \description{
-The map used comes from ?admin1.map in the choroplethrAdmin1 package. See ?get_admin_countries
-and ?get_admin_regions in the choroplethrAdmin1 package for help with the spelling of regions.
+This function can be used to plot regional data at the first sub-level of
+administration (ie., state, province, prefecture, etc.) for one or more
+countries. Use get_admin1_map() for an object which can help you coerce your
+region names into the required format; see below for an example with Japanese
+data.
 }
 \examples{
-\dontrun{
+library(dplyr)
+data("df_japan_census") # Our Japanese data is at the prefecture level, with names in english lower case.
+admin1_lookup = get_admin1_map() # We match our data to one of the geoids ("adm1_code", "diss_me", or "ne_id" ) in output of get_admin1_map().
+admin1_lookup = admin1_lookup[admin1_lookup$admin == 'Japan', c('adm1_code', 'name_en')] # The "name_en" variable is very close to how the prefectures are named in our data.
+admin1_lookup$name_lower = tolower(admin1_lookup$name_en)
+admin1_lookup$name_lower = iconv(admin1_lookup$name_lower, from = "UTF-8", to = "ASCII//TRANSLIT") # Remove accent marks
+admin1_lookup$name_lower = gsub(pattern = ' prefecture', replacement = '',  x = admin1_lookup$name_lower)
+data_prepped = left_join(df_japan_census, admin1_lookup[, c('adm1_code', 'name_lower')], by = join_by(region == name_lower)) # We merge in admin1_code after making name_en resemble our data.
+admin1_choropleth(data_prepped, geoid.name = 'adm1_code', value.name = 'pop_2010',
+                  country_zoom = 'JPN', num_colors = 4) # Create the map
 
-library(choroplethrAdmin1)
-
-data(df_japan_census)
-head(df_japan_census)
-# set the value we want to map to be the 2010 population estimates
-df_japan_census$value=df_japan_census$pop_2010
-
-# default map of all of japan
-admin1_choropleth("japan", 
-                   df_japan_census, 
-                   "2010 Japan Population Estimates", 
-                   "Population")
-
-# zoom in on the Kansai region and use a continuous scale
-kansai = c("mie", "nara", "wakayama", "kyoto", "osaka", "hyogo", "shiga")
-admin1_choropleth("japan", 
-                   df_japan_census, 
-                   "2010 Japan Population Estimates", 
-                   "Population", 
-                   1, 
-                   kansai)
-                   
-admin1_choropleth("japan", 
-                   df_japan_census, 
-                   "2010 Japan Population Estimates", 
-                   "Population", 
-                   1, 
-                   kansai,
-                   reference_map = TRUE)
-}
 }

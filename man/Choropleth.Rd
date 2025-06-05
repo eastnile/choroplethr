@@ -12,9 +12,9 @@ The base Choropleth object.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Choropleth-new}{\code{Choropleth$new()}}
-\item \href{#method-Choropleth-guess_geoid_type}{\code{Choropleth$guess_geoid_type()}}
 \item \href{#method-Choropleth-set_zoom}{\code{Choropleth$set_zoom()}}
 \item \href{#method-Choropleth-get_ggscale}{\code{Choropleth$get_ggscale()}}
+\item \href{#method-Choropleth-get_projection}{\code{Choropleth$get_projection()}}
 \item \href{#method-Choropleth-render}{\code{Choropleth$render()}}
 \item \href{#method-Choropleth-clone}{\code{Choropleth$clone()}}
 }
@@ -24,16 +24,18 @@ The base Choropleth object.
 \if{latex}{\out{\hypertarget{method-Choropleth-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Choropleth$new(user.df, geoid.name, geoid.type, value.name, num_colors)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Choropleth-guess_geoid_type"></a>}}
-\if{latex}{\out{\hypertarget{method-Choropleth-guess_geoid_type}{}}}
-\subsection{Method \code{guess_geoid_type()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Choropleth$guess_geoid_type(user.regions)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Choropleth$new(
+  ref.regions,
+  ref.regions.name,
+  map.df,
+  geoid.all,
+  user.df,
+  geoid.name,
+  geoid.type,
+  value.name,
+  num_colors,
+  label_col
+)}\if{html}{\out{</div>}}
 }
 
 }
@@ -53,11 +55,30 @@ The base Choropleth object.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Choropleth$get_ggscale(
   choropleth.df = self$choropleth.df,
+  respect_zoom = TRUE,
   custom.colors,
   color.min,
   color.max,
   na.color,
   nbreaks
+)}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Choropleth-get_projection"></a>}}
+\if{latex}{\out{\hypertarget{method-Choropleth-get_projection}{}}}
+\subsection{Method \code{get_projection()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Choropleth$get_projection(
+  choropleth.df = self$choropleth.df,
+  respect_zoom = TRUE,
+  projection_name,
+  ignore_latlon,
+  limits_lat,
+  limits_lon,
+  reproject,
+  whitespace
 )}\if{html}{\out{</div>}}
 }
 
@@ -70,25 +91,23 @@ The base Choropleth object.
 \if{html}{\out{<div class="r">}}\preformatted{Choropleth$render(
   choropleth.df = self$choropleth.df,
   ggscale,
-  projection = "cartesian",
-  limits_lat = NULL,
-  limits_lon = NULL,
-  reproject = TRUE,
-  occlude_latlon_limits = TRUE,
-  ignore_latlon = FALSE,
-  border_color = "black",
-  border_thickness = 0.2,
-  background_color = "white",
-  gridlines = FALSE,
-  latlon_ticks = FALSE,
-  label = NULL,
+  projection,
+  respect_zoom = TRUE,
+  occlude_latlon_limits,
+  border_color,
+  border_thickness,
+  background_color,
+  gridlines,
+  latlon_ticks,
+  label,
   label_text_size,
   label_text_color,
   label_box_color,
-  ggrepel_options = NULL,
-  legend = NULL,
-  legend_position = "right",
-  title = NULL
+  ggrepel_options,
+  legend,
+  legend_position,
+  title,
+  addl_gglayer
 )}\if{html}{\out{</div>}}
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/country.R
 \name{country_choropleth}
 \alias{country_choropleth}
-\title{Create a country-level choropleth}
+\title{Create a choropleth map using country-level data}
 \usage{
 country_choropleth(
   df,
@@ -13,8 +13,8 @@ country_choropleth(
   color.max = NULL,
   color.min = NULL,
   na.color = "grey",
-  nbreaks = 5,
   custom.colors = NULL,
+  nbreaks = 5,
   zoom = NULL,
   continent_zoom = NULL,
   projection = "cartesian",
@@ -26,6 +26,7 @@ country_choropleth(
   background_color = "white",
   gridlines = FALSE,
   latlon_ticks = FALSE,
+  whitespace = TRUE,
   label = NULL,
   label_text_size = 3,
   label_text_color = "black",
@@ -38,41 +39,133 @@ country_choropleth(
 )
 }
 \arguments{
-\item{df}{A data.frame with a column named "region" and a column named "value".  Elements in 
-the "region" column must exactly match how regions are named in the "region" column in ?country.map.}
+\item{df}{A dataframe containing country level data}
 
-\item{num_colors}{When plotting numeric data, the number of colors to use on the map.
-A value of 0 uses a divergent scale (useful for visualizing negative and positive numbers), a 
-value of 1 uses a continuous scale (useful for visualizing outliers), and a value greater than
-one will divide the data into that many quantiles and shade each a different color.}
+\item{geoid.name}{The variable that identifies each country}
 
-\item{zoom}{An optional vector of countries to zoom in on. Elements of this vector must exactly 
-match the names of countries as they appear in the "region" column of ?country.regions}
+\item{geoid.type}{How the variable given by geoid.name specifies each
+country. The allowed geoid.type are given by the columns name.proper,
+name.lower, iso_a3, and iso_a2 in choroplethr::country.regions. If "auto",
+the function will try to automatically determine geoid.type.}
 
-\item{legend}{An optional name for the legend.}
+\item{value.name}{The name of the variable you wish to plot.}
 
-\item{title}{An optional title for the map.}
+\item{num_colors}{The number of colors you want in your graph when plotting
+continuous data. If num_colors > 1, the variable in question will be
+divided into quantiles and converted into a factor with that many levels.
+If num_colors = 1, a continuous color gradient will be used; if num_colors = 0,
+a diverging color gradient will be used (useful for visualizing negative
+and positive numbers).  Use color.max and color.min to control the range of
+colors displayed. num_colors is ignored when plotting categorical data.}
 
-\item{colors}{A vector specifying the colors to be used if the plotted value is a character 
-or factor. These colors can be specified using R's color terms as given in ?colors, or as a
-hex value like that returned from rgb(). The number of colors must match the number of unique
-values in the variable to be plotted.}
+\item{color.max}{The color of the highest value in your data. Ignored if the
+plotted variable is categorical.}
+
+\item{color.min}{The color of the lowest value in your data. Ignored if the
+plotted variable is categorical.}
+
+\item{na.color}{The color you want to assign for regions with missing data}
+
+\item{custom.colors}{A vector of valid R color terms of the to use for the
+map when plotting factor variables. The length of this vector must match
+the number of levels in your factor variable, or num_colors for a
+continuous variable that will be discretized by the function, and the order
+should match the order of the levels of in your factor variable.}
+
+\item{nbreaks}{The number of breaks you wish to show in the legend when using
+a continuous color scale. Ignored if num_colors > 1.}
+
+\item{zoom}{An optional vector of countries to zoom in on, written in the
+same manner as geoid.name.}
+
+\item{continent_zoom}{Zoom in on a particular continent; to see which
+countries belong to which continent, see choroplethr::country.regions}
+
+\item{projection}{One of the following: "cartesian", "mercator", "robinson",
+or "albers", for equirectangular, Mercator, Robinson, and Albers Equal Area
+projections, respectively. When using the Mercator projection for world
+maps, setting limits_lon is recommended to prevent exaggeration of the size
+of Antarctica.}
+
+\item{limits_lat}{A length two vector giving the minimum and maximum latitude
+you wish to include in your map.}
+
+\item{limits_lon}{A length two vector giving the minimum and maximum
+longitude you wish to include in your map.}
+
+\item{reproject}{If TRUE, the map will be cropped and centered prior to
+applying the projection. This will generally result in a better figure when
+using the Robinson and Albers, but may lead to countries near the edge of
+the map being occluded.}
+
+\item{border_color}{The color of the borders on your map}
+
+\item{border_thickness}{The thickness of the borders on your map}
+
+\item{background_color}{The background color of your map}
+
+\item{gridlines}{Should gridlines appear on your map?}
+
+\item{latlon_ticks}{Should lat/lon tick marks appear on the edge of your map?}
+
+\item{whitespace}{Add some blank space to the sides of your map? For some
+projections, this must be set to FALSE in order for lat/lon ticks and
+display correctly.}
+
+\item{label}{The name of variable you wish to use to label your map; must be
+one of the variables that appears in the spatial dataframe just prior
+plotting (use return = 'sf' to see this dataframe), and in general, can be
+any of the allowed geoid.type. This function uses ggplot2::geom_label_repel
+to create the labels and ensure that they do not overlap.}
+
+\item{label_text_size}{The size of the text that will appear in each label}
+
+\item{label_text_color}{The color of the text that will appear in each label}
+
+\item{label_box_color}{The color of the box around each label}
+
+\item{ggrepel_options}{A list containing additional arguments to be passed to
+geom_label_repel (see ?ggplot2::geom_label_repel)}
+
+\item{legend}{A title for your legend; if NULL, value.name will be used.}
+
+\item{legend_position}{The position of your legend relative to the rest of
+the map; can be "top", "bottom", "left", or "right".}
+
+\item{title}{A title for your plot; if NULL, no title will be added.}
+
+\item{return}{If "plot", the function will return the requested map as a
+ggplot object. If "sf", the function will return the spatial dataframe used
+to draw the map (useful if you wish to customize the map yourself).}
 }
 \description{
-The map used is country.map in the choroplethrMaps package. See country.regions for
-an object which can help you coerce your regions into the required format.
+See choroplethr::country.regions for an object which can help you coerce your
+country names into the required format; the allowed geoid for this function
+are columns name.proper, name.lower, iso_a3, and iso_a2 which appear at the
+beginning of this object.
 }
 \examples{
-# demonstrate default options
-data(df_pop_country)
-country_choropleth(df_pop_country, "2012 World Bank Populate Estimates")
+# Create a choropleth map using country level data:
+data(df_country_demographics)
+country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
+                   value.name = 'gdp',
+                   title = "Median GDP of Countries in the World", legend = 'Median GDP')
 
-# demonstrate continuous scale
-country_choropleth(df_pop_country, "2012 World Bank Populate Estimates", num_colors=1)
+# Use a divergent continuous color scale and customize map appearance:
+country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
+                   value.name = 'gdp', num_colors = 0, border_color = 'grey', 
+                   color.max = 'gold', color.min = 'navyblue',
+                   projection = 'robinson', latlon_ticks = TRUE, gridlines = TRUE, whitespace = FALSE,
+                   background_color = 'azure',
+                   title = "GDP of Countries in the World", legend = 'GDP (millions)')
 
-# demonstrate zooming
-country_choropleth(df_pop_country, 
-                   "2012 World Bank Population Estimates", 
-                   num_colors=1,
-                   zoom=c("united states of america", "canada", "mexico"))
+# Zoom in on South America:
+country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
+                   value.name = 'gdp', num_colors = 0, border_color = 'grey', 
+                   continent_zoom = 'South America',
+                   color.max = 'gold', color.min = 'navyblue',
+                   projection = 'robinson', latlon_ticks = TRUE, gridlines = TRUE, whitespace = FALSE,
+                   background_color = 'azure',
+                   title = "GDP of Countries in the World", legend = 'GDP (millions)',
+                   label = 'iso_a2', label_text_size = 5)
 }

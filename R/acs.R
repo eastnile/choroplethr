@@ -25,10 +25,18 @@
 #'
 #' @importFrom tidycensus load_variables get_acs
 state_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = NULL,
-                                endyear, span = 5, title = NULL, 
-                                census_api_key = NULL,
+                                endyear, span = 5, title = NULL, census_api_key = NULL,
                                 ...)
 {
+  if (F) {
+    variable = 'B19013_001'
+    tableId = NULL
+    column_idx = NULL
+    map = 'state'
+    endyear = 2014
+    span = 5
+    census_api_key = NULL  
+  }
   acs_out = get_acs_data(variable = variable, tableId = tableId, column_idx = column_idx,
                          map = 'state', endyear = endyear,
                          span = span, census_api_key = census_api_key)
@@ -41,7 +49,6 @@ state_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = NU
   df = acs_out$df[, c('NAME', 'estimate')]
   names(df) = c('region', 'value')
   df$region = tolower(df$region)
-  df$value = as.numeric(df$value)
   df = df[df$region != 'puerto rico', ]
   state_choropleth(df = df, title = title, ...)
 }
@@ -77,7 +84,6 @@ county_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = N
   acs_out = get_acs_data(variable = variable, tableId = tableId, column_idx = column_idx,
                          map = 'county', endyear = endyear,
                          span = span, census_api_key = census_api_key)
-  
   if (is.null(title)) {
     title = acs_out$title
   } 
@@ -163,4 +169,3 @@ get_acs_data = function(variable = NULL, tableId = NULL, column_idx = NULL,
   map_title = paste(var_concept, var_label)
   return(list(df = acs_df, title = map_title))
 }
-

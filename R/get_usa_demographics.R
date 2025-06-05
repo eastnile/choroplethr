@@ -1,8 +1,3 @@
-if (base::getRversion() >= "2.15.1") {
-  utils::globalVariables(c("state.regions"))
-  utils::globalVariables(c("county.regions"))
-}
-
 #' Get a handful of demographic variables on US States from the US Census Bureau as a data.frame.
 #' 
 #' The data comes from the American Community Survey (ACS). The variables are total population
@@ -63,7 +58,7 @@ get_county_demographics = function(endyear=2013, span=5)
                                year = endyear, dataset = dataset, output = 'wide')
   acs_df = acs_df[, c(1, 3, 5)]
   names(acs_df) = c('region', 'population', 'median_hh_income')
-  acs_df$region = as.integer(acs_df$region)
+  acs_df$region = as.numeric(acs_df$region)
   data(county.regions, package="choroplethrMaps", envir=environment())
   acs_df = acs_df[acs_df$region %in% county.regions$region, ]
   return(acs_df)

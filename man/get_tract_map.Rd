@@ -2,12 +2,14 @@
 % Please edit documentation in R/tract.R
 \name{get_tract_map}
 \alias{get_tract_map}
-\title{Get a map of tracts in a state, as a data.frame}
+\title{Download a map of all census tracts in a given state}
 \usage{
-get_tract_map(state_name)
+get_tract_map(state_name, drop_geometry = TRUE)
 }
 \arguments{
-\item{state_name}{The name of the state. See ?state.regions for proper spelling and capitalization.}
+\item{state_name}{The name of the state, given by proper name, abbreviation, for FIPS code.}
+
+\item{drop_geometry}{Drop geometry data?}
 }
 \description{
 The map returned is exactly the same map which tract_choropleth uses. It is downloaded

@@ -38,6 +38,9 @@ state_choropleth(df_state_demographics, value.name = 'population', label = 'stat
 # County
 
 # test country
+if(F) {
+  devtools::document()
+}
 devtools::load_all() 
 data(df_county_demographics)
 
@@ -45,7 +48,24 @@ df_county_demographics
 
 cnty_ref = readRDS('dev/regions_county.rds')
 my_counties = cnty_ref$fips.numeric[1:200]
+ak_hi_counties = cnty_ref[cnty_ref$state.abb %in% c('AK', 'HI'), "fips.numeric"]
 
 # Test projections
 county_choropleth(df_county_demographics, value.name = 'total_population', projection = 'albers', zoom = my_counties)
+county_choropleth(df_county_demographics, value.name = 'total_population', projection = 'albers', zoom = my_counties, add_state_outline = F)
+county_choropleth(df_county_demographics, value.name = 'total_population', projection = 'albers', zoom = ak_hi_counties)
+
+# Tract
+# test country
+if(F) {
+  devtools::document()
+}
+devtools::load_all() 
+data("df_ny_tract_demographics")
+my_counties = c(36015, 36055)
+my_tracts = c(36015010800, 36015000100)
+tract_choropleth(df_ny_tract_demographics, state_name = 'new york', value.name = 'total_population', projection = 'albers', county_zoom = my_counties)
+tract_choropleth(df_ny_tract_demographics, state_name = 'new york', value.name = 'total_population', projection = 'albers', tract_zoom = my_tracts, county_zoom = my_counties)
+tract_choropleth(df_ny_tract_demographics, state_name = 'new york', value.name = 'total_population', projection = 'albers', tract_zoom = my_tracts, county_zoom = 36055)
+tract_choropleth(df_ny_tract_demographics, state_name = 'new york', value.name = 'total_population', county_zoom = 36055)
 

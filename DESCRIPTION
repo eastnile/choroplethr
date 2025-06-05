@@ -25,40 +25,28 @@ Imports:
     ggplot2 (>= 2.0.0),
     dplyr,
     R6,
-    WDI,
-    ggmap,
-    RgoogleMaps,
     tigris (>= 1.0),
-    gridExtra,
-    xml2,
-    rvest,
-    tidyr,
+    sf,
     tidycensus
 Suggests:
-    testthat,
+    testthat (>= 3.0.0),
     choroplethrMaps,
-    choroplethrAdmin1 (>= 1.1.0),
+    choroplethrAdmin1 (>= 1.1.0)
 Depends:
     R (>= 3.5.0)
 Collate: 
     'acs.R'
-    'choropleth.R'
     'admin1.R'
-    'admin1_region.R'
-    'choroplethr_animate.R'
-    'choroplethr_wdi.R'
+    'choropleth.R'
     'country.R'
-    'usa.R'
     'county.R'
-    'county_zoom.R'
     'data.R'
-    'func_tigris.R'
-    'get_congress_116_party_data.R'
-    'get_congressional_demographics.R'
     'get_usa_demographics.R'
+    'init.R'
+    'internal-docs.R'
     'state.R'
     'tract.R'
-    'utils.R'
 RoxygenNote: 7.3.2
 Encoding: UTF-8
 LazyData: true
+Config/testthat/edition: 3
