@@ -7,7 +7,7 @@
 #' @importFrom utils data
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # get some demographic data on US states from the 2010 5-year ACS
 #' df = get_state_demographics(endyear=2010, span=5)
 #' 
@@ -40,7 +40,7 @@ get_state_demographics = function(endyear=2013, span=5)
 #' @param span The span of the survey
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # get some demographic data on US counties from the 2010 5-year ACS
 #' df = get_county_demographics(endyear=2010, span=5)
 
@@ -73,7 +73,7 @@ get_county_demographics = function(endyear=2013, span=5)
 #' @param endyear The end year for the survey
 #' @param span The span of the survey
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # 36061 is the FIPS code for Manhatttan (technically "New York County"), NY.
 #' df = get_tract_demographics("new york", 36061)
 #' df$value = df$median_hh_income

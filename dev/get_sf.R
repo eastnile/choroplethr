@@ -3,6 +3,7 @@ library(rnaturalearth)
 library(sf)
 library(dplyr)
 library(ggplot2)
+library(rmapshaper)
 
 ## 1. US States ----
 state.map = states(cb = TRUE, year = 2024)
@@ -40,20 +41,59 @@ st_geometry(dc) = shifted_dc                                  # apply new geomet
 other_states = state.map %>% filter(name.proper != "District of Columbia")
 st_crs(dc) = st_crs(other_states)
 state.map.bigdc = rbind(other_states, dc)                        # recombine
-
+sum(!st_is_valid(state.map.bigdc))
 if (F) {
   ggplot(state.map.bigdc) +
     geom_sf() +  xlim(-100, -50) + ylim(30,50)
 }
 
-sum(!st_is_valid(state.map.bigdc))
+# Simplify geometries
 
-state.map = state.map[, c('fips.numeric')]
-save(state.map, file = 'data/state.map.rda')
+state.map.hires <- ms_simplify(state.map, keep = 0.05, keep_shapes = TRUE)
+state.map.lores <- ms_simplify(state.map, keep = 0.01, keep_shapes = TRUE)
+state.map.bigdc <- ms_simplify(state.map.bigdc, keep = 0.01, keep_shapes = TRUE)
+
+if (F) {
+  state.map.test1 <- ms_simplify(state.map, keep = 0.01, keep_shapes = TRUE)
+  state.map.test2 <- st_simplify(state.map, dTolerance = 1000)
+  object.size(state.map)
+  object.size(state.map.test1)
+  object.size(state.map.test2)
+  ggplot(state.map.test1) +
+    geom_sf()
+  ggplot(state.map.test2) +
+    geom_sf()
+}
+
+
+state.map.hires = state.map.hires[, c('fips.numeric')]
+save(state.map.hires, file = 'data/state.map.hires.rda')
+
+state.map.lores = state.map.lores[, c('fips.numeric')]
+save(state.map.lores, file = 'data/state.map.lores.rda')
 
 state.map.bigdc = state.map.bigdc[, c('fips.numeric')]
 save(state.map.bigdc, file = 'data/state.map.bigdc.rda')
 
+
+# Hexmap
+
+# Plot
+hex_url = "https://raw.githubusercontent.com/Z3tt/30DayMapChallenge/master/data/us_states_hexgrid.geojson.json"
+state.map.hex = st_read(hex_url, quiet = TRUE)
+state.map.hex = select(state.map.hex, iso3166_2, geometry)
+state.map.hex = merge(state.map.hex, state.regions, by.x = 'iso3166_2', by.y = 'state.abb')
+
+if (F) {
+  ggplot(state.map.hex) +
+    geom_sf(aes(geometry = geometry)) +
+    theme_void() +
+    coord_sf(crs = 3395) +
+    theme_void()
+}
+
+state.map.hex = state.map.hex[, c('fips.numeric', "geometry")]
+save(state.map.hex, file = 'data/state.map.hex.rda')
 
 # US Counties (2024) ----
 
@@ -84,6 +124,7 @@ prep_county_map = function(tigris_output) {
   county.map$fips.numeric = as.numeric(county.map$fips.character)
   county.map = county.map[, c('fips.numeric', 'fips.character', 'name.proper', 'state.fips.numeric', 'state.fips.character', 'state.abb', 'state.name.proper', 'geometry')]
   county.map = county.map[order(county.map$state.fips.numeric, county.map$fips.numeric), ]
+  county.map = ms_simplify(county.map, keep = 0.05, keep_shapes = TRUE)
   sum(!st_is_valid(county.map))
   return(county.map)
 }
@@ -95,6 +136,7 @@ county.map.2015 = prep_county_map(tigris::counties(cb = TRUE, year = 2015))
 if (F) {
   ggplot(county.map.2024) + geom_sf()
   ggplot(county.map.2015) + geom_sf()
+  county.map.2024 <- ms_simplify(county.map.2024, keep = 0.05, keep_shapes = TRUE)
 }
 
 county.regions.2024 = st_drop_geometry(county.map.2024)
@@ -167,6 +209,16 @@ sum(duplicated(world$iso_a3))
 sum(duplicated(world$iso_a2))
 sum(nchar(world$iso_a3) != 3)
 sum(nchar(world$iso_a2) != 2)
+
+sf_use_s2(FALSE)
+world <- st_simplify(world, dTolerance = 0) # fixes some invalid regions
+if (F) {
+  world_test = ms_simplify(world, keep = 0.99, keep_shapes = FALSE)
+  ggplot(filter(world_test, iso_a3=='USA')) + geom_sf()
+  ggplot(filter(world, iso_a3=='MEX')) + geom_sf()
+}
+
+sum(!st_is_valid(world))
 
 country.map = world
 country.regions = st_drop_geometry(country.map)

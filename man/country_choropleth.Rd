@@ -155,7 +155,8 @@ country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 
 country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
                    value.name = 'gdp', num_colors = 0, border_color = 'grey', 
                    color.max = 'gold', color.min = 'navyblue',
-                   projection = 'robinson', latlon_ticks = TRUE, gridlines = TRUE, whitespace = FALSE,
+                   projection = 'robinson', latlon_ticks = TRUE, 
+                   gridlines = TRUE, whitespace = FALSE,
                    background_color = 'azure',
                    title = "GDP of Countries in the World", legend = 'GDP (millions)')
 
@@ -164,7 +165,8 @@ country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 
                    value.name = 'gdp', num_colors = 0, border_color = 'grey', 
                    continent_zoom = 'South America',
                    color.max = 'gold', color.min = 'navyblue',
-                   projection = 'robinson', latlon_ticks = TRUE, gridlines = TRUE, whitespace = FALSE,
+                   projection = 'robinson', latlon_ticks = TRUE, 
+                   gridlines = TRUE, whitespace = FALSE,
                    background_color = 'azure',
                    title = "GDP of Countries in the World", legend = 'GDP (millions)',
                    label = 'iso_a2', label_text_size = 5)

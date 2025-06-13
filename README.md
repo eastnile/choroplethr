@@ -10,10 +10,27 @@ Choroplethr simplifies the creation of choropleth maps in R. Choropleths are the
 2. Providing API connections to interesting data sources for making choropleths.
 3. Providing a framework for creating choropleths from arbitrary shapefiles.
 
-## Documentation
+## 📦 Installation
 
-Documentation for choroplethr can be found [here](https://github.com/arilamstein/choroplethr).
+Install from CRAN:
+```r
+install.packages("mycoolpkg")
+```
+
+Install the development version from GitHub:
+```r
+# install.packages("remotes")
+remotes::install_github("yourusername/mycoolpkg")
+```
+
+## Basic Usage
+Create a state-level map of 
+```r
+# install.packages("remotes")
+remotes::install_github("yourusername/mycoolpkg")
+```
+
 
 ## Technical Support
 
-If you have a technical question about Choroplethr, please ask on StackOverflow: https://stackoverflow.com/questions/tagged/choroplethr.
+If you have a technical question about Choroplethr, please contact the maintainer at: zhaochen.he@cnu.edu.

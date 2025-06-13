@@ -131,18 +131,18 @@ choroplethr::county.regions.2024 for an object
 that can help you coerce your county names into this format.
 }
 \examples{
-\dontrun{
-Create a map based on US county data:
-
+\donttest{
+# Create a map based on US county data:
 data("df_county_demographics")
-
 county_choropleth(df_county_demographics, geoid.name = 'region', geoid.type = 'fips.numeric',
                   value.name = 'median_hh_income',
-                  title = "Median Household Income of U.S. Counties", legend = 'Median HH Income')
+                  title = "Median Household Income of U.S. Counties", 
+                  legend = 'Median HH Income')
 
 county_choropleth(df_county_demographics, geoid.name = 'region', geoid.type = 'fips.numeric',
                   value.name = 'median_hh_income',
                   state_zoom = c('CA', 'OR', 'WA'),
-                  title = "Median Household Income of West Coast Counties", legend = 'Median HH Income')
+                  title = "Median Household Income of West Coast Counties", 
+                  legend = 'Median HH Income')
 }
 }

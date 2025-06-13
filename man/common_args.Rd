@@ -29,6 +29,8 @@ common_args(
   label_text_color,
   label_box_color,
   ggrepel_options,
+  whitespace,
+  legend_position,
   legend,
   legend.position,
   title,
@@ -102,6 +104,13 @@ to create the labels and ensure that they do not overlap.}
 \item{ggrepel_options}{A list containing additional arguments to be passed to
 geom_label_repel (see ?ggplot2::geom_label_repel)}
 
+\item{whitespace}{Add some blank space to the sides of your map? For some
+projections, this must be set to FALSE in order for lat/lon ticks and
+display correctly.}
+
+\item{legend_position}{The position of your legend relative to the rest of
+the map; can be "top", "bottom", "left", or "right".}
+
 \item{legend}{A title for your legend; if NULL, value.name will be used.}
 
 \item{title}{A title for your plot; if NULL, no title will be added.}
@@ -109,13 +118,6 @@ geom_label_repel (see ?ggplot2::geom_label_repel)}
 \item{return}{If "plot", the function will return the requested map as a
 ggplot object. If "sf", the function will return the spatial dataframe used
 to draw the map (useful if you wish to customize the map yourself).}
-
-\item{whitespace}{Add some blank space to the sides of your map? For some
-projections, this must be set to FALSE in order for lat/lon ticks and
-display correctly.}
-
-\item{legend_position}{The position of your legend relative to the rest of
-the map; can be "top", "bottom", "left", or "right".}
 }
 \description{
 Common Parameters
