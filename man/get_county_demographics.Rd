@@ -16,7 +16,7 @@ The data comes from the American Community Survey (ACS). The variables are total
 and median household income.
 }
 \examples{
-\dontrun{
+\donttest{
 # get some demographic data on US counties from the 2010 5-year ACS
 df = get_county_demographics(endyear=2010, span=5)
 # A choropleth map shows the location of the values.

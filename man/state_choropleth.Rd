@@ -39,6 +39,8 @@ state_choropleth(
 \arguments{
 \item{df}{A dataframe containing U.S. state level data}
 
+\item{style}{Either "geographic" for a literal map of US states, "geographic_bigdc" to make Washington DC more visible, or "hexgrid" for a stylized hexagonal tile map. Note: projection = 'mercator' is suggested when using the hexgrid map.}
+
 \item{geoid.name}{The variable that identifies each state}
 
 \item{geoid.type}{How the variable given by geoid.name specifies each state (full name, abbreviation, etc). The allowed geoid.type are given in choroplethr::state.regions. If "auto", the function will try to automatically determine geoid.type.}
@@ -122,7 +124,6 @@ to draw the map (useful if you wish to customize the map yourself).}
 To see the list of allowed state names, see choroplethr::state.regions.
 }
 \examples{
-\donttest{
 # Plot continuous state level data:
 data(df_state_demographics)
 state_choropleth(df = df_state_demographics,
@@ -155,5 +156,18 @@ state_choropleth(df = df_president,
                  label = 'state.abb',
                  label_text_size = 4,
                  ggrepel_options = list(label.r = 0, force = 0.02))
-}
+                 
+# Use a styled hexagonal tile map instead of actual state shapes:
+state_choropleth(df = df_president,
+                 style = 'hexgrid',
+                 projection = 'mercator',
+                 geoid.name = 'region',
+                 geoid.type = 'name.lower',
+                 value.name = 'value',
+                 title  = "2012 US Presidential Election Results",
+                 legend = "Candidate",
+                 custom.colors = c('blue4', 'red3'),
+                 border_color = 'lightgrey',
+                 label = 'state.abb',
+                 label_text_size = 3)
 }

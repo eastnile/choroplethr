@@ -166,7 +166,7 @@ Choropleth = R6Class("Choropleth",
   
       # browser()
       # I. data is numeric
-      if (class(choropleth.df[[self$value.name]]) != 'factor') { 
+      if (!is.factor(choropleth.df[[self$value.name]])) { 
         if (!is.null(custom.colors)) {
           message('user.colors ignored when the plotted variable is continuous') 
         }
@@ -328,23 +328,22 @@ Choropleth = R6Class("Choropleth",
       if (respect_zoom) {
         choropleth.df = choropleth.df[choropleth.df$render == TRUE,]
       }
-
+      # This option clips regions outside user's desired lat/lon region; prevents distant regions from getting hugely distorted and covering up nearby regions.
       if (occlude_latlon_limits & !is.null(projection$limits$x) & !is.null(projection$limits$y)) {
         limits = c(projection$limits$x[1], projection$limits$x[2], 
                    projection$limits$y[1], projection$limits$y[2])
         names(limits) = c('xmin', 'xmax', 'ymin', 'ymax')
+        suppressMessages(sf_use_s2(FALSE))
         bbox = st_bbox(limits, crs = st_crs(4326))
-        
-        sf_use_s2(FALSE)
         bbox_poly = st_as_sfc(expand_bbox(bbox, factor = 1.1)) # Slightly expand bbox to prevent clipping of mapped regions
-        choropleth.df = st_intersection(choropleth.df, bbox_poly) # Clip regions outside user's desired lat/lon region; prevents distant regions from getting hugely distorted and covering up nearby regions.
-        sf_use_s2(TRUE)
+        choropleth.df = suppressWarnings(suppressMessages(st_intersection(choropleth.df, bbox_poly)))
+        suppressMessages(sf_use_s2(TRUE))
       }
 
       
       # ---- Set other formatting options ----      
 
-      if (class(choropleth.df[[self$value.name]]) == 'factor') {
+      if (is.factor(choropleth.df[[self$value.name]])) {
         gg_guide = guides(fill = guide_legend(
           override.aes = list(colour = "black", size = 1, linewidth = .2)  # sets black borders on legend key regardless of country border color
         ))

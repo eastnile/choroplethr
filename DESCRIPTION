@@ -1,14 +1,11 @@
 Package: choroplethr
-Title: Simplify the Creation of Choropleth Maps in R
-Description: Choropleths are thematic maps where geographic regions, such as
-    states, are colored according to some metric, such as the number of people
-    who live in that state. This package simplifies this process by 1.
-    Providing ready-made functions for creating choropleths of common maps. 2.
-    Providing data and API connections to interesting data sources for making
-    choropleths. 3. Providing a framework for creating choropleths from
-    arbitrary shapefiles. 4. Overlaying those maps over reference maps from
-    Google Maps. 
-Version: 4.0.0
+Title: Create Color-Coded Choropleth Maps in R
+Description: Choroplethr makes it easy to create color-coded (choropleth) maps
+  in R. No knowledge of cartography or shapefiles needed; go directly from your
+  data to a highly customizable map with a single line of code! Supported 
+  geographies: U.S. states, counties, and census tracts, world countries and
+  sub-country regions (e.g., provinces, prefectures, etc.).
+Version: 5.0.0
 Authors@R: c(
     person("Ari", "Lamstein", , "ari@lamsteinconsulting.com", c("aut", "cre")),
     person("Zhaochen", "He", , "zhaochen.he@cnu.edu", role = "aut"),
@@ -27,7 +24,8 @@ Imports:
     R6,
     tigris (>= 1.0),
     sf,
-    tidycensus
+    tidycensus,
+    rnaturalearth
 Suggests:
     testthat (>= 3.0.0),
     choroplethrMaps,
@@ -49,4 +47,5 @@ Collate:
 RoxygenNote: 7.3.2
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: xz
 Config/testthat/edition: 3
