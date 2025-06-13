@@ -128,8 +128,8 @@ to draw the map (useful if you wish to customize the map yourself).}
 Create a choropleth map using census tract level data for a given state.
 }
 \examples{
+\donttest{
 # Plot tract level data from New York state:
-
 df_ny_tract_demographics = choroplethr::df_ny_tract_demographics
 tract_choropleth(df = df_ny_tract_demographics, state_name = 'NY', 
                  geoid.name = 'region', value.name = 'population')
@@ -138,7 +138,7 @@ tract_choropleth(df = df_ny_tract_demographics, state_name = 'NY',
 tract_choropleth(df = df_ny_tract_demographics, state_name = 'NY', 
                  geoid.name = 'region', value.name = 'population',
                  county_zoom = c(36005, 36047, 36061, 36081, 36085))
-
+}
 }
 \seealso{
 \url{https://www.census.gov/data/academy/data-gems/2018/tract.html} for more information on Census Tracts

@@ -11,5 +11,5 @@ data(country.map)
 An sf containing geometry data for countries the world
 }
 \references{
-obtained using rnatrualearth::ne_countries
+Data obtained using the ne_countries function from rnaturalearth; https://github.com/ropensci/rnaturalearth, https://www.naturalearthdata.com/
 }

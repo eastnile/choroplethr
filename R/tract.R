@@ -36,8 +36,8 @@ get_tract_map = function(state_name, drop_geometry = TRUE) {
 #'   they appear in the "county.fips.numeric" column of the object returned from
 #'   get_tract_map().
 #' @examples
+#' \donttest{
 #' # Plot tract level data from New York state:
-#'
 #' df_ny_tract_demographics = choroplethr::df_ny_tract_demographics
 #' tract_choropleth(df = df_ny_tract_demographics, state_name = 'NY', 
 #'                  geoid.name = 'region', value.name = 'population')
@@ -46,7 +46,7 @@ get_tract_map = function(state_name, drop_geometry = TRUE) {
 #' tract_choropleth(df = df_ny_tract_demographics, state_name = 'NY', 
 #'                  geoid.name = 'region', value.name = 'population',
 #'                  county_zoom = c(36005, 36047, 36061, 36081, 36085))
-#'
+#' }
 #' @seealso \url{https://www.census.gov/data/academy/data-gems/2018/tract.html} for more information on Census Tracts
 #' @export
 #' 
@@ -56,7 +56,7 @@ tract_choropleth = function(df, state_name, geoid.name = 'region', geoid.type = 
                             border_color = 'grey15', border_thickness = 0.2,
                             background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE, whitespace = TRUE,
                             label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white', 
-                            legend = NULL, legend_position = 'bottom', title = NULL, return = 'plot') {
+                            legend = NULL, legend_position = 'right', title = NULL, return = 'plot') {
   
   tract_map = get_tract_map(state_name, drop_geometry = FALSE)
   c = Choropleth$new(ref.regions = sf::st_drop_geometry(tract_map), 

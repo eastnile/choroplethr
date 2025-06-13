@@ -4,12 +4,11 @@
 #' 
 #' @inheritParams common_args
 #' @param df A dataframe containing U.S. state level data
+#' @param style Either "geographic" for a literal map of US states, "geographic_bigdc" to make Washington DC more visible, or "hexgrid" for a stylized hexagonal tile map. Note: projection = 'mercator' is suggested when using the hexgrid map.
 #' @param geoid.name The variable that identifies each state
 #' @param geoid.type How the variable given by geoid.name specifies each state (full name, abbreviation, etc). The allowed geoid.type are given in choroplethr::state.regions. If "auto", the function will try to automatically determine geoid.type.
 #' @param zoom An optional vector of states to zoom in on, written in the same manner as geoid.name.
-
 #' @examples
-#' \donttest{
 #' # Plot continuous state level data:
 #' data(df_state_demographics)
 #' state_choropleth(df = df_state_demographics,
@@ -42,9 +41,20 @@
 #'                  label = 'state.abb',
 #'                  label_text_size = 4,
 #'                  ggrepel_options = list(label.r = 0, force = 0.02))
-#' }
-
-
+#'                  
+#' # Use a styled hexagonal tile map instead of actual state shapes:
+#' state_choropleth(df = df_president,
+#'                  style = 'hexgrid',
+#'                  projection = 'mercator',
+#'                  geoid.name = 'region',
+#'                  geoid.type = 'name.lower',
+#'                  value.name = 'value',
+#'                  title  = "2012 US Presidential Election Results",
+#'                  legend = "Candidate",
+#'                  custom.colors = c('blue4', 'red3'),
+#'                  border_color = 'lightgrey',
+#'                  label = 'state.abb',
+#'                  label_text_size = 3)
 #' @export
 state_choropleth = function(df, style = 'geographic_bigdc', geoid.name = 'region', geoid.type = 'auto', value.name = 'value', 
          num_colors = 7, color.max = '#084594', color.min = '#eff3ff', na.color = 'grey', custom.colors = NULL, nbreaks = 5,
@@ -56,12 +66,19 @@ state_choropleth = function(df, style = 'geographic_bigdc', geoid.name = 'region
                                 box.padding = 0.15,
                                 label.padding = 0.15, 
                                 max.overlaps = Inf),
-         legend = NULL, legend_position = 'bottom', title = NULL, return = 'plot') {
+         legend = NULL, legend_position = 'right', title = NULL, return = 'plot') {
 
   if (style == 'geographic_bigdc') {
     map.df = choroplethr::state.map.bigdc
   } else if (style == 'geographic') {
-    map.df = choroplethr::state.map
+    map.df = choroplethr::state.map.lores
+  } else if (style == 'hexgrid') {
+    map.df = choroplethr::state.map.hex
+    if (projection != 'mercator') {
+      message('The suggested projection for the hexgrid map is mercator.')
+    }
+  } else {
+    stop('style must be "geographic_bigdc", "geographic", or "hexgrid".')
   }
 
   c = Choropleth$new(ref.regions = choroplethr::state.regions, 

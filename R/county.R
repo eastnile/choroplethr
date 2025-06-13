@@ -18,19 +18,19 @@
 #' @param add_state_outline Should state borders be outlined in your map?
 #' 
 #' @examples
-#' \dontrun{
-#' Create a map based on US county data:
-#' 
+#' \donttest{
+#' # Create a map based on US county data:
 #' data("df_county_demographics")
-#' 
 #' county_choropleth(df_county_demographics, geoid.name = 'region', geoid.type = 'fips.numeric',
 #'                   value.name = 'median_hh_income',
-#'                   title = "Median Household Income of U.S. Counties", legend = 'Median HH Income')
+#'                   title = "Median Household Income of U.S. Counties", 
+#'                   legend = 'Median HH Income')
 #' 
 #' county_choropleth(df_county_demographics, geoid.name = 'region', geoid.type = 'fips.numeric',
 #'                   value.name = 'median_hh_income',
 #'                   state_zoom = c('CA', 'OR', 'WA'),
-#'                   title = "Median Household Income of West Coast Counties", legend = 'Median HH Income')
+#'                   title = "Median Household Income of West Coast Counties", 
+#'                   legend = 'Median HH Income')
 #' }
 #' @export
 #' @importFrom ggplot2 geom_sf
@@ -40,7 +40,7 @@ county_choropleth = function(df, map_year = 2024, geoid.name = 'region', geoid.t
                              border_color = 'grey15', border_thickness = 0.2,
                              background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE, whitespace = TRUE,
                              label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white', 
-                             legend = NULL, legend_position = 'bottom', title = NULL, return = 'plot',
+                             legend = NULL, legend_position = 'right', title = NULL, return = 'plot',
                              add_state_outline = TRUE)
 {
   if (!map_year %in% c(2024, 2015)) {
@@ -96,7 +96,7 @@ county_choropleth = function(df, map_year = 2024, geoid.name = 'region', geoid.t
   if (add_state_outline) {
     counties_used = unique(c$choropleth.df$fips.numeric[c$choropleth.df$render])
     states_used = unique(floor(counties_used/1000))
-    state_map = choroplethr::state.map
+    state_map = choroplethr::state.map.hires
     state_map = state_map[state_map$fips.numeric %in% states_used, ]
     state_outline = geom_sf(data = state_map, color = 'black', fill = NA, linewidth = 0.5)
   } else {

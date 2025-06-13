@@ -129,21 +129,6 @@ NULL
 #' ?get_county_demographics. 
 #' @keywords data
 #' @usage data(df_county_demographics)
-#' @examples
-#' \dontrun{
-#' library(choroplethr)
-#' data(df_county_demographics)
-#' 
-#' # examine the 2013, 5-year county percent hispanic estimates as a boxplot and choropleth
-#'
-#' # the boxplot shows the distribution
-#' boxplot(df_county_demographics$percent_hispanic)
-#' 
-#' # the choropleth map shows the location of the values
-#' # first set the 'value' column to be the column we want to render
-#' df_county_demographics$value = df_county_demographics$percent_hispanic
-#' county_choropleth(df_county_demographics)
-#' }
 NULL
 
 #' A data.frame containing demographic statistics for each Census Tract in New York State.
@@ -207,15 +192,24 @@ NULL
 #'
 #' @name df_country_demographics
 #' @docType data
-#' @references Data from rnaturalearth::ne_countries(); https://www.naturalearthdata.com/
+#' @references Data obtained using the ne_countries function from rnaturalearth; https://github.com/ropensci/rnaturalearth, https://www.naturalearthdata.com/
 #' @keywords data
 #' @usage data(df_country_demographics)
 NULL
 
-#' An sf containing geometry data for US states
+#' An sf containing higher resolution geometry data for US states
+#' 
+#' Note: Resolution is still much lower than raw data from tigris
+#' @name state.map.hires
+#' @usage data(state.map.hires)
+#' @docType data
+#' @references obtained using tigris::states()
+NULL
+
+#' An sf containing lower resolution geometry data for US states
 #'
-#' @name state.map
-#' @usage data(state.map)
+#' @name state.map.lores
+#' @usage data(state.map.lores)
 #' @docType data
 #' @references obtained using tigris::states()
 NULL
@@ -225,6 +219,14 @@ NULL
 #' @name state.map.bigdc
 #' @usage data(state.map.bigdc)
 #' @docType data
+NULL
+
+#' An sf containing a hexagonal tile map for US states
+#'
+#' @name state.map.hex
+#' @usage data(state.map.hex)
+#' @docType data
+#' #' @references obtained from:"https://raw.githubusercontent.com/Z3tt/30DayMapChallenge/master/data/us_states_hexgrid.geojson.json"
 NULL
 
 #' Supported regions for US states
@@ -269,7 +271,7 @@ NULL
 #' @name country.map
 #' @usage data(country.map)
 #' @docType data
-#' @references obtained using rnatrualearth::ne_countries
+#' @references Data obtained using the ne_countries function from rnaturalearth; https://github.com/ropensci/rnaturalearth, https://www.naturalearthdata.com/
 NULL
 
 #' Supported regions for world countries

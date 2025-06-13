@@ -62,6 +62,6 @@ common_args <- function(df, geoid.name, geoid.type, value.name, num_colors,
                         projection, limits_lat, limits_lon, reproject,
                         border_color, border_thickness, background_color, gridlines, latlon_ticks,
                         label, label_text_size, label_text_color, label_box_color,
-                        ggrepel_options,
+                        ggrepel_options, whitespace, legend_position,
                         legend, legend.position, title, return) {}
 
