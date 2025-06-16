@@ -34,12 +34,13 @@
 #' }
 #' @export
 #' @importFrom ggplot2 geom_sf
-county_choropleth = function(df, map_year = 2024, geoid.name = 'region', geoid.type = 'auto', value.name = 'value', 
+county_choropleth = function(df, map_year = 2024, geoid.name = 'region', geoid.type = 'auto', value.name = 'value',
                              num_colors = 7, color.max = NULL, color.min = NULL, na.color = 'grey', custom.colors = NULL, nbreaks = 5,
-                             county_zoom = NULL, state_zoom = NULL, projection = 'albers', 
+                             county_zoom = NULL, state_zoom = NULL, projection = 'albers',
                              border_color = 'grey15', border_thickness = 0.2,
                              background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE, whitespace = TRUE,
-                             label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white', 
+                             label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white',
+                             ggrepel_options = NULL,
                              legend = NULL, legend_position = 'right', title = NULL, return = 'plot',
                              add_state_outline = TRUE)
 {
