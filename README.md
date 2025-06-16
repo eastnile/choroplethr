@@ -1,36 +1,107 @@
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/arilamstein/choroplethr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/arilamstein/choroplethr/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 # Choroplethr
 
-Choroplethr simplifies the creation of choropleth maps in R. Choropleths are thematic maps where geographic regions, such as states, are colored according to some metric, such as the number of people who live in that state. Choroplethr simplifies this process by
-    
-1. Providing ready-made functions for creating choropleths using 220 different maps.
-2. Providing API connections to interesting data sources for making choropleths.
-3. Providing a framework for creating choropleths from arbitrary shapefiles.
+Choroplethr makes it easy to create color-coded (choropleth) maps in R. No knowledge of cartography or shapefiles needed; go directly from your geographically identified data to a highly customizable map with a single line of code! Supported geographies: U.S. states, counties, and census tracts, world countries and sub-country regions (e.g., provinces, prefectures, etc.).
 
 ## 📦 Installation
 
 Install from CRAN:
-```r
-install.packages("mycoolpkg")
+
+``` r
+install.packages("choroplethr")
 ```
 
 Install the development version from GitHub:
-```r
+
+``` r
 # install.packages("remotes")
-remotes::install_github("yourusername/mycoolpkg")
+remotes::install_github("eastnile/choroplethr")
 ```
 
 ## Basic Usage
-Create a state-level map of 
-```r
-# install.packages("remotes")
-remotes::install_github("yourusername/mycoolpkg")
+
+Create a map using your state level data:
+
+``` r
+#library(choroplethr)
+my_state_data = choroplethr::df_state_demographics
+head(my_state_data) # Data organized by state names in lower case
 ```
 
+| region   | population | median_hh_income |
+|:---------|-----------:|-----------------:|
+| alabama  |    4799277 |            43253 |
+| alaska   |     720316 |            70760 |
+| arizona  |    6479703 |            49774 |
+| arkansas |    2933369 |            40768 |
+
+``` r
+state_choropleth(my_state_data, geoid.name = 'region', value.name = 'median_hh_income',
+                 legend = 'Median HH Income', title = 'Household Income in US States')
+```
+
+<p align="center">
+<img src="man/figures/state_map_basic.JPG" width="600"/>
+</p>
+
+Choroplethr accepts a variety of ways to identify each state, such as proper name, abbreviation, or FIPS code, and will automatically try to determine the type of identifier used, if unspecified. To see the list of accepted identifiers, see ?state_choropleth or choroplethr::state.regions.
+
+Many options are available to customize the appearance of the map:
+
+``` r
+state_choropleth(my_state_data, geoid.name = 'region', value.name = 'median_hh_income',
+                 legend = 'Median HH Income', title = 'Household Income in US States',
+                 legend_position = 'right', color.max = 'seagreen', color.min = 'maroon',
+                 border_thickness = .7, label = 'state.abb', style = 'hexgrid',
+                 projection = 'mercator')
+```
+
+<p align="center">
+<img src="man/figures/state_map_2.JPG" width="600"/>
+</p>
+
+Categorical data can also be plotted, with your choice of colors:
+
+``` r
+df_president = choroplethr::df_president
+state_choropleth(df = df_president, geoid.name = 'region', value.name = 'value',
+                 title  = "2012 US Presidential Election Results",
+                 legend = "Candidate", custom.colors = c('blue4', 'red3'),
+                 border_color = 'lightgrey', legend_position = 'bottom')
+```
+
+<p align="center">
+<img src="man/figures/state_map_prez.JPG" width="500"/>
+</p>
+
+## Other Geographies
+
+Choroplethr current supports five different map types:
+
+-   U.S. State level maps: **state_choropleth()**
+-   U.S. County level maps: **county_choropleth()**
+-   U.S. Census tract level maps: **tract_choropleth()**
+-   World maps by country: **country_choropleth()**
+-   World maps by sub-country administrative regions (ie, provinces, prefectures, etc): **admin1_choropleth()**
+
+``` r
+df_country_demographics = choroplethr::df_country_demographics
+country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
+                   value.name = 'gdp', continent_zoom = 'Europe', projection = 'albers',
+                   title = "GDP of Countries in Europe", legend = 'Total GDP')
+```
+
+<p align="center">
+<img src="man/figures/europe.JPG" width="600"/>
+</p>
+
+Please see the help documentation inside R (e.g. ?country_choroplethr) to learn more about these functions.
 
 ## Technical Support
 
-If you have a technical question about Choroplethr, please contact the maintainer at: zhaochen.he@cnu.edu.
+If you have a technical question about Choroplethr, please contact the maintainer at: [zhaochen.he\@cnu.edu](mailto:zhaochen.he@cnu.edu){.email}.

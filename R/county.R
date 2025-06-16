@@ -34,13 +34,14 @@
 #' }
 #' @export
 #' @importFrom ggplot2 geom_sf
-county_choropleth = function(df, map_year = 2024, geoid.name = 'region', geoid.type = 'auto', value.name = 'value', 
+county_choropleth = function(df, map_year = 2024, geoid.name = 'region', geoid.type = 'auto', value.name = 'value',
                              num_colors = 7, color.max = NULL, color.min = NULL, na.color = 'grey', custom.colors = NULL, nbreaks = 5,
-                             county_zoom = NULL, state_zoom = NULL, projection = 'albers', 
+                             county_zoom = NULL, state_zoom = NULL, projection = 'albers',
                              border_color = 'grey15', border_thickness = 0.2,
                              background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE, whitespace = TRUE,
-                             label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white', 
-                             legend = NULL, legend_position = 'bottom', title = NULL, return = 'plot',
+                             label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white',
+                             ggrepel_options = NULL,
+                             legend = NULL, legend_position = 'right', title = NULL, return = 'plot',
                              add_state_outline = TRUE)
 {
   if (!map_year %in% c(2024, 2015)) {
@@ -68,9 +69,9 @@ county_choropleth = function(df, map_year = 2024, geoid.name = 'region', geoid.t
   
   if (!is.null(state_zoom)) {
     state_zoom_geoid = guess_geoid_type(user.regions = state_zoom, geoid.all = c('name.proper', 'name.lower', 'state.abb', 'fips.character', 'fips.numeric'),
-                                        ref.regions = choroplethr::state.regions, ref.regions.name = 'choroplethr::choroplethr::state.regions')
+                                       ref.regions = choroplethr::state.regions, ref.regions.name = 'choroplethr::state.regions')
     if (!all(state_zoom %in% choroplethr::state.regions[[state_zoom_geoid]])) {
-      stop('all elements of state_zoom must match one of the columns in choroplethr::choroplethr::state.regions')
+      stop('all elements of state_zoom must match one of the columns in choroplethr::state.regions')
     }
     state_zoom_fipsn = choroplethr::state.regions[choroplethr::state.regions[[state_zoom_geoid]] %in% state_zoom, "fips.numeric"]
     counties_in_state_zoom = ref.regions[ref.regions$state.fips.numeric %in% state_zoom_fipsn, c$geoid.type]

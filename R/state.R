@@ -66,7 +66,7 @@ state_choropleth = function(df, style = 'geographic_bigdc', geoid.name = 'region
                                 box.padding = 0.15,
                                 label.padding = 0.15, 
                                 max.overlaps = Inf),
-         legend = NULL, legend_position = 'bottom', title = NULL, return = 'plot') {
+         legend = NULL, legend_position = 'right', title = NULL, return = 'plot') {
 
   if (style == 'geographic_bigdc') {
     map.df = choroplethr::state.map.bigdc

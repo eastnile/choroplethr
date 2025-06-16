@@ -13,7 +13,7 @@ get_tract_map = function(state_name, drop_geometry = TRUE) {
   tract.map.df = tracts(state = state_name, cb = TRUE)
   tract.map.df$tractid.numeric = as.numeric(tract.map.df$GEOID)
   tract.map.df$county.fips.numeric = as.numeric(paste0(tract.map.df$STATEFP, tract.map.df$COUNTYFP))
-  st_transform(tract.map.df, 4326)
+  tract.map.df = st_transform(tract.map.df, 4326)
   if (drop_geometry) {
     tract.map.df = as.data.frame(sf::st_drop_geometry(tract.map.df))
   }
@@ -50,13 +50,14 @@ get_tract_map = function(state_name, drop_geometry = TRUE) {
 #' @seealso \url{https://www.census.gov/data/academy/data-gems/2018/tract.html} for more information on Census Tracts
 #' @export
 #' 
-tract_choropleth = function(df, state_name, geoid.name = 'region', geoid.type = 'auto', value.name = 'value', 
+tract_choropleth = function(df, state_name, geoid.name = 'region', geoid.type = 'auto', value.name = 'value',
                             num_colors = 7, color.max = NULL, color.min = NULL, na.color = 'grey', custom.colors = NULL, nbreaks = 5,
-                            tract_zoom = NULL, county_zoom = NULL, projection = 'cartesian', 
+                            tract_zoom = NULL, county_zoom = NULL, projection = 'cartesian',
                             border_color = 'grey15', border_thickness = 0.2,
                             background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE, whitespace = TRUE,
-                            label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white', 
-                            legend = NULL, legend_position = 'bottom', title = NULL, return = 'plot') {
+                            label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white',
+                            ggrepel_options = NULL,
+                            legend = NULL, legend_position = 'right', title = NULL, return = 'plot') {
   
   tract_map = get_tract_map(state_name, drop_geometry = FALSE)
   c = Choropleth$new(ref.regions = sf::st_drop_geometry(tract_map), 
