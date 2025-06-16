@@ -31,7 +31,6 @@
 #'   longitude you wish to include in your map.
 #' @param border_color The color of the borders on your map
 #' @param border_thickness The thickness of the borders on your map
-#' @param border_color The color of the borders on your map
 #' @param background_color The background color of your map
 #' @param gridlines Should gridlines appear on your map?
 #' @param latlon_ticks Should lat/lon tick marks appear on the edge of your map?
