@@ -4,8 +4,9 @@
 #' @importFrom stringr str_split str_replace_all
 #' @importFrom sf sf_use_s2 st_drop_geometry st_bbox st_as_sfc st_intersection st_crs
 #' @importFrom dplyr left_join join_by
+#' @importFrom ggrepel geom_label_repel
 #' @export
-Choropleth = R6Class("Choropleth", 
+Choropleth = R6Class("Choropleth",
   public = list(
     user.df = NULL,  # input from user
     ref.regions = NULL,
