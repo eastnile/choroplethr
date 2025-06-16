@@ -1,0 +1,19 @@
+# CITATION file for the choroplethr package
+
+citHeader("To cite the choroplethr package in publications use:")
+
+citEntry(
+  entry = "Manual",
+  title = "choroplethr: Create Color-Coded Choropleth Maps in R",
+  author = personList(
+    person("Ari", "Lamstein", email = "ari@lamsteinconsulting.com", role = c("aut")),
+    person("Zhaochen", "He", email = "zhaochen.he@cnu.edu", role = c("ctb", "cre")),
+    person("Brian", "Johnson", role = "ctb"),
+    person("Trulia, Inc.", role = "cph")
+  ),
+  year = "2024",
+  note = "R package version 5.0.0",
+  url = "https://github.com/eastnile/choroplethr"
+)
+
+citFooter("Please cite the R software as well if you use this package.")
