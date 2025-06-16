@@ -120,8 +120,8 @@ Choropleth = R6Class("Choropleth",
           if (length(levels(user.df.prepped[[value.name]] )) != num_colors) {
             warning('After discretization, the number of categories did not match num_colors. This may be due to the data having fewer unique values than num_colors.')
           }
+          self$value_was_discretized = TRUE
         }
-        self$value_was_discretized = TRUE
       }
       # Bind geometries
       by_vars = intersect(names(self$map.df), names(user.df.prepped))
