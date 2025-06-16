@@ -69,9 +69,9 @@ county_choropleth = function(df, map_year = 2024, geoid.name = 'region', geoid.t
   
   if (!is.null(state_zoom)) {
     state_zoom_geoid = guess_geoid_type(user.regions = state_zoom, geoid.all = c('name.proper', 'name.lower', 'state.abb', 'fips.character', 'fips.numeric'),
-                                        ref.regions = choroplethr::state.regions, ref.regions.name = 'choroplethr::choroplethr::state.regions')
+                                       ref.regions = choroplethr::state.regions, ref.regions.name = 'choroplethr::state.regions')
     if (!all(state_zoom %in% choroplethr::state.regions[[state_zoom_geoid]])) {
-      stop('all elements of state_zoom must match one of the columns in choroplethr::choroplethr::state.regions')
+      stop('all elements of state_zoom must match one of the columns in choroplethr::state.regions')
     }
     state_zoom_fipsn = choroplethr::state.regions[choroplethr::state.regions[[state_zoom_geoid]] %in% state_zoom, "fips.numeric"]
     counties_in_state_zoom = ref.regions[ref.regions$state.fips.numeric %in% state_zoom_fipsn, c$geoid.type]
