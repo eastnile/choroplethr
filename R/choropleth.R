@@ -171,7 +171,7 @@ Choropleth = R6Class("Choropleth",
           message('user.colors ignored when the plotted variable is continuous') 
         }
         var_range = range(choropleth.df[[self$value.name]], na.rm = TRUE)
-        mid = (var_range[2]-var_range[1])/2
+        mid = (var_range[2] + var_range[1]) / 2
         breaks = pretty(choropleth.df[[self$value.name]], n = nbreaks)
         if (self$num_colors == 1) {
           if (is.null(color.max)) {
