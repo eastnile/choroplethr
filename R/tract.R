@@ -13,7 +13,7 @@ get_tract_map = function(state_name, drop_geometry = TRUE) {
   tract.map.df = tracts(state = state_name, cb = TRUE)
   tract.map.df$tractid.numeric = as.numeric(tract.map.df$GEOID)
   tract.map.df$county.fips.numeric = as.numeric(paste0(tract.map.df$STATEFP, tract.map.df$COUNTYFP))
-  st_transform(tract.map.df, 4326)
+  tract.map.df = st_transform(tract.map.df, 4326)
   if (drop_geometry) {
     tract.map.df = as.data.frame(sf::st_drop_geometry(tract.map.df))
   }
