@@ -6,10 +6,10 @@
 \usage{
 state_choropleth(
   df,
-  style = "geographic_bigdc",
   geoid.name = "region",
   geoid.type = "auto",
   value.name = "value",
+  style = "geographic_bigdc",
   num_colors = 7,
   color.max = "#084594",
   color.min = "#eff3ff",
@@ -31,7 +31,7 @@ state_choropleth(
   ggrepel_options = list(force = 0.01, box.padding = 0.15, label.padding = 0.15,
     max.overlaps = Inf),
   legend = NULL,
-  legend_position = "bottom",
+  legend_position = "right",
   title = NULL,
   return = "plot"
 )
@@ -39,13 +39,13 @@ state_choropleth(
 \arguments{
 \item{df}{A dataframe containing U.S. state level data}
 
-\item{style}{Either "geographic" for a literal map of US states, "geographic_bigdc" to make Washington DC more visible, or "hexgrid" for a stylized hexagonal tile map. Note: projection = 'mercator' is suggested when using the hexgrid map.}
-
 \item{geoid.name}{The variable that identifies each state}
 
 \item{geoid.type}{How the variable given by geoid.name specifies each state (full name, abbreviation, etc). The allowed geoid.type are given in choroplethr::state.regions. If "auto", the function will try to automatically determine geoid.type.}
 
 \item{value.name}{The name of the variable you wish to plot.}
+
+\item{style}{Either "geographic" for a literal map of US states, "geographic_bigdc" to make Washington DC more visible, or "hexgrid" for a stylized hexagonal tile map. Note: projection = 'mercator' is suggested when using the hexgrid map.}
 
 \item{num_colors}{The number of colors you want in your graph when plotting
 continuous data. If num_colors > 1, the variable in question will be

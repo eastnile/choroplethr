@@ -31,7 +31,7 @@ tract_choropleth(
   label_box_color = "white",
   ggrepel_options = NULL,
   legend = NULL,
-  legend_position = "bottom",
+  legend_position = "right",
   title = NULL,
   return = "plot"
 )
@@ -114,7 +114,8 @@ to create the labels and ensure that they do not overlap.}
 
 \item{label_box_color}{The color of the box around each label}
 
-\item{ggrepel_options}{A list containing additional arguments to be passed to geom_label_repel (see ?ggplot2::geom_label_repel)}
+\item{ggrepel_options}{A list containing additional arguments to be passed to
+geom_label_repel (see ?ggplot2::geom_label_repel)}
 
 \item{legend}{A title for your legend; if NULL, value.name will be used.}
 

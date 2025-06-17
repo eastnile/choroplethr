@@ -75,8 +75,8 @@ state_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = NU
 #' #  Median household income, zooming in on all counties in New York, New Jersey and Connecticut
 #' county_choropleth_acs(variable = "B19013_001", num_colors=1, endyear = 2011,
 #' state_zoom=c("new york", "new jersey", "connecticut"))
-#' @importFrom tidycensus load_variables get_acs
 #' }
+#' @importFrom tidycensus load_variables get_acs
 county_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = NULL,
                                  endyear, span = 5, title = NULL, 
                                  census_api_key = NULL, ...)
@@ -169,3 +169,4 @@ get_acs_data = function(variable = NULL, tableId = NULL, column_idx = NULL,
   map_title = paste(var_concept, var_label)
   return(list(df = acs_df, title = map_title))
 }
+

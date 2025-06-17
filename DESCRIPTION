@@ -29,8 +29,7 @@ Imports:
     rnaturalearth
 Suggests:
     testthat (>= 3.0.0),
-    choroplethrMaps,
-    choroplethrAdmin1 (>= 1.1.0),
+    rnaturalearthhires,
     knitr,
     rmarkdown
 Depends:

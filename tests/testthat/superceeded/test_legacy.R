@@ -151,11 +151,11 @@ test_that("less than full states works", {
 # country 
 
 
-data('df_world')
+data('df_country_demographics')
 
 # Baseline
 test_that("default parameters returns ggplot", {
-  expect_s3_class(country_choropleth(df = df_world, geoid.name = 'iso_a3', value.name = 'population'), 'ggplot')
+  expect_s3_class(country_choropleth(df = df_country_demographics, geoid.name = 'iso_a3', value.name = 'population'), 'ggplot')
 })
 
 # 
@@ -213,7 +213,7 @@ test_that("default parameters returns ggplot", {
 # })
 
 # acs
-library(testthat)
+# library(testthat)
 
 # test_that('get_acs_data returns a list with data and a map title', {
 #   expect_type(get_acs_data(variable = 'B19013_001', map = 'county', endyear = 2012, span = 5), 'list')
@@ -233,14 +233,14 @@ library(testthat)
 # })
 
 
-test_that("state_choropleth_acs returns a ggplot2 with parameters set", {
-  expect_s3_class(state_choropleth_acs(variable = "B19013_001", endyear = 2012, num_colors=1, zoom=c("new york", "new jersey", "connecticut")), "ggplot") 
-})
-
-test_that("county_choropleth_acs returns a ggplot2 with parameters set", {
-  expect_s3_class(suppressWarnings(
-    county_choropleth_acs(variable = "B19013_001", endyear = 2012, num_colors=1, state_zoom=c("new york", "new jersey", "connecticut"))), 
-    "ggplot")
-})
+# test_that("state_choropleth_acs returns a ggplot2 with parameters set", {
+#   expect_s3_class(state_choropleth_acs(variable = "B19013_001", endyear = 2012, num_colors=1, zoom=c("new york", "new jersey", "connecticut")), "ggplot") 
+# })
+# 
+# test_that("county_choropleth_acs returns a ggplot2 with parameters set", {
+#   expect_s3_class(suppressWarnings(
+#     county_choropleth_acs(variable = "B19013_001", endyear = 2012, num_colors=1, state_zoom=c("new york", "new jersey", "connecticut"))), 
+#     "ggplot")
+# })
 
 

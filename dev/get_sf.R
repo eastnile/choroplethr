@@ -227,7 +227,19 @@ save(country.regions, file = 'data/country.regions.rda', compress = TRUE)
 country.map = country.map[, c('iso_a3', 'geometry')]
 save(country.map, file = 'data/country.map.rda', compress = TRUE)
 
+# Admin1
 
+sf_admin1 = rnaturalearth::ne_states(returnclass = "sf")
+sf_admin1 = st_transform(sf_admin1, 4326)
+vars_needed = names(sf_admin1)[-grep('FCLASS', names(sf_admin1))]
+sf_admin1 = sf_admin1[, vars_needed]
 
+sf_admin1_lores <- ms_simplify(sf_admin1, keep = 0.05, keep_shapes = TRUE)
+
+format(object.size(sf_admin1), 'MB')
+
+format(object.size(sf_admin1_lores), 'MB')
+
+ggplot(sf_admin1_lores %>% filter(geonunit == 'Japan')) + geom_sf()
 
 
