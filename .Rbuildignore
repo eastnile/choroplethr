@@ -11,3 +11,4 @@ wiki-images
 ^Meta$
 ^dev$
 ^\.github$
+^CRAN-SUBMISSION$

@@ -1,11 +1,9 @@
+# Choroplethr <img src="man/figures/hexlogo.jpg" align="right" width="120"/>
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/arilamstein/choroplethr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/arilamstein/choroplethr/actions/workflows/R-CMD-check.yaml)
 
 <!-- badges: end -->
-
-# Choroplethr
-<img src="man/figures/hexlogo.jpg" align="right" width="120" style="position: absolute; top: 10px; right: 10px; width: 120px;" />
 
 Choroplethr makes it easy to create color-coded (choropleth) maps in R. No knowledge of cartography or shapefiles needed; go directly from your geographically identified data to a highly customizable map with a single line of code! Supported geographies: U.S. states, counties, and census tracts, world countries and sub-country regions (e.g., provinces, prefectures, etc.).
 
@@ -106,7 +104,7 @@ Please see the help documentation inside R (e.g. ?country_choroplethr) to learn 
 
 Note: admin1_choropleth() requires the rnaturalearthhires package to be installed.
 This package contains the needed high resolution subcountry maps, but is not
-presently hosted on CRAN due to its large file size. To use admin1_choroplethr,
+presently hosted on CRAN due to its large file size. To use admin1_choropleth,
 please first install the remotes package, then install rnaturalearthhires from
 github:
 
