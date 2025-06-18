@@ -3,7 +3,7 @@ if (F) {
   tools::resaveRdaFiles("data/", compress = "xz")
   devtools::load_all() 
   devtools::document()
-  devtools::check()
+  devtools::check(cran = T)
 }
 
 df_world = choroplethr::df_country_demographics
@@ -11,7 +11,7 @@ df_pop_state = choroplethr::df_pop_state
 df_county_demographics = choroplethr::df_county_demographics
 
 # Baseline
-state_choropleth(df = df_pop_state, value.name = 'value', label = 'state.abb')
+state_choropleth(df = df_pop_state)
 state_choropleth(df = df_pop_state, value.name = 'value', label = 'state.abb', style = 'hexgrid', projection = 'mercator')
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population')
 county_choropleth(df = df_county_demographics, geoid.name = 'region', value.name = 'median_hh_income', state_zoom = c('CA','OR','WA'))
@@ -29,7 +29,7 @@ country_choropleth(df = df_world, geoid.name = 'region', value.name = 'region_ty
 # Continuous
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population')
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 4)
-country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 1)
+country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 6, color.min = 'red', color.max = 'green')
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 0)
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 0, nbreaks = 2)
 
@@ -100,4 +100,27 @@ country_choropleth(df = df_world, geoid.name = 'region', value.name = 'populatio
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', projection = 'cartesian', zoom = c('USA', 'CAN', 'MEX'), limits_lat = c(0,60), limits_lon = c(-110, -50))
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', projection = 'robinson', zoom = c('USA', 'CAN', 'MEX'), limits_lat = c(0,60), limits_lon = c(-110, -50))
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', projection = 'albers', zoom = c('USA', 'CAN', 'MEX'), limits_lat = c(0,60), limits_lon = c(-110, -50))
+
+# test admin1
+
+    library(dplyr)
+    data("df_japan_census") # Our Japanese data is at the prefecture level, with names in english lower case.
+    admin1_lookup = get_admin1_map() # We match our data to one of the geoids ("adm1_code", "diss_me", or "ne_id" ) in output of get_admin1_map().
+    admin1_lookup = admin1_lookup[admin1_lookup$admin == 'Japan', c('adm1_code', 'name_en')] # The "name_en" variable is very close to how the prefectures are named in our data.
+    admin1_lookup$name_lower = tolower(admin1_lookup$name_en)
+    admin1_lookup$name_lower = iconv(admin1_lookup$name_lower, from = "UTF-8", to = "ASCII//TRANSLIT") # Remove accent marks
+    admin1_lookup$name_lower = gsub(pattern = ' prefecture', replacement = '',  x = admin1_lookup$name_lower)
+    data_prepped = left_join(df_japan_census, admin1_lookup[, c('adm1_code', 'name_lower')], by = join_by(region == name_lower)) # We merge in admin1_code after making name_en resemble our data.
+    admin1_choropleth(data_prepped, geoid.name = 'adm1_code', value.name = 'pop_2010',
+                      country_zoom = 'JPN', num_colors = 4) # Create the map
+    
+# test tract
+    df_ny_tract_demographics = choroplethr::df_ny_tract_demographics
+    tract_choropleth(df = df_ny_tract_demographics, state_name = 'NY', 
+                     geoid.name = 'region', value.name = 'population')
+    tract_choropleth(df = df_ny_tract_demographics, state_name = 'NY', 
+                     geoid.name = 'region', value.name = 'population',
+                     county_zoom = c(36005, 36047, 36061, 36081, 36085))
+
+
 

@@ -12,7 +12,7 @@ Authors@R: c(
     person("Brian", "Johnson", , role = "ctb"),
     person("Trulia, Inc.", role = c("cph"))
     )
-Maintainer: Zhaochen He <zhaocehn.he@cnu.edu>
+Maintainer: Zhaochen He <zhaochen.he@cnu.edu>
 URL: https://github.com/eastnile/choroplethr
 Copyright: Trulia, Inc.
 License: BSD_3_clause + file LICENSE
@@ -22,14 +22,14 @@ Imports:
     ggplot2 (>= 2.0.0),
     dplyr,
     R6,
+    ggrepel,
     tigris (>= 1.0),
     sf,
     tidycensus,
     rnaturalearth
 Suggests:
     testthat (>= 3.0.0),
-    choroplethrMaps,
-    choroplethrAdmin1 (>= 1.1.0),
+    rnaturalearthhires,
     knitr,
     rmarkdown
 Depends:

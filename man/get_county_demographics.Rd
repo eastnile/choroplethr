@@ -15,13 +15,3 @@ get_county_demographics(endyear = 2013, span = 5)
 The data comes from the American Community Survey (ACS). The variables are total population
 and median household income.
 }
-\examples{
-\donttest{
-# get some demographic data on US counties from the 2010 5-year ACS
-df = get_county_demographics(endyear=2010, span=5)
-# A choropleth map shows the location of the values.
-# Set the 'value' column to be the column we want to render.
-df$value = df$median_hh_income
-county_choropleth(df)
-}
-}

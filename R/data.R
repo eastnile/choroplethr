@@ -226,7 +226,7 @@ NULL
 #' @name state.map.hex
 #' @usage data(state.map.hex)
 #' @docType data
-#' #' @references obtained from:"https://raw.githubusercontent.com/Z3tt/30DayMapChallenge/master/data/us_states_hexgrid.geojson.json"
+#' @references obtained from: https://raw.githubusercontent.com/Z3tt/30DayMapChallenge/master/data/us_states_hexgrid.geojson.json
 NULL
 
 #' Supported regions for US states
@@ -247,7 +247,7 @@ NULL
 #' Supported regions for US counties in 2015
 #'
 #' @name county.regions.2015
-#' @usage data(county.regions.2024)
+#' @usage data(county.regions.2015)
 #' @docType data
 NULL
 
@@ -266,8 +266,8 @@ NULL
 #' @docType data
 NULL
 
-#' An sf containing geometry data for countries the world
-#'
+#' An sf containing geometry data for countries of the world
+#' 
 #' @name country.map
 #' @usage data(country.map)
 #' @docType data

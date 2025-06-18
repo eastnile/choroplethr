@@ -149,7 +149,7 @@ beginning of this object.
 data(df_country_demographics)
 country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
                    value.name = 'gdp',
-                   title = "Median GDP of Countries in the World", legend = 'Median GDP')
+                   title = "GDP of Countries in the World", legend = 'GDP (millions)')
 
 # Use a divergent continuous color scale and customize map appearance:
 country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',

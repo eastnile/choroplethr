@@ -56,8 +56,8 @@
 #'                  label = 'state.abb',
 #'                  label_text_size = 3)
 #' @export
-state_choropleth = function(df, style = 'geographic_bigdc', geoid.name = 'region', geoid.type = 'auto', value.name = 'value', 
-         num_colors = 7, color.max = '#084594', color.min = '#eff3ff', na.color = 'grey', custom.colors = NULL, nbreaks = 5,
+state_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', value.name = 'value', style = 'geographic_bigdc', 
+                            num_colors = 7, color.max = '#084594', color.min = '#eff3ff', na.color = 'grey', custom.colors = NULL, nbreaks = 5,
          zoom = NULL, projection = 'albers', 
          border_color = 'grey15', border_thickness = 0.2,
          background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE, whitespace = TRUE,

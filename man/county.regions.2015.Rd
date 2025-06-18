@@ -5,7 +5,7 @@
 \alias{county.regions.2015}
 \title{Supported regions for US counties in 2015}
 \usage{
-data(county.regions.2024)
+data(county.regions.2015)
 }
 \description{
 Supported regions for US counties in 2015
