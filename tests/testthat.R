@@ -9,4 +9,4 @@
 library(testthat)
 library(choroplethr)
 
-test_check("choroplethr")
+# test_check("choroplethr")

@@ -5,6 +5,7 @@
 <!-- badges: end -->
 
 # Choroplethr
+<img src="man/figures/hexlogo.jpg" align="right" width="120" style="position: absolute; top: 10px; right: 10px; width: 120px;" />
 
 Choroplethr makes it easy to create color-coded (choropleth) maps in R. No knowledge of cartography or shapefiles needed; go directly from your geographically identified data to a highly customizable map with a single line of code! Supported geographies: U.S. states, counties, and census tracts, world countries and sub-country regions (e.g., provinces, prefectures, etc.).
 
@@ -89,6 +90,7 @@ Choroplethr current supports five different map types:
 -   World maps by country: **country_choropleth()**
 -   World maps by sub-country administrative regions (ie, provinces, prefectures, etc): **admin1_choropleth()**
 
+For example:
 ``` r
 df_country_demographics = choroplethr::df_country_demographics
 country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
@@ -101,6 +103,38 @@ country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 
 </p>
 
 Please see the help documentation inside R (e.g. ?country_choroplethr) to learn more about these functions.
+
+Note: admin1_choropleth() requires the rnaturalearthhires package to be installed.
+This package contains the needed high resolution subcountry maps, but is not
+presently hosted on CRAN due to its large file size. To use admin1_choroplethr,
+please first install the remotes package, then install rnaturalearthhires from
+github:
+
+``` r
+# install.packages("remotes")
+remotes::install_github('ropensci/rnaturalearthhires')
+```
+
+## For users of older versions of choroplethr:
+
+Version 5 of the package contains many new changes to improve the appearance
+and customization of the maps produced; some of these changes are not backwards
+compatible with previous versions of choroplethr. If you need everything to work
+in exactly the same manner as before, please follow these instructions to install
+the previous versions of choroplethr from the CRAN archive:
+
+https://cran.r-project.org/src/contrib/Archive/choroplethr/
+
+Copy the URL of the version you require, then paste this URL into the following
+command in R (I'm using version 3.7.3 as an example):
+
+``` r
+install.packages(
+  'https://cran.r-project.org/src/contrib/Archive/choroplethr/choroplethr_3.7.3.tar.gz',
+  repos = NULL,
+  type = "source"
+)
+```
 
 ## Technical Support
 
