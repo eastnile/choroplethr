@@ -80,7 +80,7 @@ state_choropleth(df = df_president, geoid.name = 'region', value.name = 'value',
 
 ## Other Geographies
 
-Choroplethr current supports five different map types:
+Choroplethr currently supports five different map types:
 
 -   U.S. State level maps: **state_choropleth()**
 -   U.S. County level maps: **county_choropleth()**
