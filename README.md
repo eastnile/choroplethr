@@ -22,6 +22,12 @@ Install the development version from GitHub:
 remotes::install_github("eastnile/choroplethr")
 ```
 
+Note: If you are using OSX and running an older version of R, the command above may install an older version of the package. If this occurs, please install using the following command, or install from Github, or update R.
+
+``` r
+install.packages("choroplethr", type = 'source')
+```
+
 ## Basic Usage
 
 Create a map using your state level data:
