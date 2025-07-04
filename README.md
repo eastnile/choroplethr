@@ -14,18 +14,17 @@ Install from CRAN:
 ``` r
 install.packages("choroplethr")
 ```
+Note: If you are using OSX and running an older version of R, the command above may install an older version of the package. If this occurs, please install using the following command or update R.
 
-Install the development version from GitHub:
+``` r
+install.packages("choroplethr", type = 'source')
+```
+
+Install the latest development version from GitHub:
 
 ``` r
 # install.packages("remotes")
 remotes::install_github("eastnile/choroplethr")
-```
-
-Note: If you are using OSX and running an older version of R, the command above may install an older version of the package. If this occurs, please install using the following command, or install from Github, or update R.
-
-``` r
-install.packages("choroplethr", type = 'source')
 ```
 
 ## Basic Usage
