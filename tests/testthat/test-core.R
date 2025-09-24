@@ -7,7 +7,7 @@ df_county_demographics = choroplethr::df_county_demographics
 test_that("basic parameters returns ggplot", {
   expect_s3_class(country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population'), 'ggplot')
   expect_s3_class(state_choropleth(df = df_pop_state, value.name = 'value'), 'ggplot')
-  expect_warning(expect_s3_class(county_choropleth(df = df_county_demographics, geoid.name = 'region', value.name = 'population'), 'ggplot'))
+  expect_message(expect_s3_class(county_choropleth(df = df_county_demographics, geoid.name = 'region', value.name = 'population'), 'ggplot'))
 })
 
 # Continuous data with divergent and convergent scales
@@ -24,20 +24,20 @@ test_that("continuous data returns discrete scale with num colors > 1", {
 })
 
 test_that("categorical data returns discrete scale and warns that num_colors ignored", {
-  expect_warning(country_choropleth(df = df_world, geoid.name = 'region', value.name = 'region_type', num_colors = 7))
+  expect_message(country_choropleth(df = df_world, geoid.name = 'region', value.name = 'region_type', num_colors = 7))
 })
 
 test_that("custom colors work", {
   expect_s3_class(country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_colors = 6,
                      custom.colors = c('grey', 'green', 'blue', 'violet', 'brown', 'orange')), 'ggplot')
   
-  expect_warning(expect_s3_class(country_choropleth(df = df_world, geoid.name = 'region', value.name = 'region_type', 
+  expect_message(expect_s3_class(country_choropleth(df = df_world, geoid.name = 'region', value.name = 'region_type', 
                                custom.colors = c('grey', 'green', 'blue', 'violet', 'brown', 'orange')), 'ggplot'))
   
   expect_error(country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_colors = 3,
                                custom.colors = c('grey', 'green', 'blue', 'violet', 'brown', 'orange')))
   
-  expect_warning(expect_error(country_choropleth(df = df_world, geoid.name = 'region', value.name = 'region_type', 
+  expect_message(expect_error(country_choropleth(df = df_world, geoid.name = 'region', value.name = 'region_type', 
                                custom.colors = c('grey', 'green', 'blue'))))
 })
 

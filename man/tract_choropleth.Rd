@@ -10,6 +10,7 @@ tract_choropleth(
   geoid.name = "region",
   geoid.type = "auto",
   value.name = "value",
+  map_year = 2020,
   num_colors = 7,
   color.max = NULL,
   color.min = NULL,
@@ -49,6 +50,8 @@ the allowed geoid.type are given by the columns "AFFGEOID", "GEOID", or
 function will try to automatically determine geoid.type.}
 
 \item{value.name}{The name of the variable you wish to plot.}
+
+\item{map_year}{Uses tract definitions for that particular year, as reported by the tigris package. Only years 2013 and later are supported.}
 
 \item{num_colors}{The number of colors you want in your graph when plotting
 continuous data. If num_colors > 1, the variable in question will be

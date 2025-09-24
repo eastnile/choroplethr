@@ -2,7 +2,7 @@
 #' @import ggplot2 
 #' @importFrom R6 R6Class
 #' @importFrom stringr str_split str_replace_all
-#' @importFrom sf sf_use_s2 st_drop_geometry st_bbox st_as_sfc st_intersection st_crs
+#' @importFrom sf sf_use_s2 st_drop_geometry st_bbox st_as_sfc st_intersection st_crs st_coordinates st_centroid
 #' @importFrom dplyr left_join join_by
 #' @importFrom ggrepel geom_label_repel
 #' @export
@@ -20,23 +20,18 @@ Choropleth = R6Class("Choropleth",
     num_colors = NULL,
     user_value_factor_or_string = NULL,
     value_was_discretized = FALSE,
-    # warn           = TRUE,  # warn user on clipped or missing values                
-
     initialize = function(ref.regions, ref.regions.name,
                           map.df, geoid.all,
                           user.df, geoid.name, geoid.type, value.name, num_colors, label_col)
     {
-      # Usually ref.regions, ref.regions.name, map.df, map.df.name, and geoid.all will be given by a subclass. If instantiating
-      # the base class, they must all be supplied together.
-      # if (!is.null(geoid.all) | !is.null(map.df) | !is.null(ref.regions) | !is.null(map.df.name) | !is.null(ref.regions.name)) {
-      #   if (is.null(geoid.all) | is.null(map.df) | is.null(ref.regions) | is.null(map.df.name) | is.null(ref.regions.name)) {
-      #     stop('If at least one of geoid.all, map.df, ref.regions, map.df.name, or ref.regions.name are present, they must all be specified.')
-      #   }
       # browser()
+      ## Initialize reference maps
+      # Assert correct input types
       stopifnot('sf' %in% class(map.df))
       stopifnot('data.frame' %in% class(ref.regions))
+      # Assert geoid.all is one of the accepted identifiers
       stopifnot(all(geoid.all %in% names(ref.regions)))
-      # stopifnot(all(geoid.all %in% names(map.df)))
+      # Assert geoid uniquely identifies reference data
       for (id in geoid.all) {
         stopifnot(anyDuplicated(map.df[[id]]) == 0)
         stopifnot(anyDuplicated(ref.regions[[id]]) == 0)
@@ -45,9 +40,9 @@ Choropleth = R6Class("Choropleth",
       self$map.df = map.df
       self$ref.regions = ref.regions
       self$ref.regions.name = ref.regions.name
-      # }
+
       
-      # Check user inputs ----
+      ## Check user inputs ----
       stopifnot(length(geoid.name) == 1)
       stopifnot(class(geoid.name) == 'character')
       stopifnot(geoid.name %in% names(user.df))
@@ -55,8 +50,13 @@ Choropleth = R6Class("Choropleth",
       stopifnot(class(value.name) == 'character')
       stopifnot(value.name %in% names(user.df))
       stopifnot(is_whole_number(num_colors) & num_colors >= 0)
+      
       if(!geoid.type %in% c(self$geoid.all, 'auto') | is.null(geoid.type)) {
         stop(paste0('The allowed geoid.type are: ', paste0(self$geoid.all, collapse = ', '), '; or auto to guess the type.'))
+      }
+      
+      if (anyDuplicated(user.df[[geoid.name]]) != 0) {
+        stop(paste0("The variable '", geoid.name, "' must uniquely identify observations in the data to be plotted."))
       }
       
       if(value.name %in% names(self$ref.regions)) {
@@ -76,11 +76,7 @@ Choropleth = R6Class("Choropleth",
       } else {
         stop('The variable to be plotted must be a numeric, factor, or character.')
       }
-      
-      if (anyDuplicated(user.df[[geoid.name]]) != 0) {
-        stop(paste0("The variable '", geoid.name, "' must uniquely identify observations in the data to be plotted."))
-      }
-      
+  
       if (!is.null(label_col)) {
         if (!label_col %in% names(self$ref.regions)) {
           stop(paste0("The requested label must be the name of a column present in ", self$ref.regions.name))
@@ -91,8 +87,7 @@ Choropleth = R6Class("Choropleth",
         user.df = st_drop_geometry(user.df)
       }
 
-      # Prep user input data ----
-
+      ## Prep user input data ----
       user.df.prepped = user.df[, c(geoid.name, value.name)]
       if (identical(geoid.type, 'auto')) { # Establish geoid if it's not specified
         geoid.type = guess_geoid_type(user.regions = user.df.prepped[[geoid.name]],
@@ -104,7 +99,7 @@ Choropleth = R6Class("Choropleth",
       } 
       unmatched = user.df.prepped[[geoid.name]][!user.df.prepped[[geoid.name]] %in% self$ref.regions[[geoid.type]]]
       if (length(unmatched) > 0) {
-        warning(paste0('The following regions were not found in ', self$ref.regions.name, ' and cannot be plotted: ', 
+        message(paste0('The following regions were not found in ', self$ref.regions.name, ' and cannot be plotted: ', 
                        paste0(unmatched, collapse = ', ')))
         user.df.prepped = user.df.prepped[!user.df.prepped[[geoid.name]] %in% unmatched, ]
       }
@@ -112,17 +107,13 @@ Choropleth = R6Class("Choropleth",
       ref_cols_needed = unique(c(self$geoid.all, label_col))
       user.df.prepped = dplyr::left_join(self$ref.regions[, ref_cols_needed], user.df.prepped, by = geoid.type)
 
-      # Discretize value if need be ----
-      if (num_colors > 1) {
-        if (self$user_value_factor_or_string) {
-          warning('num colors will be ignored since the plotted variable is a factor.')
-        } else {
-          user.df.prepped[[value.name]] = discretize(x = user.df.prepped[[value.name]], nlvls = num_colors)
-          if (length(levels(user.df.prepped[[value.name]] )) != num_colors) {
-            warning('After discretization, the number of categories did not match num_colors. This may be due to the data having fewer unique values than num_colors.')
-          }
-          self$value_was_discretized = TRUE
+      # Discretize value if need be
+      if (num_colors > 1 & !self$user_value_factor_or_string) {
+        user.df.prepped[[value.name]] = discretize(x = user.df.prepped[[value.name]], nlvls = num_colors)
+        if (length(levels(user.df.prepped[[value.name]] )) != num_colors) {
+          warning('After discretization, the number of categories did not match num_colors. This may be due to the data having fewer unique values than num_colors.')
         }
+        self$value_was_discretized = TRUE
       }
       # Bind geometries
       by_vars = intersect(names(self$map.df), names(user.df.prepped))
@@ -326,6 +317,7 @@ Choropleth = R6Class("Choropleth",
                       legend, legend_position, title,
                       addl_gglayer)
     {
+      suppressMessages(sf_use_s2(FALSE))
       if (respect_zoom) {
         choropleth.df = choropleth.df[choropleth.df$render == TRUE,]
       }
@@ -334,11 +326,9 @@ Choropleth = R6Class("Choropleth",
         limits = c(projection$limits$x[1], projection$limits$x[2], 
                    projection$limits$y[1], projection$limits$y[2])
         names(limits) = c('xmin', 'xmax', 'ymin', 'ymax')
-        suppressMessages(sf_use_s2(FALSE))
         bbox = st_bbox(limits, crs = st_crs(4326))
         bbox_poly = st_as_sfc(expand_bbox(bbox, factor = 1.1)) # Slightly expand bbox to prevent clipping of mapped regions
         choropleth.df = suppressWarnings(suppressMessages(st_intersection(choropleth.df, bbox_poly)))
-        suppressMessages(sf_use_s2(TRUE))
       }
 
       
@@ -353,12 +343,13 @@ Choropleth = R6Class("Choropleth",
       }
       
       if (!is.null(label)) {
-        arglist_main = list(data = choropleth.df,
-                            mapping = aes_string(label = label, geometry = 'geometry'),
-                            stat = "sf_coordinates",
+        labs = choropleth.df[[label]]
+        arglist_main = list(mapping = aes(label = labs, geometry = geometry),
+                            stat = "sf_coordinates", 
                             size = label_text_size,
                             color = label_text_color,
                             fill = label_box_color)
+        
         arglist_all = c(arglist_main, ggrepel_options)
         gg_label = do.call(ggrepel::geom_label_repel, arglist_all)
       } else {
@@ -366,7 +357,7 @@ Choropleth = R6Class("Choropleth",
       }
 
       if (gridlines) {
-        gg_grid = element_line(color = "dark grey", size = .1)
+        gg_grid = element_line(color = "dark grey", linewidth = .1)
       } else {
         gg_grid = element_blank()
       }
@@ -384,9 +375,9 @@ Choropleth = R6Class("Choropleth",
           coord_sf(crs = 4326, lims_method = 'geometry_bbox', expand = FALSE) + theme(axis.text = element_blank(),
                                                                                       axis.ticks = element_blank())
       }
-      
-      ggplot(choropleth.df) +
-        geom_sf(aes(fill = .data[[self$value.name]]), color = border_color, linewidth = border_thickness) +
+      mydata = choropleth.df[[self$value.name]]
+      plot = ggplot(choropleth.df) +
+        geom_sf(aes(fill = mydata), color = border_color, linewidth = border_thickness) +
         addl_gglayer + 
         ggscale +
         projection + 
@@ -411,6 +402,9 @@ Choropleth = R6Class("Choropleth",
         labs(fill = ifelse(is.null(legend), self$value.name, legend))+
         gg_guide +
         ggtitle(title)
+      suppressMessages(sf_use_s2(TRUE))
+      return(plot)
+
     }
   )
 )

@@ -1,82 +1,48 @@
-library(urbnmapr)
-states_sf <- get_urbn_map("states", sf = TRUE)
-ggplot(states_sf) +
-  geom_sf(fill = "grey", color = "white")
-
-
-
-library(sf)
+map = choroplethr::state.map.lores
 library(ggplot2)
-library(dplyr)
-library(tigris)      # for US state boundaries
-library(viridis)     # for color scales
+library(ggrepel)
+library(sf)
+ggplot(map) + geom_sf(aes(fill = fips.numeric)) + 
+  geom_label_repel(aes(label = fips.numeric, geometry = 'geometry'), 
+                   stat = "sf_coordinates")
 
-options(tigris_class = "sf")
-states <- states(cb = TRUE) %>%
-  filter(!STUSPS %in% c("PR", "VI", "GU", "MP", "AS"))
-
-# Reposition AK and HI (without using case_when)
-ak_index <- states$STUSPS == "AK"
-hi_index <- states$STUSPS == "HI"
-
-# Scale + shift Alaska (in WGS84 space — still degrees)
-states$geometry[ak_index] <- (states$geometry[ak_index] - st_centroid(states$geometry[ak_index])) * 0.35 +
-  st_point(c(-120, 25))
-
-# Shift Hawaii
-states$geometry[hi_index] <- states$geometry[hi_index] + c(35, 4)
+map$lon <- sf::st_coordinates(sf::st_centroid(map$geometry))[,1]
+map$lat <- sf::st_coordinates(sf::st_centroid(map$geometry))[,2]
 
 
+ggplot(map) + geom_sf(aes(fill = fips.numeric)) + 
+  geom_label_repel(aes(label = fips.numeric, x = lon, y = lat))
 
-options(tigris_class = "sf")
-states_sf <- states(cb = TRUE) %>%
-  filter(!STUSPS %in% c("PR", "VI", "GU", "MP", "AS"))  # remove territories
-set.seed(42)
-state_data <- data.frame(
-  STUSPS = state.abb,
-  value = runif(50, 0, 100)
-)
+myvar = 'fips.numeric'
 
+ggplot(map) + geom_sf(aes(fill = fips.numeric)) + 
+  geom_label_repel(aes(label = .data[['fips.numeric']], x = lon, y = lat))
 
-# Merge with spatial data
-states_sf <- left_join(states_sf, state_data, by = "STUSPS")
+mylabs = map$fips.numeric
+myx = map$lon
+myy = map$lat
 
+ggplot(map) + geom_sf(aes(fill = fips.numeric)) + 
+  geom_label_repel(aes(label = mylabs, x = myx, y = myy))
 
-# Reposition AK and HI (without using case_when)
-ak_index <- states_sf$STUSPS == "AK"
-hi_index <- states_sf$STUSPS == "HI"
+arglist = list(label = mylabs, x = myx, y = myy)
+gg_lab = geom_label_repel(do.call(ggplot2::aes, arglist))
 
-# Scale + shift Alaska (in WGS84 space — still degrees)
-states_sf$geometry[ak_index] <- (states_sf$geometry[ak_index] - st_centroid(states_sf$geometry[ak_index])) * 0.35 +
-  st_point(c(-120, 25))
+ggplot(map) + geom_sf(aes(fill = fips.numeric)) + gg_lab
 
-# Shift Hawaii
-states_sf$geometry[hi_index] <- states_sf$geometry[hi_index] + c(35, 4)
+arglist = list(mapping = aes(label = mylabs, x = myx, y = myy),
+               size = 1,
+               color = 'red',
+               fill = 'blue')
 
+gglab = do.call(ggrepel::geom_label_repel, arglist)
 
-
-states_sf_proj <- st_transform(states_sf, 5070)
-
-st_geometry(states_sf_proj[states_sf_proj$STUSPS == "AK", ]) <-
-  st_geometry(states_sf_proj[states_sf_proj$STUSPS == "AK", ]) * 0.35 + c(4e6, -2.5e6)
-
-st_geometry(states_sf_proj[states_sf_proj$STUSPS == "HI", ]) <-
-  st_geometry(states_sf_proj[states_sf_proj$STUSPS == "HI", ]) + c(5e6, -1e6)
-
-
-ggplot(states_sf_proj) +
-  geom_sf(aes(fill = value)) +
-  theme_void()
-
-
-st_geometry(states_sf[states_sf$STUSPS == "AK", ]) <- 
-  st_geometry(states_sf[states_sf$STUSPS == "AK", ]) * 0.35 + c(55, -130)
-
-st_geometry(states_sf[states_sf$STUSPS == "HI", ]) <- 
-  st_geometry(states_sf[states_sf$STUSPS == "HI", ]) + c(52, -5)
-
-ggplot(states_sf) +
-  geom_sf(aes(fill = value), color = "white", size = 0.2) +
-  scale_fill_viridis(option = "plasma", name = "Example Value") +
-  theme_void() +
-  theme(legend.position = "bottom")
+arglist_main = list(data = choropleth.df,
+                    mapping = aes_string(label = label, geometry = 'geometry'),
+                    # mapping = aes(label = .data[[label]], geometry = 'geometry'),
+                    stat = "sf_coordinates",
+                    size = label_text_size,
+                    color = label_text_color,
+                    fill = label_box_color)
+arglist_all = c(arglist_main, ggrepel_options)
+gg_label = do.call(ggrepel::geom_label_repel, arglist_all)
