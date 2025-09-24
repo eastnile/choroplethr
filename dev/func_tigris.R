@@ -1,3 +1,5 @@
+library(tigris)
+
 tigris_state_sf = function() {
   if (F) {
     year = 2015
@@ -64,6 +66,33 @@ check_tigris_county_avail = function(years) {
   avail_df = do.call(rbind, info)
   return(avail_df)
 }
+
+check_tigris_tract_avail = function(years) {
+  info = list()
+  for (i in seq_along(years)) {
+    cat(years[i], ' ')
+    res = try(tracts(cb = TRUE, state = 'NY', year = years[i]))
+    if ('try-error' %in% class(res)) {
+      info[[i]] = data.frame(year = years[i], avail = 0, df_class = NA, ncol = NA, nrow = NA,
+                             colnames = NA, uniqueids = NA)
+    } else {
+      unique_cols = character()
+      for (col in names(res)) {
+        if (sum(duplicated(res[[col]])) == 0) {
+          unique_cols = c(col, unique_cols)
+        }
+      }
+      info[[i]] = data.frame(year = years[i], avail = 1, df_class = paste0(class(res), collapse = ';'), 
+                             ncol = ncol(res), nrow = nrow(res),
+                             colnames = paste0(names(res), collapse = ';'), uniqueids = paste0(unique_cols, collapse = ';'))
+    }
+  }
+  avail_df = do.call(rbind, info)
+  return(avail_df)
+}
+
+
+
 if (F) {
   chk_state = check_tigris_state_avail(1700:2025)
   saveRDS(chk_state, 'dev/tigris_state_avail.rds')
@@ -75,6 +104,11 @@ if (F) {
   chk_county = check_tigris_county_avail(1700:2025)
   saveRDS(chk_county, 'dev/tigris_county_avail.rds')
   # Only avail for 2022, 23, and 24. 
+  
+  chk_tract = check_tigris_tract_avail(2000:2025)
+  saveRDS(chk_tract, 'dev/tigris_tract_avail.rds')
+  # Only avail for 2019 to 2025, 3 naming regimes
+
 }
 
 

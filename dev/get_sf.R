@@ -151,7 +151,26 @@ save(county.map.2015, file = 'data/county.map.2015.rda')
 
 
 ## 3. World  ----
-world <- ne_countries(scale = "small", returnclass = "sf")
+world <- ne_countries(scale = 50, returnclass = "sf")
+worldsmall <- ne_countries(scale = 110, returnclass = "sf")
+world <- ms_simplify(world, keep = 0.33, keep_shapes = FALSE) # simply geometries, drops some regions
+
+world = world[world$adm0_a3 %in% worldsmall$adm0_a3, ]
+
+if (F) {
+  ggplot(world) + geom_sf()
+  ggplot(world) + geom_sf() + coord_sf(xlim = c(-10, 40), ylim = c(35, 65))
+  # cross reference simplified geometries with smaller world map
+  worldbig <- ne_countries(scale = 50, returnclass = "sf")
+  worldsmall <- ne_countries(scale = 110, returnclass = "sf")
+  diff = setdiff(union(worldsmall$adm0_a3,  worldbig$adm0_a3), 
+                 intersect(worldsmall$adm0_a3,  worldbig$adm0_a3))
+  z = worldbig[worldbig$adm0_a3 %in% diff, ]
+  z = worldsmall[worldsmall$adm0_a3 %in% diff, ]
+  world = world[, c('admin', 'geometry')]
+  sum(!st_is_valid(worldbig))
+}
+
 
 # Establish unique geoid ----
 
@@ -210,12 +229,13 @@ sum(duplicated(world$iso_a2))
 sum(nchar(world$iso_a3) != 3)
 sum(nchar(world$iso_a2) != 2)
 
-sf_use_s2(FALSE)
-world <- st_simplify(world, dTolerance = 0) # fixes some invalid regions
-if (F) {
+
+if (F) { # old code, obsolete
+  sf_use_s2(FALSE)
+  world <- st_simplify(world, dTolerance = 0) # fixes some invalid regions
   world_test = ms_simplify(world, keep = 0.99, keep_shapes = FALSE)
   ggplot(filter(world_test, iso_a3=='USA')) + geom_sf()
-  ggplot(filter(world, iso_a3=='MEX')) + geom_sf()
+  ggplot(world) + geom_sf()
 }
 
 sum(!st_is_valid(world))

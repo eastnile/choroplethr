@@ -4,10 +4,12 @@
 \alias{get_tract_map}
 \title{Download a map of all census tracts in a given state}
 \usage{
-get_tract_map(state_name, drop_geometry = TRUE)
+get_tract_map(state_name, map_year, drop_geometry = TRUE)
 }
 \arguments{
 \item{state_name}{The name of the state, given by proper name, abbreviation, for FIPS code.}
+
+\item{map_year}{The year of the map you want to download.}
 
 \item{drop_geometry}{Drop geometry data?}
 }

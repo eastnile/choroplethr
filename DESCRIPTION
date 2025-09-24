@@ -5,9 +5,9 @@ Description: Easily create color-coded (choropleth) maps in R. No knowledge of
   identified data to a highly customizable map with a single line of code! 
   Supported geographies: U.S. states, counties, and census tracts, world
   countries and sub-country regions (e.g., provinces, prefectures, etc.).
-  One of the suggested packages, rnaturalearthhires, is not available on CRAN
-  owing to its larger filesize (40MB). It can be installed from GitHub using 
-  remotes::install_github("https://github.com/ropensci/rnaturalearthhires").
+  Please note that one of the suggested packages, rnaturalearthhires, is not 
+  available on CRAN owing to its larger filesize (40MB). It can be installed 
+  from GitHub using remotes::install_github("https://github.com/ropensci/rnaturalearthhires").
   This package contains higher resolution sub-country maps and is only needed 
   for the choropleth_admin1() function.
 Version: 5.0.0

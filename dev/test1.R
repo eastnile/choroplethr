@@ -1,5 +1,6 @@
 devtools::load_all() 
 if (F) {
+  #install.packages(c('Hmisc','stringr', 'ggplot2', 'dplyr', 'R6', 'ggrepel', 'tigris', 'sf', 'tidycensus', 'rnatrualearth'))
   tools::resaveRdaFiles("data/", compress = "xz")
   devtools::load_all() 
   devtools::document()
@@ -19,6 +20,7 @@ county_choropleth(df = df_county_demographics, map_year = 2015, geoid.name = 're
 
 # return = sf 
 z = country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', label = 'continent', return = 'sf')
+class(z)
 
 # Categorical
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'region_type')
@@ -31,6 +33,7 @@ country_choropleth(df = df_world, geoid.name = 'region', value.name = 'populatio
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 4)
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 6, color.min = 'red', color.max = 'green')
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 0)
+country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 1)
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 0, nbreaks = 2)
 
 # Test discretization
@@ -53,7 +56,14 @@ country_choropleth(df = df_world, geoid.name = 'region', value.name = 'populatio
 
 # Test labels
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', label = 'jomama') # should give error
-country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', label = 'iso_a3')
+country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', label = 'iso_a3', legend_position = 'bottom')
+
+country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', label = 'iso_a3', legend_position = 'bottom', projection = 'mercator', limits_lat = c(-80, 80))
+
+country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', label = 'iso_a3', legend_position = 'bottom', projection = 'robinson')
+
+country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', label = 'iso_a3', legend_position = 'bottom', projection = 'albers')
+
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', label = 'iso_a3', ggrepel_options = list(label.padding = 1))
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', label = 'iso_a3', label_text_size = .5)
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', label = 'iso_a3', label_text_color = 'red')
@@ -64,7 +74,8 @@ country_choropleth(df = df_world, geoid.name = 'region', value.name = 'populatio
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', border_color = 'red', border_thickness = 2)
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', border_color = 'red', border_thickness = 2, background_color = 'blue')
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', gridlines = TRUE)
-country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', gridlines = TRUE, latlon_ticks = TRUE, whitespace = FALSE)
+country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', gridlines = TRUE, 
+                   latlon_ticks = TRUE, whitespace = FALSE)
 
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', title = 'jomama')
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', title = 'jomama', legend = 'jomama')
@@ -74,6 +85,11 @@ country_choropleth(df = df_world, geoid.name = 'region', value.name = 'populatio
 # Test zoom
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', zoom = c('jomama'))
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', zoom = c('USA', 'CAN', 'MEX'))
+
+# Test continent
+country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', continent_zoom = 'Europe')
+country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', continent_zoom = 'Europe',
+                   projection = 'albers')
 
 # Test projection
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', projection = 'mercator')
