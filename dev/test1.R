@@ -45,7 +45,7 @@ country_choropleth(df = df_world_onecolor, geoid.name = 'region', value.name = '
 
 # Test colors
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 1,
-                   color.min = 'red', color.max = 'jomama')
+                   color.min = 'red', color.max = 'jomama') # should error saying not a color
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 0,
                    color.min = 'red', color.max = 'green')
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', num_color = 1,
