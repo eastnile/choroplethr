@@ -1,358 +1,489 @@
 #' The base Choropleth object.
+#' @import ggplot2 
 #' @importFrom R6 R6Class
-#' @importFrom ggplot2 scale_color_continuous coord_quickmap coord_map scale_x_continuous scale_y_continuous geom_sf coord_sf
-#' @importFrom ggmap get_map ggmap
-#' @importFrom RgoogleMaps MaxZoom
-#' @importFrom stringr str_extract_all
+#' @importFrom stringr str_split str_replace_all
+#' @importFrom sf sf_use_s2 st_drop_geometry st_bbox st_as_sfc st_intersection st_crs
+#' @importFrom dplyr left_join join_by
+#' @importFrom ggrepel geom_label_repel
 #' @export
-Choropleth = R6Class("Choropleth", 
-                     
+Choropleth = R6Class("Choropleth",
   public = list(
-    # the key objects for this class
-    user.df        = NULL, # input from user
-    map.df         = NULL, # geometry of the map
+    user.df = NULL,  # input from user
+    ref.regions = NULL,
+    ref.regions.name = NULL, 
+    map.df = NULL, # geometry of the map
+    geoid.all = NULL,
+    geoid.name = NULL,
+    geoid.type = NULL,
+    value.name = NULL,
     choropleth.df  = NULL, # result of binding user data with our map data
-            
-    title          = "",    # title for map
-    legend         = "",    # title for legend
-    warn           = TRUE,  # warn user on clipped or missing values                      
-    ggplot_scale   = NULL,  # override default scale.
-                            # warning, you need to set "drop=FALSE" for insets to render correctly
-    
-    # as of ggplot v2.1.0, R6 class variables cannot be assigned to ggplot2 objects
-    # in the class declaration. Doing so will break binary builds, so assign them
-    # in the constructor instead
-    projection     = NULL, 
-    ggplot_polygon = NULL, 
-    
-    # variables for working with simple features
-    projection_sf  = NULL,
-    ggplot_sf      = NULL,
-      
-    # a choropleth map is defined by these two variables
-    # a data.frame of a map
-    # a data.frame that expresses values for regions of each map
-    initialize = function(map.df, user.df)
+    num_colors = NULL,
+    user_value_factor_or_string = NULL,
+    value_was_discretized = FALSE,
+    # warn           = TRUE,  # warn user on clipped or missing values                
+
+    initialize = function(ref.regions, ref.regions.name,
+                          map.df, geoid.all,
+                          user.df, geoid.name, geoid.type, value.name, num_colors, label_col)
     {
-      stopifnot(is.data.frame(map.df))
-      stopifnot("region" %in% colnames(map.df))
+      # Usually ref.regions, ref.regions.name, map.df, map.df.name, and geoid.all will be given by a subclass. If instantiating
+      # the base class, they must all be supplied together.
+      # if (!is.null(geoid.all) | !is.null(map.df) | !is.null(ref.regions) | !is.null(map.df.name) | !is.null(ref.regions.name)) {
+      #   if (is.null(geoid.all) | is.null(map.df) | is.null(ref.regions) | is.null(map.df.name) | is.null(ref.regions.name)) {
+      #     stop('If at least one of geoid.all, map.df, ref.regions, map.df.name, or ref.regions.name are present, they must all be specified.')
+      #   }
+      # browser()
+      stopifnot('sf' %in% class(map.df))
+      stopifnot('data.frame' %in% class(ref.regions))
+      stopifnot(all(geoid.all %in% names(ref.regions)))
+      # stopifnot(all(geoid.all %in% names(map.df)))
+      for (id in geoid.all) {
+        stopifnot(anyDuplicated(map.df[[id]]) == 0)
+        stopifnot(anyDuplicated(ref.regions[[id]]) == 0)
+      }
+      self$geoid.all = geoid.all
       self$map.df = map.df
+      self$ref.regions = ref.regions
+      self$ref.regions.name = ref.regions.name
+      # }
       
-      # all input, regardless of map, is just a bunch of (region, value) pairs
-      stopifnot(is.data.frame(user.df))
-      stopifnot(c("region", "value") %in% colnames(user.df))
-      self$user.df = user.df
-      self$user.df = self$user.df[, c("region", "value")]
-      
-      stopifnot(anyDuplicated(self$user.df$region) == 0)
-      
-      # things like insets won't color properly if they are characters, and not factors
-      if (is.character(self$user.df$value))
-      {
-        self$user.df$value = as.factor(self$user.df$value)
+      # Check user inputs ----
+      stopifnot(length(geoid.name) == 1)
+      stopifnot(class(geoid.name) == 'character')
+      stopifnot(geoid.name %in% names(user.df))
+      stopifnot(length(value.name) == 1)
+      stopifnot(class(value.name) == 'character')
+      stopifnot(value.name %in% names(user.df))
+      stopifnot(is_whole_number(num_colors) & num_colors >= 0)
+      if(!geoid.type %in% c(self$geoid.all, 'auto') | is.null(geoid.type)) {
+        stop(paste0('The allowed geoid.type are: ', paste0(self$geoid.all, collapse = ', '), '; or auto to guess the type.'))
       }
       
-      # initialize the map to the max zoom - i.e. all regions
-      self$set_zoom(NULL)
+      if(value.name %in% names(self$ref.regions)) {
+        stop(paste0('value.name must be distinct from geoid.name, and from any of the other columns in ', 
+        self$ref.regions.name, '.'))
+      }
       
-      # if the user's data contains values which are not on the map, 
-      # then emit a warning if appropriate
-      if (self$warn)
-      {
-        all_regions = unique(self$map.df$region)
-        user_regions = unique(self$user.df$region)
-        invalid_regions = setdiff(user_regions, all_regions)
-        if (length(invalid_regions) > 0)
-        {
-          invalid_regions = paste(invalid_regions, collapse = ", ")
-          warning(paste0("Your data.frame contains the following regions which are not mappable: ", invalid_regions))
+      if (is.factor(user.df[[value.name]])) {
+        self$user_value_factor_or_string = TRUE
+      } else if (is.character(user.df[[value.name]])) {
+        self$user_value_factor_or_string = TRUE
+        user.df[[value.name]] = as.factor(user.df[[value.name]])
+        message(paste0('The variable to be plotted is a character and will be converted to factor with ', 
+                      length(levels(user.df[[value.name]])), ' levels before plotting.'))
+      } else if (is.numeric(user.df[[value.name]])) {
+        self$user_value_factor_or_string = FALSE
+      } else {
+        stop('The variable to be plotted must be a numeric, factor, or character.')
+      }
+      
+      if (anyDuplicated(user.df[[geoid.name]]) != 0) {
+        stop(paste0("The variable '", geoid.name, "' must uniquely identify observations in the data to be plotted."))
+      }
+      
+      if (!is.null(label_col)) {
+        if (!label_col %in% names(self$ref.regions)) {
+          stop(paste0("The requested label must be the name of a column present in ", self$ref.regions.name))
         }
       }
-      
-      # as of ggplot v2.1.0, R6 class variables cannot be assigned to ggplot2 objects
-      # in the class declaration. Doing so will break binary builds, so assign them
-      # in the constructor instead
-      self$projection     = coord_quickmap()
-      self$ggplot_polygon = geom_polygon(aes(fill = value), color = "dark grey", size = 0.2)
-      
-      # experimental features for porting to simple features
-      self$projection_sf = coord_sf()
-      self$ggplot_sf     = geom_sf(aes(fill = value), color = "dark grey", size = 0.2)
-    },
 
-    render = function() 
-    {
-      self$prepare_map()
-      
-      if ("sf" %in% class(self$choropleth.df)) {
-        ggplot(self$choropleth.df) +
-          self$ggplot_sf +
-          self$get_scale() +
-          self$theme_clean() + 
-          ggtitle(self$title) +
-          self$projection_sf
-      } else {
-        ggplot(self$choropleth.df, aes(long, lat, group = group)) +
-          self$ggplot_polygon + 
-          self$get_scale() +
-          self$theme_clean() + 
-          ggtitle(self$title) + 
-          self$projection
+      if ('sf' %in% class(user.df)) { # if sf drop geometry data otherwise merge won't work
+        user.df = st_drop_geometry(user.df)
       }
-    },
 
-    # left
-    get_min_long = function() 
-    {
-      min(self$choropleth.df$long)
-    },
-    
-    # right 
-    get_max_long = function() 
-    {
-      max(self$choropleth.df$long) 
-    },
-    
-    # bottom 
-    get_min_lat = function() 
-    {
-      min(self$choropleth.df$lat) 
-    },
-    
-    # top
-    get_max_lat = function() 
-    {
-      max(self$choropleth.df$lat) 
-    },
-    
-    get_bounding_box = function(long_margin_percent, lat_margin_percent)
-    {
-      c(self$get_min_long(), # left
-        self$get_min_lat(),  # bottom
-        self$get_max_long(), # right
-        self$get_max_lat())  # top
-    },
-    
-    get_x_scale = function()
-    {
-      scale_x_continuous(limits = c(self$get_min_long(), self$get_max_long()))
-    },
-    
-    get_y_scale = function()
-    {
-      scale_y_continuous(limits = c(self$get_min_lat(), self$get_max_lat()))
-    },
-    
-    get_reference_map = function()
-    {
-      # note: center is (long, lat) but MaxZoom is (lat, long)
-      
-      center = c(mean(self$choropleth.df$long), 
-                 mean(self$choropleth.df$lat))
+      # Prep user input data ----
 
-      max_zoom = MaxZoom(range(self$choropleth.df$lat), 
-                         range(self$choropleth.df$long))
-      
-      get_map(location = center,
-              zoom     = max_zoom,
-              color    = "bw")  
-    },
-    
-    get_choropleth_as_polygon = function(alpha)
-    {
-      geom_polygon(data = self$choropleth.df,
-                   aes(x = long, y = lat, fill = value, group = group), alpha = alpha) 
-    },
-    
-    render_with_reference_map = function(alpha = 0.5)
-    {
-      self$prepare_map()
+      user.df.prepped = user.df[, c(geoid.name, value.name)]
+      if (identical(geoid.type, 'auto')) { # Establish geoid if it's not specified
+        geoid.type = guess_geoid_type(user.regions = user.df.prepped[[geoid.name]],
+                                      geoid.all = self$geoid.all,
+                                      ref.regions = self$ref.regions,
+                                      ref.regions.name = self$ref.regions.name)
+        message(paste0("geoid_type = 'auto'; the geoid ", geoid.name, " was determined to be of type: ", 
+                     geoid.type, ". To see the list of allowed geoids, see ", self$ref.regions.name, "."))
+      } 
+      unmatched = user.df.prepped[[geoid.name]][!user.df.prepped[[geoid.name]] %in% self$ref.regions[[geoid.type]]]
+      if (length(unmatched) > 0) {
+        warning(paste0('The following regions were not found in ', self$ref.regions.name, ' and cannot be plotted: ', 
+                       paste0(unmatched, collapse = ', ')))
+        user.df.prepped = user.df.prepped[!user.df.prepped[[geoid.name]] %in% unmatched, ]
+      }
+      names(user.df.prepped) = c(geoid.type, value.name)
+      ref_cols_needed = unique(c(self$geoid.all, label_col))
+      user.df.prepped = dplyr::left_join(self$ref.regions[, ref_cols_needed], user.df.prepped, by = geoid.type)
 
-      reference_map = self$get_reference_map()
-      
-      ggmap(reference_map) +  
-        self$get_choropleth_as_polygon(alpha) + 
-        self$get_scale() +
-        self$get_x_scale() +
-        self$get_y_scale() +
-        self$theme_clean() + 
-        ggtitle(self$title) + 
-        coord_map()
-    },
-    
-    # support e.g. users just viewing states on the west coast
-    clip = function() {
-      stopifnot(!is.null(private$zoom))
-      
-      self$user.df = self$user.df[self$user.df$region %in% private$zoom, ]
-      self$map.df  = self$map.df[self$map.df$region %in% private$zoom, ]
-    },
-    
-    # for us, discretizing values means 
-    # 1. assigning each value to one of num_colors colors
-    # 2. formatting the intervals e.g. with commas
-    #' @importFrom Hmisc cut2    
-    discretize = function() 
-    {
-      if (is.numeric(self$user.df$value) && private$num_colors > 1) {
-        
-        # if cut2 uses scientific notation,  our attempt to put in commas will fail
-        scipen_orig = getOption("scipen")
-        options(scipen=999)
-        self$user.df$value = cut2(self$user.df$value, g = private$num_colors)
-        options(scipen=scipen_orig)
-        
-        levels(self$user.df$value) = sapply(levels(self$user.df$value), self$format_levels)
+      # Discretize value if need be ----
+      if (num_colors > 1) {
+        if (self$user_value_factor_or_string) {
+          warning('num colors will be ignored since the plotted variable is a factor.')
+        } else {
+          user.df.prepped[[value.name]] = discretize(x = user.df.prepped[[value.name]], nlvls = num_colors)
+          if (length(levels(user.df.prepped[[value.name]] )) != num_colors) {
+            warning('After discretization, the number of categories did not match num_colors. This may be due to the data having fewer unique values than num_colors.')
+          }
+          self$value_was_discretized = TRUE
+        }
       }
-    },
-    
-    bind = function() {
-      self$choropleth.df = left_join(self$map.df, self$user.df, by="region")
-      missing_regions = unique(self$choropleth.df[is.na(self$choropleth.df$value), ]$region)
-      if (self$warn && length(missing_regions) > 0)
-      {
-        missing_regions = paste(missing_regions, collapse = ", ");
-        warning_string = paste("The following regions were missing and are being set to NA:", missing_regions);
-        warning(warning_string);
-      }
+      # Bind geometries
+      by_vars = intersect(names(self$map.df), names(user.df.prepped))
+      choropleth.df = left_join(self$map.df, user.df.prepped, by = by_vars)
+      rownames(choropleth.df) = NULL
+      choropleth.df$render = TRUE
+      stopifnot('sf' %in% class(choropleth.df))
       
-      # does this work?
-      if ("SpatialPolygonsDataFrame" %in% class(self$choropleth.df)) {
-        self$choropleth.df = self$choropleth.df[order(self$choropleth.df$order), ];
-      }
+      # Set attributes
+      self$user.df = user.df
+      self$geoid.name = geoid.name
+      self$geoid.type = geoid.type
+      self$value.name = value.name
+      self$choropleth.df = choropleth.df
+      self$num_colors = num_colors
     },
     
-    prepare_map = function()
-    {
-      self$clip() # clip the input - e.g. remove value for Washington DC on a 50 state map
-      self$discretize() # discretize the input. normally people don't want a continuous scale
-      self$bind() # bind the input values to the map values
+    set_zoom = function(zoom) {
+      if (is.null(zoom)) {
+        return(invisible(NULL)) 
+      }
+      if (!all(zoom %in% self$ref.regions[, self$geoid.type])) {
+        stop('The regions in zoom must be in the list of available regions (', self$ref.regions.name, ') and must match the geoid.type of the data (', self$geoid.type, ').' )
+      }
+      self$choropleth.df$render[!self$choropleth.df[[self$geoid.type]] %in% zoom] = FALSE
+      if(all(self$choropleth.df$render == FALSE)) {
+        stop('The map contains zero regions once zoom was applied.')
+      }
     },
 
     #' @importFrom ggplot2 scale_fill_gradient2
-    get_scale = function()
-    {
-      if (!is.null(self$ggplot_scale)) 
-      {
-        self$ggplot_scale
-      } else if (private$num_colors == 0) {
-        min_value = min(self$choropleth.df$value, na.rm = TRUE)
-        max_value = max(self$choropleth.df$value, na.rm = TRUE)
-        stopifnot(!is.na(min_value) && !is.na(max_value))
-
-        scale_fill_gradient2(self$legend, na.value = "black", limits = c(min_value, max_value))
-
-      } else if (private$num_colors == 1) {
-        
-        min_value = min(self$choropleth.df$value, na.rm = TRUE)
-        max_value = max(self$choropleth.df$value, na.rm = TRUE)
-        stopifnot(!is.na(min_value) && !is.na(max_value))
-
-        # by default, scale_fill_continuous uses a light value for high values and a dark value for low values
-        # however, this is the opposite of how choropleths are normally colored (see wikipedia)
-        # these low and high values are from the 7 color brewer blue scale (see colorbrewer.org)
-        scale_fill_continuous(self$legend, low="#eff3ff", high="#084594", na.value="black", limits=c(min_value, max_value))
-      } else {
-        scale_fill_brewer(self$legend, drop=FALSE, na.value="black")        
+    get_ggscale = function(choropleth.df = self$choropleth.df, respect_zoom = TRUE,
+                           custom.colors, color.min, color.max, na.color, nbreaks) {
+      stopifnot(is_valid_color(c(color.min, color.max, na.color)))
+      if (!is.null(custom.colors)) {
+        stopifnot(is_valid_color(custom.colors))
       }
-    },
-    
-    # theme_clean and theme_inset are used to draw the map over a clean background.
-    # The difference is that theme_inset also removes the legend of the map.
-    # These functions used to be based on the code from section 13.19 of  
-    # "Making a Map with a Clean Background" of "R Graphics Cookbook" by Winston Chang.  
-    # 
-    # However, it appears that as of version 2.2.1.9000 of ggplot2 that code simply does not work
-    # anymore. (In particular, calling ggplotGrob on maps created with those themes (which choroplethr
-    # does for maps that appear as insets, such as Alaska) was causing a crash).
-    # So these functions now use theme_void
-    #' @importFrom ggplot2 theme_void
-    theme_clean = function()
-    {
-      ggplot2::theme_void()
-    },
-    
-    # This is a copy of the actual code in theme_void, but it also remove the legend
-    #' @importFrom ggplot2 theme_void theme "%+replace%"
-    theme_inset = function()
-    {
-      ggplot2::theme_void() %+replace%
-        ggplot2::theme(legend.position = "none")
-    },
+      
+      if (respect_zoom) {
+        choropleth.df = choropleth.df[choropleth.df$render == TRUE,]
+      }
   
-    # Make the output of cut2 a bit easier to read
-    # 
-    # Adds commas to numbers, removes unnecessary whitespace and allows an arbitrary separator.
-    # 
-    # @param x A factor with levels created via Hmisc::cut2.
-    # @param nsep A separator which you wish to use.  Defaults to " to ".
-    # 
-    # @export
-    # @examples
-    # data(df_pop_state)
-    #
-    # x = Hmisc::cut2(df_pop_state$value, g=3)
-    # levels(x)
-    # # [1] "[ 562803, 2851183)" "[2851183, 6353226)" "[6353226,37325068]"
-    # levels(x) = sapply(levels(x), format_levels)
-    # levels(x)
-    # # [1] "[562,803 to 2,851,183)"    "[2,851,183 to 6,353,226)"  "[6,353,226 to 37,325,068]"
-    #
-    # @seealso \url{http://stackoverflow.com/questions/22416612/how-can-i-get-cut2-to-use-commas/}, which this implementation is based on.
-    format_levels = function(x, nsep=" to ") 
-    {
-      n = str_extract_all(x, "[-+]?[0-9]*\\.?[0-9]+")[[1]]  # extract numbers
-      v = format(as.numeric(n), big.mark=",", trim=TRUE) # change format
-      x = as.character(x)
-      
-      # preserve starting [ or ( if appropriate
-      prefix = ""
-      if (substring(x, 1, 1) %in% c("[", "("))
-      {
-        prefix = substring(x, 1, 1)
+      # browser()
+      # I. data is numeric
+      if (!is.factor(choropleth.df[[self$value.name]])) { 
+        if (!is.null(custom.colors)) {
+          message('user.colors ignored when the plotted variable is continuous') 
+        }
+        var_range = range(choropleth.df[[self$value.name]], na.rm = TRUE)
+        mid = (var_range[2] + var_range[1]) / 2
+        breaks = pretty(choropleth.df[[self$value.name]], n = nbreaks)
+        if (self$num_colors == 1) {
+          if (is.null(color.max)) {
+            color.max = '#084594'
+          }
+          if (is.null(color.min)) {
+            color.min = '#eff3ff'
+          }
+          ggscale = scale_fill_gradient(na.value = na.color, low = color.min, high = color.max, breaks = breaks, labels = scales::label_comma(),
+                                                 guide = guide_colorbar(frame.colour = "black", ticks.colour = "black"))
+        } else {
+          if (is.null(color.max)) {
+            color.max = 'gold'
+          }
+          if (is.null(color.min)) {
+            color.min = 'purple4'
+          }
+          ggscale = scale_fill_gradient2(na.value = na.color, low = color.min, high = color.max, mid = 'white', 
+                                                  midpoint = mid, breaks = breaks, labels = scales::label_comma(),
+                                                  guide = guide_colorbar(frame.colour = "black", ticks.colour = "black"))
+        }
+      # II. data is a factor
+      } else { 
+        nlevels = length(levels(choropleth.df[[self$value.name]]))
+        if (!is.null(custom.colors)) { # IIa. user colors override other options
+          n.user.colors = length(custom.colors)
+          if (n.user.colors != nlevels) {
+            stop(paste0(n.user.colors, ' color(s) were specified in custom.colors but the variable to be plotted has ', nlevels, ' levels.')) 
+            # also add: check if user's color syntax was valid
+          }
+          names(custom.colors) = levels(choropleth.df[[self$value.name]])
+          ggscale = scale_fill_manual(values = custom.colors)
+        } else {
+          if (self$value_was_discretized) { # IIb. value is a discretized continuous variable
+            if (is.null(color.max)) {
+              color.max = '#084594'
+            }
+            if (is.null(color.min)) {
+              color.min = '#eff3ff'
+            }
+            mycolors = colorRampPalette(c(color.min, color.max))(nlevels)
+            ggscale = scale_fill_manual(values = mycolors, na.value = na.color)
+          } else {
+            if (!is.null(color.min) | !is.null(color.max)) { # IIc. value is categorical
+              message('color_min and color_max ignored when plotting a categorical variable.')
+            }
+            ggscale = scale_fill_brewer(self$legend, drop=FALSE, na.value = na.color, type = 'qual')   
+          }
+        }
       }
-      
-      # preserve ending ] or ) if appropriate
-      suffix = ""
-      if (substring(x, nchar(x), nchar(x)) %in% c("]", ")"))
-      {
-        suffix = substring(x, nchar(x), nchar(x))
-      }
-      
-      # recombine
-      paste0(prefix, paste(v,collapse=nsep), suffix)
+      return(ggscale)
     },
     
-    set_zoom = function(zoom)
-    {
-      if (is.null(zoom))
-      {
-        # initialize the map to the max zoom - i.e. all regions
-        private$zoom = unique(self$map.df$region)      
-      } else {
-        stopifnot(all(zoom %in% unique(self$map.df$region)))
-        private$zoom = zoom
+    get_projection = function(choropleth.df = self$choropleth.df, respect_zoom = TRUE,
+                              projection_name,  ignore_latlon,
+                              limits_lat, limits_lon, reproject,
+                              whitespace) {
+      if (respect_zoom) {
+        choropleth.df = choropleth.df[choropleth.df$render == TRUE,]
       }
-    },
+      if (is.null(limits_lat) & is.null(limits_lon)) { # skip reprojection of no lat/lon limits are given
+        reproject = FALSE
+        ignore_latlon = TRUE
+      }
 
-    get_zoom = function() { private$zoom },
-    
-    set_num_colors = function(num_colors)
-    {
-      # if R's ?is.integer actually tested if a value was an integer, we could replace the 
-      # first 2 tests with is.integer(num_colors)
-      stopifnot(is.numeric(num_colors) 
-                && num_colors%%1 == 0 
-                && num_colors >= 0 
-                && num_colors < 10)
+      bbox = st_bbox(choropleth.df)
+      # If reproject == F, projection will be set with the whole map's bounding box, THEN the user's
+      # lat/lon limit will be applied. This will simply crop the entire map to the user's desired limits,
+      # but the resulting figure may look distorted if the region inside the user's latlon limits is
+      # far away from the centroid of the whole map.
       
-      private$num_colors = num_colors      
+      # If reproject == T, the user's lat/lon limits will be imposed, and the map cropped, PRIOR to 
+      # applying the projection. This will center the projection around the user's desired region and
+      # will generally produce a better figure.
+      
+      # browser()
+      if (reproject) { 
+        if (!is.null(limits_lat)) {
+          bbox['ymin'] = limits_lat[1]
+          bbox['ymax'] = limits_lat[2]
+        } 
+        if (!is.null(limits_lon)) {
+          bbox['xmin'] = limits_lon[1]
+          bbox['xmax'] = limits_lon[2]
+        } 
+      }
+      
+      lat_1 = bbox["ymin"] + 0.25 * (bbox["ymax"] - bbox["ymin"])
+      lat_2 = bbox["ymin"] + 0.75 * (bbox["ymax"] - bbox["ymin"])
+      lat_0 = (bbox["ymin"] + bbox["ymax"]) / 2
+      lon_0 = (bbox["xmin"] + bbox["xmax"]) / 2
+      
+      # -- fill in lat/lon limits with bbox if they are missing; otherwise 
+      # albers/robinson will throw error if the entire world is being mapped for
+      # some reason. If both at & lon limits are NULL, switch to default 
+      # rendering based on bbox.
+      
+      if (is.null(limits_lon)) {
+        limits_lon = c(bbox['xmin'], bbox['xmax'])
+      }
+      
+      if (is.null(limits_lat)) {
+        limits_lat = c(bbox['ymin'], bbox['ymax'])
+      }
+      
+      if (is.null(limits_lon) & is.null(limits_lat)) {
+        ignore_latlon = T
+      }
+      # -- Apply projections
+      if (projection_name == 'cartesian') {
+        if (ignore_latlon) {
+          projection = coord_sf(crs = 4326, lims_method = 'geometry_bbox', expand = whitespace)
+        } else {
+          projection = coord_sf(crs = 4326, ylim = limits_lat, xlim = limits_lon, expand = whitespace)
+        }
+      } else if (projection_name == 'mercator') {
+        if (ignore_latlon) {
+          projection = coord_sf(crs = 3857, lims_method = 'geometry_bbox', expand = whitespace)
+        } else {
+          projection = coord_sf(crs = 3857, default_crs = 4326,  ylim = limits_lat, xlim = limits_lon, expand = whitespace)
+        }
+      } else if (projection_name == 'robinson') {
+        proj_str = sprintf("+proj=robin +lon_0=%.6f", lon_0)
+        if (ignore_latlon) {
+          projection = coord_sf(crs = proj_str, lims_method = 'geometry_bbox', expand = whitespace)
+        } else {
+          projection = coord_sf(crs = proj_str, default_crs = 4326, ylim = limits_lat, xlim = limits_lon, expand = whitespace)
+        }
+      } else if (projection_name == 'albers') {
+        proj_str = sprintf("+proj=aea +lat_1=%.6f +lat_2=%.6f +lat_0=%.6f +lon_0=%.6f",
+                           lat_1, lat_2, lat_0, lon_0)
+        if (ignore_latlon) {
+          projection = coord_sf(crs = proj_str, lims_method = 'geometry_bbox', expand = whitespace)
+        } else {
+          projection = coord_sf(crs = proj_str, default_crs = 4326, ylim = limits_lat, xlim = limits_lon, expand = whitespace)
+        }
+      } else {
+        stop("projection_name must be 'cartesian', 'mercator', 'robinson', or 'albers'.")
+      }
+      
+      return(projection)
+    },
+    
+    
+    render = function(choropleth.df = self$choropleth.df, ggscale, projection, 
+                      respect_zoom = TRUE, occlude_latlon_limits, 
+                      border_color, border_thickness,
+                      background_color, gridlines, latlon_ticks, 
+                      label, label_text_size, label_text_color, label_box_color,
+                      ggrepel_options,
+                      legend, legend_position, title,
+                      addl_gglayer)
+    {
+      if (respect_zoom) {
+        choropleth.df = choropleth.df[choropleth.df$render == TRUE,]
+      }
+      # This option clips regions outside user's desired lat/lon region; prevents distant regions from getting hugely distorted and covering up nearby regions.
+      if (occlude_latlon_limits & !is.null(projection$limits$x) & !is.null(projection$limits$y)) {
+        limits = c(projection$limits$x[1], projection$limits$x[2], 
+                   projection$limits$y[1], projection$limits$y[2])
+        names(limits) = c('xmin', 'xmax', 'ymin', 'ymax')
+        suppressMessages(sf_use_s2(FALSE))
+        bbox = st_bbox(limits, crs = st_crs(4326))
+        bbox_poly = st_as_sfc(expand_bbox(bbox, factor = 1.1)) # Slightly expand bbox to prevent clipping of mapped regions
+        choropleth.df = suppressWarnings(suppressMessages(st_intersection(choropleth.df, bbox_poly)))
+        suppressMessages(sf_use_s2(TRUE))
+      }
+
+      
+      # ---- Set other formatting options ----      
+
+      if (is.factor(choropleth.df[[self$value.name]])) {
+        gg_guide = guides(fill = guide_legend(
+          override.aes = list(colour = "black", size = 1, linewidth = .2)  # sets black borders on legend key regardless of country border color
+        ))
+      } else {
+        gg_guide = NULL
+      }
+      
+      if (!is.null(label)) {
+        arglist_main = list(data = choropleth.df,
+                            mapping = aes_string(label = label, geometry = 'geometry'),
+                            stat = "sf_coordinates",
+                            size = label_text_size,
+                            color = label_text_color,
+                            fill = label_box_color)
+        arglist_all = c(arglist_main, ggrepel_options)
+        gg_label = do.call(ggrepel::geom_label_repel, arglist_all)
+      } else {
+        gg_label = NULL
+      }
+
+      if (gridlines) {
+        gg_grid = element_line(color = "dark grey", size = .1)
+      } else {
+        gg_grid = element_blank()
+      }
+      if (latlon_ticks) {
+        gg_axis_text = element_text()
+        gg_axis_tick = element_line()
+      } else {
+        gg_axis_text = element_blank()
+        gg_axis_tick = element_blank()
+      }
+      # ---- Render map ----
+      if (F) {
+        ggplot(choropleth.df) +
+          geom_sf(aes(fill = .data[[self$value.name]]), color = border_color, linewidth = border_thickness) + 
+          coord_sf(crs = 4326, lims_method = 'geometry_bbox', expand = FALSE) + theme(axis.text = element_blank(),
+                                                                                      axis.ticks = element_blank())
+      }
+      
+      ggplot(choropleth.df) +
+        geom_sf(aes(fill = .data[[self$value.name]]), color = border_color, linewidth = border_thickness) +
+        addl_gglayer + 
+        ggscale +
+        projection + 
+        gg_label + 
+        theme(
+          plot.title = element_text(hjust = 0.5),
+          panel.background = element_rect(fill = background_color, color = NA), 
+          panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+          panel.grid.major = gg_grid,
+          axis.text = gg_axis_text,
+          axis.ticks = gg_axis_tick,
+          axis.title = element_blank(),
+          legend.position = legend_position,
+          legend.title = element_text(hjust = 0.5),
+          legend.text = element_text(hjust = 0),
+          legend.background = element_rect(
+            fill = "white",    # background color inside the box
+            color = "black",   # border color of the box
+            linewidth = 0.25    # thickness of the border
+          )
+        ) +
+        labs(fill = ifelse(is.null(legend), self$value.name, legend))+
+        gg_guide +
+        ggtitle(title)
     }
-  ),
-  
-  private = list(
-    zoom = NULL, # a vector of regions to zoom in on. if NULL, show all
-    num_colors = 7,     # number of colors to use on the map. if 1 then use a continuous scale
-    has_invalid_regions = FALSE
   )
 )
+
+is_valid_color = function(color) {
+  res = try(grDevices::col2rgb(color))
+  if ('try-error' %in% class(res)) {
+    return(FALSE)
+  } else {
+    return(TRUE)
+  }
+}
+
+is_whole_number = function(x) {
+  is.numeric(x) && floor(x) == x
+}
+
+#' @importFrom Hmisc cut2 
+discretize = function(x, nlvls) {
+  #browser()
+  scipen_orig = getOption("scipen") # Remove scientific notation
+  options(scipen=999)
+  x_cut = Hmisc::cut2(x, g = nlvls, m = 1, minmax = T)
+  labelgood = character()
+  for (i in seq_along(levels(x_cut))) {
+    str = levels(x_cut)[i]
+    strsplit = unlist(str_split(str, pattern = ','))
+    if (length(strsplit) == 1) {
+      labelgood[i] = str
+    } else {
+      left = trimws(str_replace_all(strsplit[1], "[\\[\\]\\(\\)]", ""))
+      right = trimws(str_replace_all(strsplit[2], "[\\[\\]\\(\\)]", ""))
+      left = format(as.numeric(left), big.mark = ',')
+      right = format(as.numeric(right), big.mark = ',')
+      labelgood[i] = paste0(left, ' to <', right)
+    }
+  }
+  stopifnot(length(labelgood) == length(levels(x_cut)))
+  levels(x_cut) = labelgood
+  options(scipen=scipen_orig)
+  stopifnot(length(x) == length(x_cut))
+  return(x_cut)
+}
+
+expand_bbox = function(bbox, factor = 0.2) {
+  x_range = bbox["xmax"] - bbox["xmin"]
+  y_range = bbox["ymax"] - bbox["ymin"]
+  bbox["xmin"] = bbox["xmin"] - x_range * factor / 2
+  bbox["xmax"] = bbox["xmax"] + x_range * factor / 2
+  bbox["ymin"] = bbox["ymin"] - y_range * factor / 2
+  bbox["ymax"] = bbox["ymax"] + y_range * factor / 2
+  return(bbox)
+}
+
+guess_geoid_type = function(user.regions, geoid.all, ref.regions, ref.regions.name) {
+  stopifnot(is.vector(user.regions))
+  unmatched = list()
+  n_unmatched = numeric()
+  for (name in geoid.all) {
+    if (!identical(class(user.regions), class(ref.regions[[name]]))) {
+      unmatched[[name]] = user.regions
+      n_unmatched[name] = length(user.regions)
+    } else {
+      unmatched[[name]] = user.regions[!user.regions %in% ref.regions[[name]]]
+      n_unmatched[name] = length(unmatched[[name]])
+    }
+  }
+  geoid.type.guess = names(n_unmatched)[which.min(n_unmatched)] # if there's a tie it pick the first one
+  if (n_unmatched[geoid.type.guess] == length(user.regions)) {
+    stop(paste0('None of the regions given by geoid.name match any of the valid geoids (',  paste(geoid.all, collapse = ', '),
+                ') for this type of map. For a list of available geoids, see ', ref.regions.name, '. Also check that the variable types match; this function distinguishes between integer and numeric values.'))
+  }
+  return(geoid.type.guess)
+}
+
+

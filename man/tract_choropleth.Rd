@@ -2,44 +2,147 @@
 % Please edit documentation in R/tract.R
 \name{tract_choropleth}
 \alias{tract_choropleth}
-\title{Create a choropleth of Census Tracts in a particular state.}
+\title{Create a choropleth map using census tract level data for a given state.}
 \usage{
 tract_choropleth(
   df,
   state_name,
-  title = "",
-  legend = "",
+  geoid.name = "region",
+  geoid.type = "auto",
+  value.name = "value",
   num_colors = 7,
+  color.max = NULL,
+  color.min = NULL,
+  na.color = "grey",
+  custom.colors = NULL,
+  nbreaks = 5,
   tract_zoom = NULL,
   county_zoom = NULL,
-  reference_map = FALSE
+  projection = "cartesian",
+  border_color = "grey15",
+  border_thickness = 0.2,
+  background_color = "white",
+  gridlines = FALSE,
+  latlon_ticks = FALSE,
+  whitespace = TRUE,
+  label = NULL,
+  label_text_size = 2.25,
+  label_text_color = "black",
+  label_box_color = "white",
+  ggrepel_options = NULL,
+  legend = NULL,
+  legend_position = "right",
+  title = NULL,
+  return = "plot"
 )
 }
 \arguments{
-\item{df}{A data.frame with a column named "region" and a column named "value".}
+\item{df}{A dataframe containing census tract level data for a given state.}
 
-\item{state_name}{The name of the state. See ?state.regions for proper spelling and capitalization.}
+\item{state_name}{The state in question, given by either proper name, abbreviation, or FIPS code.}
 
-\item{title}{An optional title for the map.}
+\item{geoid.name}{The variable that identifies each tract.}
 
-\item{legend}{An optional name for the legend.}
+\item{geoid.type}{How the variable given by geoid.name specifies each tract;
+the allowed geoid.type are given by the columns "AFFGEOID", "GEOID", or
+"tractid.numeric" variable obtained from get_tract_map(). If "auto", the
+function will try to automatically determine geoid.type.}
 
-\item{num_colors}{The number of colors to use on the map.  A value of 0 uses 
-a divergent scale (useful for visualizing negative and positive numbers), A 
-value of 1 uses a continuous scale (useful for visualizing outliers), and a 
-value in [2, 9] will use that many quantiles.}
+\item{value.name}{The name of the variable you wish to plot.}
 
-\item{tract_zoom}{An optional vector of tracts to zoom in on. Elements of this vector must exactly 
-match the names of tracts as they appear in the "region" column of the object returned from "get_tract_map".}
+\item{num_colors}{The number of colors you want in your graph when plotting
+continuous data. If num_colors > 1, the variable in question will be
+divided into quantiles and converted into a factor with that many levels.
+If num_colors = 1, a continuous color gradient will be used; if num_colors = 0,
+a diverging color gradient will be used (useful for visualizing negative
+and positive numbers).  Use color.max and color.min to control the range of
+colors displayed. num_colors is ignored when plotting categorical data.}
 
-\item{county_zoom}{An optional vector of county FIPS codes to zoom in on. Elements of this 
-vector must exactly match the names of counties as they appear in the "county.fips.numeric" column 
-of the object returned from "get_tract_map".}
+\item{color.max}{The color of the highest value in your data. Ignored if the
+plotted variable is categorical.}
 
-\item{reference_map}{If true, render the choropleth over a reference map from Google Maps.}
+\item{color.min}{The color of the lowest value in your data. Ignored if the
+plotted variable is categorical.}
+
+\item{na.color}{The color you want to assign for regions with missing data}
+
+\item{custom.colors}{A vector of valid R color terms of the to use for the
+map when plotting factor variables. The length of this vector must match
+the number of levels in your factor variable, or num_colors for a
+continuous variable that will be discretized by the function, and the order
+should match the order of the levels of in your factor variable.}
+
+\item{nbreaks}{The number of breaks you wish to show in the legend when using
+a continuous color scale. Ignored if num_colors > 1.}
+
+\item{tract_zoom}{An optional vector of tracts to zoom in on, written in the same
+manner as geoid.name.}
+
+\item{county_zoom}{An optional vector of countries to zoom in on, written as
+they appear in the "county.fips.numeric" column of the object returned from
+get_tract_map().}
+
+\item{projection}{One of the following: "cartesian", "mercator", "robinson",
+or "albers", for equirectangular, Mercator, Robinson, and Albers Equal Area
+projections, respectively. When using the Mercator projection for world
+maps, setting limits_lon is recommended to prevent exaggeration of the size
+of Antarctica.}
+
+\item{border_color}{The color of the borders on your map}
+
+\item{border_thickness}{The thickness of the borders on your map}
+
+\item{background_color}{The background color of your map}
+
+\item{gridlines}{Should gridlines appear on your map?}
+
+\item{latlon_ticks}{Should lat/lon tick marks appear on the edge of your map?}
+
+\item{whitespace}{Add some blank space to the sides of your map? For some
+projections, this must be set to FALSE in order for lat/lon ticks and
+display correctly.}
+
+\item{label}{The name of variable you wish to use to label your map; must be
+one of the variables that appears in the spatial dataframe just prior
+plotting (use return = 'sf' to see this dataframe), and in general, can be
+any of the allowed geoid.type. This function uses ggplot2::geom_label_repel
+to create the labels and ensure that they do not overlap.}
+
+\item{label_text_size}{The size of the text that will appear in each label}
+
+\item{label_text_color}{The color of the text that will appear in each label}
+
+\item{label_box_color}{The color of the box around each label}
+
+\item{ggrepel_options}{A list containing additional arguments to be passed to
+geom_label_repel (see ?ggplot2::geom_label_repel)}
+
+\item{legend}{A title for your legend; if NULL, value.name will be used.}
+
+\item{legend_position}{The position of your legend relative to the rest of
+the map; can be "top", "bottom", "left", or "right".}
+
+\item{title}{A title for your plot; if NULL, no title will be added.}
+
+\item{return}{If "plot", the function will return the requested map as a
+ggplot object. If "sf", the function will return the spatial dataframe used
+to draw the map (useful if you wish to customize the map yourself).}
 }
 \description{
-Create a choropleth of Census Tracts in a particular state.
+Create a choropleth map using census tract level data for a given state.
+}
+\examples{
+\donttest{
+# Plot tract level data from New York state:
+df_ny_tract_demographics = choroplethr::df_ny_tract_demographics
+tract_choropleth(df = df_ny_tract_demographics, state_name = 'NY', 
+                 geoid.name = 'region', value.name = 'population')
+
+# Zoom in on the five counties that comprise New York City: 
+tract_choropleth(df = df_ny_tract_demographics, state_name = 'NY', 
+                 geoid.name = 'region', value.name = 'population',
+                 county_zoom = c(36005, 36047, 36061, 36081, 36085))
+}
 }
 \seealso{
 \url{https://www.census.gov/data/academy/data-gems/2018/tract.html} for more information on Census Tracts

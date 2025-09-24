@@ -1,153 +1,116 @@
-#' Create a county-level choropleth
-#' @export
-#' @importFrom dplyr left_join
-#' @include usa.R
-CountyChoropleth = R6Class("CountyChoropleth",
-  inherit = USAChoropleth,
-  
-  public = list(
-    # this map looks better with an outline of the states added
-    add_state_outline = TRUE, 
-    
-    # initialize with us state map
-    initialize = function(user.df)
-    {
-      if (!requireNamespace("choroplethrMaps", quietly = TRUE)) {
-        stop("Package choroplethrMaps is needed for this function to work. Please install it.", call. = FALSE)
-      }
-
-      data(county.map, package="choroplethrMaps", envir=environment())
-      data(county.regions, package="choroplethrMaps", envir=environment())
-      # USAChoropleth requires a column called "state" that has full lower case state name (e.g. "new york")
-      county.map$state = merge(county.map, county.regions, sort=FALSE, by.x="region", by.y="region")$state.name
-      super$initialize(county.map, user.df)
-      
-      # by default, show all states on the map
-      data(state.map, package="choroplethrMaps", envir=environment())
-      private$zoom = unique(state.map$region)
-      
-      if (private$has_invalid_regions)
-      {
-        warning("Please see ?county.regions for a list of mappable regions")
-      }
-      
-    },
-    
-    # user.df has county FIPS codes for regions, but subsetting happens at the state level
-    clip = function() 
-    {
-      # remove regions not on the map before doing the merge
-      data(county.regions, package="choroplethrMaps", envir=environment())
-
-      self$user.df = self$user.df[self$user.df$region %in% county.regions$region, ]
-      self$user.df$state = merge(self$user.df, county.regions, sort=FALSE, all.X=TRUE, by.x="region", by.y="region")$state.name
-      self$user.df = self$user.df[self$user.df$state %in% private$zoom, ]
-      self$user.df$state = NULL
-        
-      self$map.df  = self$map.df[self$map.df$state %in% private$zoom, ]
-    }
-  )
-)
-
-
-#' Create a choropleth of US Counties
+#' Create a choropleth map using U.S. county level data:
 #' 
-#' The map used is county.map in the choroplethrMaps package.  See country.regions
-#' in the choroplethrMaps package for an object which can help you coerce your regions
-#' into the required format.
+#' Counties must be identified by FIPS code; see choroplethr::county.regions.2015 or 
+#' choroplethr::county.regions.2024 for an object
+#' that can help you coerce your county names into this format.
 #' 
-#' @param df A data.frame with a column named "region" and a column named "value".  Elements in 
-#' the "region" column must exactly match how regions are named in the "region" column in county.map.
-#' @param title An optional title for the map.  
-#' @param legend An optional name for the legend.  
-#' @param num_colors The number of colors to use on the map.  A value of 0 uses 
-#' a divergent scale (useful for visualizing negative and positive numbers), A 
-#' value of 1 uses a continuous scale (useful for visualizing outliers), and a 
-#' value in [2, 9] will use that many quantiles. 
-#' @param state_zoom An optional vector of states to zoom in on. Elements of this vector must exactly 
-#' match the names of states as they appear in the "region" column of ?state.regions.
-#' @param county_zoom An optional vector of counties to zoom in on. Elements of this vector must exactly 
-#' match the names of counties as they appear in the "region" column of ?county.regions.
-#' @param reference_map If true, render the choropleth over a reference map from Google Maps.
+#' @inheritParams common_args
+#' @param df A dataframe containing U.S. county level data
+#' @param map_year Either 2015 or 2024; uses county definitions from that particular year.
+#' @param geoid.name The name of the variable that identifies each county
+#' @param geoid.type Either "fips.numeric" or "fips.character"; if "auto", the
+#'   function will try to automatically determine geoid.type. See
+#'   choroplethr::county.regions.2015 or choroplethr::county.regions.2024 a lookup table.
+#' @param state_zoom An optional vector of states to zoom in on. Elements of
+#'   this vector must match one of the columns in choroplethr::state.regions.
+#' @param county_zoom An optional vector of counties to zoom in on, written in
+#'   the same manner as geoid.name.
+#' @param add_state_outline Should state borders be outlined in your map?
 #' 
 #' @examples
 #' \donttest{
-#' # default parameters
-#' data(df_pop_county)
-#' county_choropleth(df_pop_county, 
-#'                   title  = "US 2012 County Population Estimates", 
-#'                   legend = "Population")
-#'                   
-#' # zoom in on california and add a reference map
-#' county_choropleth(df_pop_county, 
-#'                   title         = "California County Population Estimates", 
-#'                   legend        = "Population",
-#'                   state_zoom    = "california",
-#'                   reference_map = TRUE)
-#'
-#' # continuous scale 
-#' data(df_pop_county)
-#' county_choropleth(df_pop_county, 
-#'                  title      = "US 2012 County Population Estimates", 
-#'                  legend     = "Population", 
-#'                  num_colors = 1, 
-#'                  state_zoom = c("california", "oregon", "washington"))
-#'
-#' library(dplyr)
-#' library(choroplethrMaps)
-#' data(county.regions)
-#'
-#' # show the population of the 5 counties (boroughs) that make up New York City
-#' nyc_county_names = c("kings", "bronx", "new york", "queens", "richmond")
-#' nyc_county_fips = county.regions %>%
-#'   filter(state.name == "new york" & county.name %in% nyc_county_names) %>%
-#'   select(region)
-#' county_choropleth(df_pop_county, 
-#'                   title        = "Population of Counties in New York City",
-#'                   legend       = "Population",
-#'                   num_colors   = 1,
-#'                   county_zoom = nyc_county_fips$region)
+#' # Create a map based on US county data:
+#' data("df_county_demographics")
+#' county_choropleth(df_county_demographics, geoid.name = 'region', geoid.type = 'fips.numeric',
+#'                   value.name = 'median_hh_income',
+#'                   title = "Median Household Income of U.S. Counties", 
+#'                   legend = 'Median HH Income')
+#' 
+#' county_choropleth(df_county_demographics, geoid.name = 'region', geoid.type = 'fips.numeric',
+#'                   value.name = 'median_hh_income',
+#'                   state_zoom = c('CA', 'OR', 'WA'),
+#'                   title = "Median Household Income of West Coast Counties", 
+#'                   legend = 'Median HH Income')
 #' }
 #' @export
-#' @importFrom Hmisc cut2
-#' @importFrom stringr str_extract_all
-#' @importFrom ggplot2 ggplot aes geom_polygon scale_fill_brewer ggtitle theme theme_grey element_blank geom_text
-#' @importFrom ggplot2 scale_fill_continuous scale_colour_brewer
-#' @importFrom grid unit
-county_choropleth = function(df, title="", legend="", num_colors=7, state_zoom=NULL, county_zoom=NULL, reference_map=FALSE)
+#' @importFrom ggplot2 geom_sf
+county_choropleth = function(df, map_year = 2024, geoid.name = 'region', geoid.type = 'auto', value.name = 'value',
+                             num_colors = 7, color.max = NULL, color.min = NULL, na.color = 'grey', custom.colors = NULL, nbreaks = 5,
+                             county_zoom = NULL, state_zoom = NULL, projection = 'albers',
+                             border_color = 'grey15', border_thickness = 0.2,
+                             background_color = 'white', gridlines = FALSE, latlon_ticks = FALSE, whitespace = TRUE,
+                             label = NULL, label_text_size = 2.25, label_text_color = 'black', label_box_color = 'white',
+                             ggrepel_options = NULL,
+                             legend = NULL, legend_position = 'right', title = NULL, return = 'plot',
+                             add_state_outline = TRUE)
 {
-  # user can only zoom in by one of the zoom options
-  if (!is.null(state_zoom) && !is.null(county_zoom))
-  {
-    stop("You cannnot set state_zoom and county_zoom at the same time.")
+  if (!map_year %in% c(2024, 2015)) {
+    stop("map_year must be 2024 or 2015")
   }
-
-  if (!is.null(county_zoom))
-  {
-    c = CountyZoomChoropleth$new(df)
-    c$title  = title
-    c$legend = legend
-    c$set_num_colors(num_colors)
-    c$set_zoom(county_zoom)
-    if (reference_map) {
-      c$render_with_reference_map()
+  
+  if (map_year == 2024) {
+    ref.regions = choroplethr::county.regions.2024
+    ref.regions.name = 'choroplethr::county.regions.2024'
+    map.df = choroplethr::county.map.2024
+  } else if (map_year == 2015) {
+    ref.regions = choroplethr::county.regions.2015
+    ref.regions.name = 'choroplethr::county.regions.2015'
+    map.df = choroplethr::county.map.2015
+  } else {
+    stop("map_year must be 2024 or 2015.")
+  }
+  
+  c = Choropleth$new(ref.regions = ref.regions, 
+                     ref.regions.name = ref.regions.name,
+                     map.df = map.df, 
+                     geoid.all =  c('fips.numeric', 'fips.character'),
+                     user.df = df, geoid.name = geoid.name, geoid.type = geoid.type, 
+                     value.name = value.name, num_colors = num_colors, label_col = label)
+  
+  if (!is.null(state_zoom)) {
+    state_zoom_geoid = guess_geoid_type(user.regions = state_zoom, geoid.all = c('name.proper', 'name.lower', 'state.abb', 'fips.character', 'fips.numeric'),
+                                       ref.regions = choroplethr::state.regions, ref.regions.name = 'choroplethr::state.regions')
+    if (!all(state_zoom %in% choroplethr::state.regions[[state_zoom_geoid]])) {
+      stop('all elements of state_zoom must match one of the columns in choroplethr::state.regions')
+    }
+    state_zoom_fipsn = choroplethr::state.regions[choroplethr::state.regions[[state_zoom_geoid]] %in% state_zoom, "fips.numeric"]
+    counties_in_state_zoom = ref.regions[ref.regions$state.fips.numeric %in% state_zoom_fipsn, c$geoid.type]
+    if(!is.null(county_zoom)) {
+      c$set_zoom(intersect(county_zoom, counties_in_state_zoom))
     } else {
-      c$render()
+      c$set_zoom(counties_in_state_zoom)
     }
   } else {
-    c = CountyChoropleth$new(df)
-    c$title  = title
-    c$legend = legend
-    c$set_num_colors(num_colors)
-    c$set_zoom(state_zoom)
-    if (reference_map) {
-      if (is.null(state_zoom))
-      {
-        stop("Reference maps do not currently work with maps that have insets, such as maps of the 50 US States.")
-      }
-      c$render_with_reference_map()
-    } else {
-      c$render()
-    }
+    c$set_zoom(county_zoom)
   }
+  
+  ggscale = c$get_ggscale(custom.colors = custom.colors, color.max = color.max, color.min = color.min, 
+                          na.color = na.color, nbreaks = nbreaks)
+  
+  ggproj = c$get_projection(projection = projection, limits_lat = NULL, limits_lon = NULL,
+                            reproject = FALSE, ignore_latlon = TRUE, whitespace = whitespace)
+  
+  if (return == 'sf') {
+    return(c$choropleth.df)
+  }
+  
+  if (add_state_outline) {
+    counties_used = unique(c$choropleth.df$fips.numeric[c$choropleth.df$render])
+    states_used = unique(floor(counties_used/1000))
+    state_map = choroplethr::state.map.hires
+    state_map = state_map[state_map$fips.numeric %in% states_used, ]
+    state_outline = geom_sf(data = state_map, color = 'black', fill = NA, linewidth = 0.5)
+  } else {
+    state_outline = NULL
+  }
+
+  plot = c$render(ggscale = ggscale, projection = ggproj, 
+                  border_color = border_color, border_thickness = border_thickness,
+                  background_color = background_color, gridlines = gridlines, latlon_ticks = latlon_ticks, 
+                  label = label, label_text_size = label_text_size, label_text_color = label_text_color, label_box_color = label_box_color,
+                  ggrepel_options = ggrepel_options, occlude_latlon_limits = FALSE,
+                  legend = legend, legend_position = legend_position, title = title,
+                  addl_gglayer = state_outline)
+  
+  return(plot)
 }

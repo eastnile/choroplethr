@@ -44,7 +44,7 @@ Creates a choropleth of US counties using the US Census' American Community Surv
 \examples{
 \donttest{
 #  Median household income, zooming in on all counties in New York, New Jersey and Connecticut
-county_choropleth_acs(variable = "B19013_001", num_colors=1, 
+county_choropleth_acs(variable = "B19013_001", num_colors=1, endyear = 2011,
 state_zoom=c("new york", "new jersey", "connecticut"))
 }
 }

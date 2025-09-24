@@ -118,22 +118,8 @@ NULL
 #' ?get_state_demographics. 
 #' @keywords data
 #' @usage data(df_state_demographics)
-#' @examples
-#' \donttest{
-#' library(choroplethr)
-#' data(df_state_demographics)
-#' 
-#' # examine the 2013, 5-year state percent hispanic estimates as a boxplot and choropleth
-#'
-#' # the boxplot shows the distribution
-#' boxplot(df_state_demographics$percent_hispanic)
-#' 
-#' # the choropleth map shows the location of the values
-#' # first set the 'value' column to be the column we want to render
-#' df_state_demographics$value = df_state_demographics$percent_hispanic
-#' state_choropleth(df_state_demographics)
-#' }
 NULL
+
 
 #' A data.frame containing demographic statistics for each county in the United States.
 #'
@@ -143,21 +129,6 @@ NULL
 #' ?get_county_demographics. 
 #' @keywords data
 #' @usage data(df_county_demographics)
-#' @examples
-#' \donttest{
-#' library(choroplethr)
-#' data(df_county_demographics)
-#' 
-#' # examine the 2013, 5-year county percent hispanic estimates as a boxplot and choropleth
-#'
-#' # the boxplot shows the distribution
-#' boxplot(df_county_demographics$percent_hispanic)
-#' 
-#' # the choropleth map shows the location of the values
-#' # first set the 'value' column to be the column we want to render
-#' df_county_demographics$value = df_county_demographics$percent_hispanic
-#' county_choropleth(df_county_demographics)
-#' }
 NULL
 
 #' A data.frame containing demographic statistics for each Census Tract in New York State.
@@ -216,3 +187,97 @@ NULL
 #' @keywords data
 #' @usage data(df_congress116_demographics)
 NULL
+
+#' A data.frame containing population estimates for Countries in 2012.   
+#'
+#' @name df_country_demographics
+#' @docType data
+#' @references Data obtained using the ne_countries function from rnaturalearth; https://github.com/ropensci/rnaturalearth, https://www.naturalearthdata.com/
+#' @keywords data
+#' @usage data(df_country_demographics)
+NULL
+
+#' An sf containing higher resolution geometry data for US states
+#' 
+#' Note: Resolution is still much lower than raw data from tigris
+#' @name state.map.hires
+#' @usage data(state.map.hires)
+#' @docType data
+#' @references obtained using tigris::states()
+NULL
+
+#' An sf containing lower resolution geometry data for US states
+#'
+#' @name state.map.lores
+#' @usage data(state.map.lores)
+#' @docType data
+#' @references obtained using tigris::states()
+NULL
+
+#' An sf containing geometry data for US states with DC enlarged
+#'
+#' @name state.map.bigdc
+#' @usage data(state.map.bigdc)
+#' @docType data
+NULL
+
+#' An sf containing a hexagonal tile map for US states
+#'
+#' @name state.map.hex
+#' @usage data(state.map.hex)
+#' @docType data
+#' @references obtained from: https://raw.githubusercontent.com/Z3tt/30DayMapChallenge/master/data/us_states_hexgrid.geojson.json
+NULL
+
+#' Supported regions for US states
+#'
+#' @name state.regions
+#' @usage data(state.regions)
+#' @docType data
+NULL
+
+#' An sf containing geometry data for US counties in 2015
+#'
+#' @name county.map.2015
+#' @usage data(county.map.2015)
+#' @docType data
+#' @references obtained using tigris::counties()
+NULL
+
+#' Supported regions for US counties in 2015
+#'
+#' @name county.regions.2015
+#' @usage data(county.regions.2015)
+#' @docType data
+NULL
+
+#' An sf containing geometry data for US counties in 2024
+#'
+#' @name county.map.2024
+#' @usage data(county.map.2024)
+#' @docType data
+#' @references obtained using tigris::counties()
+NULL
+
+#' Supported regions for US counties in 2024
+#'
+#' @name county.regions.2024
+#' @usage data(county.regions.2024)
+#' @docType data
+NULL
+
+#' An sf containing geometry data for countries of the world
+#' 
+#' @name country.map
+#' @usage data(country.map)
+#' @docType data
+#' @references Data obtained using the ne_countries function from rnaturalearth; https://github.com/ropensci/rnaturalearth, https://www.naturalearthdata.com/
+NULL
+
+#' Supported regions for world countries
+#'
+#' @name country.regions
+#' @usage data(country.regions)
+#' @docType data
+NULL
+

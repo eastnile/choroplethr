@@ -1,20 +1,23 @@
 Package: choroplethr
-Title: Simplify the Creation of Choropleth Maps
-Description: Choropleths are thematic maps where geographic regions, such as
-    states, are colored according to some metric, such as the number of people
-    who live in that state. This package simplifies this process by 1.
-    Providing ready-made functions for creating choropleths of common maps. 2.
-    Providing data and API connections to interesting data sources for making
-    choropleths. 3. Providing a framework for creating choropleths from
-    arbitrary shapefiles. 4. Overlaying those maps over reference maps from
-    'Google Maps'. 
-Version: 4.0.0
+Title: Create Color-Coded Choropleth Maps in R
+Description: Easily create color-coded (choropleth) maps in R. No knowledge of 
+  cartography or shapefiles needed; go directly from your geographically
+  identified data to a highly customizable map with a single line of code! 
+  Supported geographies: U.S. states, counties, and census tracts, world
+  countries and sub-country regions (e.g., provinces, prefectures, etc.).
+  One of the suggested packages, rnaturalearthhires, is not available on CRAN
+  owing to its larger filesize (40MB). It can be installed from GitHub using 
+  remotes::install_github("https://github.com/ropensci/rnaturalearthhires").
+  This package contains higher resolution sub-country maps and is only needed 
+  for the choropleth_admin1() function.
+Version: 5.0.0
 Authors@R: c(
-    person("Ari", "Lamstein", , "ari@lamsteinconsulting.com", "aut"),
-    person("Zhaochen", "He", , "zhaochen.he@cnu.edu", role = c("aut", "cre")),
+    person("Ari", "Lamstein", , "ari@lamsteinconsulting.com", c("aut")),
+    person("Zhaochen", "He", , "zhaochen.he@cnu.edu", role = c("ctb", "cre")),
     person("Brian", "Johnson", , role = "ctb"),
     person("Trulia, Inc.", role = c("cph"))
     )
+Maintainer: Zhaochen He <zhaochen.he@cnu.edu>
 URL: https://github.com/eastnile/choroplethr
 Copyright: Trulia, Inc.
 License: BSD_3_clause + file LICENSE
@@ -24,37 +27,30 @@ Imports:
     ggplot2 (>= 2.0.0),
     dplyr,
     R6,
-    WDI,
-    ggmap,
-    RgoogleMaps,
+    ggrepel,
     tigris (>= 1.0),
-    gridExtra,
-    xml2,
-    rvest,
-    tidyr,
-    tidycensus
+    sf,
+    tidycensus,
+    rnaturalearth
 Suggests:
-    testthat,
-    choroplethrMaps,
-    choroplethrAdmin1 (>= 1.1.0),
+    testthat (>= 3.0.0),
+    rnaturalearthhires
 Depends:
     R (>= 3.5.0)
 Collate: 
     'acs.R'
-    'choropleth.R'
     'admin1.R'
-    'admin1_region.R'
-    'choroplethr_wdi.R'
+    'choropleth.R'
     'country.R'
-    'usa.R'
     'county.R'
-    'county_zoom.R'
     'data.R'
-    'get_congress_116_party_data.R'
-    'get_congressional_demographics.R'
     'get_usa_demographics.R'
+    'init.R'
+    'internal-docs.R'
     'state.R'
     'tract.R'
-    'utils.R'
 RoxygenNote: 7.3.2
 Encoding: UTF-8
+LazyData: true
+LazyDataCompression: xz
+Config/testthat/edition: 3
