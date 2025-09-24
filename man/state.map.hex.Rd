@@ -11,6 +11,5 @@ data(state.map.hex)
 An sf containing a hexagonal tile map for US states
 }
 \references{
-obtained from:
-  \url{https://raw.githubusercontent.com/Z3tt/30DayMapChallenge/master/data/us_states_hexgrid.geojson.json}
+obtained from: \href{https://raw.githubusercontent.com/Z3tt/30DayMapChallenge/master/data/us_states_hexgrid.geojson.json}{Cedric Scherer's Github}
 }

@@ -11,8 +11,8 @@ data(df_country_demographics)
 A data.frame containing population estimates for Countries in 2012.
 }
 \references{
-Data obtained using the ne_countries function from rnaturalearth;
-  \url{https://github.com/ropensci/rnaturalearth},
+Data obtained using the ne_countries function from rnaturalearth \cr
+  \url{https://github.com/ropensci/rnaturalearth},\cr
   \url{https://www.naturalearthdata.com/}
 }
 \keyword{data}

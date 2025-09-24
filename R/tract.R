@@ -30,7 +30,7 @@ get_tract_map = function(state_name, map_year, drop_geometry = TRUE) {
 #'   abbreviation, or FIPS code.
 #' @param geoid.name The variable that identifies each tract.
 #' @param geoid.type How the variable given by geoid.name specifies each tract;
-#'   the allowed geoid.type are given by the columns "AFFGEOID", "GEOID", or
+#'   the allowed \cr geoid.type are given by the columns "GEOID", or
 #'   "tractid.numeric" variable obtained from get_tract_map(). If "auto", the
 #'   function will try to automatically determine geoid.type.
 #' @param map_year Uses tract definitions for that particular year, as reported

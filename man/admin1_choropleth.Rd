@@ -152,7 +152,7 @@ data.
 \details{
 Note: This function requires the package rnatrualearthhires, which is not
 available on CRAN due to the filesize of the map being large. You can install
-it using: 
+it using: \cr
 remotes::install_github("ropensci/rnaturalearthhires")
 }
 \examples{

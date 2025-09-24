@@ -42,7 +42,7 @@ get_admin1_map = function(cache = TRUE, drop_geometry = TRUE) {
 #'
 #' Note: This function requires the package rnatrualearthhires, which is not
 #' available on CRAN due to the filesize of the map being large. You can install
-#' it using: 
+#' it using: \cr
 #' remotes::install_github("ropensci/rnaturalearthhires")
 #'
 #' @inheritParams common_args

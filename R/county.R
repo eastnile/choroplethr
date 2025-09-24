@@ -1,7 +1,8 @@
 #' Create a choropleth map using U.S. county level data:
 #'
-#' Counties must be identified by FIPS code; see
-#' choroplethr::county.regions.2015 or choroplethr::county.regions.2024 for an
+#' Counties must be identified by FIPS code; see 
+#' choroplethr::county.regions.2015 \cr
+#' or choroplethr::county.regions.2024 for an
 #' object that can help you coerce your county names into this format.
 #'
 #' @inheritParams common_args
@@ -10,8 +11,8 @@
 #'   particular year.
 #' @param geoid.name The name of the variable that identifies each county
 #' @param geoid.type Either "fips.numeric" or "fips.character"; if "auto", the
-#'   function will try to automatically determine geoid.type. See
-#'   choroplethr::county.regions.2015 or choroplethr::county.regions.2024 a
+#'   function will try to automatically determine geoid.type. \cr See
+#'   choroplethr::county.regions.2015 or \cr choroplethr::county.regions.2024 a
 #'   lookup table.
 #' @param state_zoom An optional vector of states to zoom in on. Elements of
 #'   this vector must match one of the columns in choroplethr::state.regions.

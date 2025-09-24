@@ -46,8 +46,8 @@ particular year.}
 \item{geoid.name}{The name of the variable that identifies each county}
 
 \item{geoid.type}{Either "fips.numeric" or "fips.character"; if "auto", the
-function will try to automatically determine geoid.type. See
-choroplethr::county.regions.2015 or choroplethr::county.regions.2024 a
+function will try to automatically determine geoid.type. \cr See
+choroplethr::county.regions.2015 or \cr choroplethr::county.regions.2024 a
 lookup table.}
 
 \item{value.name}{The name of the variable you wish to plot.}
@@ -133,8 +133,9 @@ to draw the map (useful if you wish to customize the map yourself).}
 \item{add_state_outline}{Should state borders be outlined in your map?}
 }
 \description{
-Counties must be identified by FIPS code; see
-choroplethr::county.regions.2015 or choroplethr::county.regions.2024 for an
+Counties must be identified by FIPS code; see 
+choroplethr::county.regions.2015 \cr
+or choroplethr::county.regions.2024 for an
 object that can help you coerce your county names into this format.
 }
 \examples{

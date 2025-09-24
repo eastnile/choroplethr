@@ -46,7 +46,7 @@ abbreviation, or FIPS code.}
 \item{geoid.name}{The variable that identifies each tract.}
 
 \item{geoid.type}{How the variable given by geoid.name specifies each tract;
-the allowed geoid.type are given by the columns "AFFGEOID", "GEOID", or
+the allowed \cr geoid.type are given by the columns "GEOID", or
 "tractid.numeric" variable obtained from get_tract_map(). If "auto", the
 function will try to automatically determine geoid.type.}
 

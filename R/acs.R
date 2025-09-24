@@ -12,7 +12,7 @@
 #' @param span Either 1, 3, or 5, the ACS vintage you wish to use.
 #' @param title A title for the plot; if not specified, a title will be assigned
 #'   based on the variable.
-#' @param census_api_key Optional. Census API keys can be obtained at:
+#' @param census_api_key Optional. Census API keys can be obtained at: \cr
 #'   https://api.census.gov/data/key_signup.html
 #' @param ... Other arguments passed to state_choropleth; see
 #'   ?state_choropleth()
@@ -71,8 +71,8 @@ state_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = NU
 #' @param span Either 1, 3, or 5, the ACS vintage you wish to use.
 #' @param title A title for the plot; if not specified, a title will be assigned
 #'   based on the variable.
-#' @param census_api_key Optional. Census API keys can be obtained at:
-#'   https://api.census.gov/data/key_signup.html
+#' @param census_api_key Optional. Census API keys can be obtained at: \cr
+#'   \url{https://api.census.gov/data/key_signup.html}
 #' @param ... Other arguments passed to county_choropleth; see
 #'   ?county_choropleth()
 #' @return A choropleth.
@@ -117,7 +117,7 @@ county_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = N
 #' @param map The type map you wish to create; either 'state', 'county', 'zip',
 #'   or 'tract'
 #' @param span Either 1, 3, or 5, the ACS vintage you wish to use.
-#' @param census_api_key Optional. Census API keys can be obtained at:
+#' @param census_api_key Optional. Census API keys can be obtained at: \cr
 #'   https://api.census.gov/data/key_signup.html
 #' @param include_moe Whether to include the 90 percent margin of error.
 #' @export

@@ -33,6 +33,6 @@ Legend:
 }
 }
 \references{
-Taken from \url{https://en.wikipedia.org/wiki/List_of_United_States_presidential_election_results_by_state} 3/20/2014.
+Source: \href{https://en.wikipedia.org/wiki/List_of_United_States_presidential_election_results_by_state}{Wikipedia}
 }
 \keyword{data}

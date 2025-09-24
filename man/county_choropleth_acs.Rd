@@ -32,8 +32,8 @@ the index of the column you wish to plot.}
 \item{title}{A title for the plot; if not specified, a title will be assigned
 based on the variable.}
 
-\item{census_api_key}{Optional. Census API keys can be obtained at:
-https://api.census.gov/data/key_signup.html}
+\item{census_api_key}{Optional. Census API keys can be obtained at: \cr
+\url{https://api.census.gov/data/key_signup.html}}
 
 \item{...}{Other arguments passed to county_choropleth; see
 ?county_choropleth()}

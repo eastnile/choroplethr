@@ -32,7 +32,7 @@ or 'tract'}
 
 \item{span}{Either 1, 3, or 5, the ACS vintage you wish to use.}
 
-\item{census_api_key}{Optional. Census API keys can be obtained at:
+\item{census_api_key}{Optional. Census API keys can be obtained at: \cr
 https://api.census.gov/data/key_signup.html}
 
 \item{include_moe}{Whether to include the 90 percent margin of error.}

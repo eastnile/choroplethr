@@ -45,8 +45,8 @@ country_choropleth(
 
 \item{geoid.type}{How the variable given by geoid.name specifies each
 country. The allowed geoid.type are given by the columns name.proper,
-name.lower, iso_a3, and iso_a2 in choroplethr::country.regions. If "auto",
-the function will try to automatically determine geoid.type.}
+name.lower, iso_a3, \cr and iso_a2 in choroplethr::country.regions. If
+"auto", the function will try to automatically determine geoid.type.}
 
 \item{value.name}{The name of the variable you wish to plot.}
 
