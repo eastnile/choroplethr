@@ -24,28 +24,33 @@
 #' @examples
 #' # Create a choropleth map using country level data:
 #' data(df_country_demographics)
-#' country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
-#'                    value.name = 'gdp',
-#'                    title = "GDP of Countries in the World", legend = 'GDP (millions)')
+#' country_choropleth(df_country_demographics, geoid.name = 'region', 
+#'                    geoid.type = 'iso_a3', value.name = 'gdp',
+#'                    title = "GDP of Countries in the World", 
+#'                    legend = 'GDP (millions)')
 #' 
 #' # Use a divergent continuous color scale and customize map appearance:
-#' country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
-#'                    value.name = 'gdp', num_colors = 0, border_color = 'grey', 
+#' country_choropleth(df_country_demographics, geoid.name = 'region', 
+#'                    geoid.type = 'iso_a3', value.name = 'gdp', 
+#'                    num_colors = 0, border_color = 'grey', 
 #'                    color.max = 'gold', color.min = 'navyblue',
 #'                    projection = 'robinson', latlon_ticks = TRUE, 
 #'                    gridlines = TRUE, whitespace = FALSE,
 #'                    background_color = 'azure',
-#'                    title = "GDP of Countries in the World", legend = 'GDP (millions)')
+#'                    title = "GDP of Countries in the World", 
+#'                    legend = 'GDP (millions)')
 #' 
 #' # Zoom in on South America:
-#' country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
+#' country_choropleth(df_country_demographics, geoid.name = 'region', 
+#'                    geoid.type = 'iso_a3',
 #'                    value.name = 'gdp', num_colors = 0, border_color = 'grey', 
 #'                    continent_zoom = 'South America',
 #'                    color.max = 'gold', color.min = 'navyblue',
 #'                    projection = 'robinson', latlon_ticks = TRUE, 
 #'                    gridlines = TRUE, whitespace = FALSE,
 #'                    background_color = 'azure',
-#'                    title = "GDP of Countries in the World", legend = 'GDP (millions)',
+#'                    title = "GDP of Countries in the World", 
+#'                    legend = 'GDP (millions)',
 #'                    label = 'iso_a2', label_text_size = 5)
 #' @export
 country_choropleth = function(df, geoid.name = 'region', geoid.type = 'auto', value.name = 'value',

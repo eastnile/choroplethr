@@ -3,12 +3,14 @@
 \docType{data}
 \name{df_president}
 \alias{df_president}
-\title{A data.frame containing election results from the 2012 US Presidential election.}
+\title{A data.frame containing election results from the 2012 US Presidential
+election.}
 \usage{
 data(df_president)
 }
 \description{
-A data.frame containing election results from the 2012 US Presidential election.
+A data.frame containing election results from the 2012 US Presidential
+election.
 }
 \references{
 Taken from the FEC website on 11/21/2014.

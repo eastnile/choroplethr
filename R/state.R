@@ -4,10 +4,17 @@
 #' 
 #' @inheritParams common_args
 #' @param df A dataframe containing U.S. state level data
-#' @param style Either "geographic" for a literal map of US states, "geographic_bigdc" to make Washington DC more visible, or "hexgrid" for a stylized hexagonal tile map. Note: projection = 'mercator' is suggested when using the hexgrid map.
+#' @param style Either "geographic" for a literal map of US states,
+#'   "geographic_bigdc" to make Washington DC more visible, or "hexgrid" for a
+#'   stylized hexagonal tile map. Note: projection = 'mercator' is suggested
+#'   when using the hexgrid map.
 #' @param geoid.name The variable that identifies each state
-#' @param geoid.type How the variable given by geoid.name specifies each state (full name, abbreviation, etc). The allowed geoid.type are given in choroplethr::state.regions. If "auto", the function will try to automatically determine geoid.type.
-#' @param zoom An optional vector of states to zoom in on, written in the same manner as geoid.name.
+#' @param geoid.type How the variable given by geoid.name specifies each state
+#'   (full name, abbreviation, etc). The allowed geoid.type are given in
+#'   choroplethr::state.regions. If "auto", the function will try to
+#'   automatically determine geoid.type.
+#' @param zoom An optional vector of states to zoom in on, written in the same
+#'   manner as geoid.name.
 #' @examples
 #' # Plot continuous state level data:
 #' data(df_state_demographics)

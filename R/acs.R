@@ -1,25 +1,29 @@
 #' Create a US State choropleth from ACS data
-#' 
-#' Creates a choropleth of US states using the US Census' American Community Survey (ACS) data.  
-#' @param variable The variable you wish to plot. A list of available census 
-#' variables can be obtained using tidycensus::load_variables()
-#' @param tableId Alternatively, you may specify the ACS table you wish to plot. 
-#' If the table has more than one variable inside it, you must also specify the 
-#' index of the column you wish to plot.
+#'
+#' Creates a choropleth of US states using the US Census' American Community
+#' Survey (ACS) data.
+#' @param variable The variable you wish to plot. A list of available census
+#'   variables can be obtained using tidycensus::load_variables()
+#' @param tableId Alternatively, you may specify the ACS table you wish to plot.
+#'   If the table has more than one variable inside it, you must also specify
+#'   the index of the column you wish to plot.
 #' @param column_idx The index of the desired column within the table.
 #' @param endyear The end year of the survey to use.
 #' @param span Either 1, 3, or 5, the ACS vintage you wish to use.
-#' @param title A title for the plot; if not specified, a title will be assigned based on the variable.
-#' @param census_api_key Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html
-#' @param ... Other arguments passed to state_choropleth; see ?state_choropleth()
+#' @param title A title for the plot; if not specified, a title will be assigned
+#'   based on the variable.
+#' @param census_api_key Optional. Census API keys can be obtained at:
+#'   https://api.census.gov/data/key_signup.html
+#' @param ... Other arguments passed to state_choropleth; see
+#'   ?state_choropleth()
 #' @return A choropleth.
 
 #' @export
 #' @examples
 #' \donttest{
-#' # Create a state choropleth for median household income zooming in 
+#' # Create a state choropleth for median household income zooming in
 #' # on New York, New Jersey and Connecticut
-#' state_choropleth_acs(variable = "B19013_001", endyear = 2011, num_colors=1, 
+#' state_choropleth_acs(variable = "B19013_001", endyear = 2011, num_colors=1,
 #' zoom=c("new york", "new jersey", "connecticut"))
 #'}
 #'
@@ -54,25 +58,30 @@ state_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = NU
 }
 
 #' Create a US County choropleth from ACS data
-#' 
-#' Creates a choropleth of US counties using the US Census' American Community Survey (ACS) data.  
-#' @param variable The variable you wish to plot. A list of available census 
-#' variables can be obtained using tidycensus::load_variables()
-#' @param tableId Alternatively, you may specify the ACS table you wish to plot. 
-#' If the table has more than one variable inside it, you must also specify the 
-#' index of the column you wish to plot.
+#'
+#' Creates a choropleth of US counties using the US Census' American Community
+#' Survey (ACS) data.
+#' @param variable The variable you wish to plot. A list of available census
+#'   variables can be obtained using tidycensus::load_variables()
+#' @param tableId Alternatively, you may specify the ACS table you wish to plot.
+#'   If the table has more than one variable inside it, you must also specify
+#'   the index of the column you wish to plot.
 #' @param column_idx The index of the desired column within the table.
 #' @param endyear The end year of the survey to use.
 #' @param span Either 1, 3, or 5, the ACS vintage you wish to use.
-#' @param title A title for the plot; if not specified, a title will be assigned based on the variable.
-#' @param census_api_key Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html
-#' @param ... Other arguments passed to county_choropleth; see ?county_choropleth()
+#' @param title A title for the plot; if not specified, a title will be assigned
+#'   based on the variable.
+#' @param census_api_key Optional. Census API keys can be obtained at:
+#'   https://api.census.gov/data/key_signup.html
+#' @param ... Other arguments passed to county_choropleth; see
+#'   ?county_choropleth()
 #' @return A choropleth.
 
 #' @export
 #' @examples
 #' \donttest{
-#' #  Median household income, zooming in on all counties in New York, New Jersey and Connecticut
+#' #  Median household income, zooming in on all counties in New York, New
+#' #  Jersey and Connecticut
 #' county_choropleth_acs(variable = "B19013_001", num_colors=1, endyear = 2011,
 #' state_zoom=c("new york", "new jersey", "connecticut"))
 #' }
@@ -98,16 +107,18 @@ county_choropleth_acs = function(variable = NULL, tableId = NULL, column_idx = N
 }
 
 #' Use tidycensus to obtain the data needed to create a choropleth map.
-#' @param variable The variable you wish to plot. A list of available census 
-#' variables can be obtained using tidycensus::load_variables()
-#' @param tableId Alternatively, you may specify the ACS table you wish to plot. 
-#' If the table has more than one variable inside it, you must also specify the 
-#' index of the column you wish to plot.
+#' @param variable The variable you wish to plot. A list of available census
+#'   variables can be obtained using tidycensus::load_variables()
+#' @param tableId Alternatively, you may specify the ACS table you wish to plot.
+#'   If the table has more than one variable inside it, you must also specify
+#'   the index of the column you wish to plot.
 #' @param column_idx The index of the desired column within the table.
 #' @param endyear The end year of the survey to use.
-#' @param map The type map you wish to create; either 'state', 'county', 'zip', or 'tract'
+#' @param map The type map you wish to create; either 'state', 'county', 'zip',
+#'   or 'tract'
 #' @param span Either 1, 3, or 5, the ACS vintage you wish to use.
-#' @param census_api_key Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html
+#' @param census_api_key Optional. Census API keys can be obtained at:
+#'   https://api.census.gov/data/key_signup.html
 #' @param include_moe Whether to include the 90 percent margin of error.
 #' @export
 #' @importFrom tidycensus load_variables get_acs

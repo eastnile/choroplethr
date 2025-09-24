@@ -4,10 +4,11 @@
 #' @param num_colors The number of colors you want in your graph when plotting
 #'   continuous data. If num_colors > 1, the variable in question will be
 #'   divided into quantiles and converted into a factor with that many levels.
-#'   If num_colors = 1, a continuous color gradient will be used; if num_colors = 0,
-#'   a diverging color gradient will be used (useful for visualizing negative
-#'   and positive numbers).  Use color.max and color.min to control the range of
-#'   colors displayed. num_colors is ignored when plotting categorical data.
+#'   If num_colors = 1, a continuous color gradient will be used; if num_colors
+#'   = 0, a diverging color gradient will be used (useful for visualizing
+#'   negative and positive numbers).  Use color.max and color.min to control the
+#'   range of colors displayed. num_colors is ignored when plotting categorical
+#'   data.
 #' @param color.max The color of the highest value in your data. Ignored if the
 #'   plotted variable is categorical.
 #' @param color.min The color of the lowest value in your data. Ignored if the
@@ -21,10 +22,10 @@
 #'   continuous variable that will be discretized by the function, and the order
 #'   should match the order of the levels of in your factor variable.
 #' @param projection One of the following: "cartesian", "mercator", "robinson",
-#'   or "albers", for equirectangular, Mercator, Robinson, and Albers Equal Area
-#'   projections, respectively. When using the Mercator projection for world
-#'   maps, setting limits_lon is recommended to prevent exaggeration of the size
-#'   of Antarctica.
+#'   or "albers", for the equirectangular, Mercator, Robinson, and Albers Equal
+#'   Area projections, respectively. When using the Mercator projection for
+#'   world maps, setting limits_lon is recommended to prevent exaggeration of
+#'   the size of Antarctica.
 #' @param limits_lat A length two vector giving the minimum and maximum latitude
 #'   you wish to include in your map.
 #' @param limits_lon A length two vector giving the minimum and maximum

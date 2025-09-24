@@ -2,7 +2,8 @@
 % Please edit documentation in R/get_usa_demographics.R
 \name{get_county_demographics}
 \alias{get_county_demographics}
-\title{Get a handful of demographic variables on US Counties from the US Census Bureau as a data.frame.}
+\title{Get a handful of demographic variables on US Counties from the US Census
+Bureau as a data.frame.}
 \usage{
 get_county_demographics(endyear = 2013, span = 5)
 }
@@ -12,6 +13,6 @@ get_county_demographics(endyear = 2013, span = 5)
 \item{span}{The span of the survey}
 }
 \description{
-The data comes from the American Community Survey (ACS). The variables are total population
-and median household income.
+The data comes from the American Community Survey (ACS). The variables are
+total population and median household income.
 }

@@ -1,0 +1,14 @@
+* using log directory 'C:/Users/zhaochenhe/git/choroplethr/..Rcheck'
+* using R version 4.3.3 (2024-02-29 ucrt)
+* using platform: x86_64-w64-mingw32 (64-bit)
+* R was compiled by
+    gcc.exe (GCC) 12.3.0
+    GNU Fortran (GCC) 12.3.0
+* running under: Windows 10 x64 (build 19045)
+* using session charset: UTF-8
+* using option '--as-cran'
+* checking for file './DESCRIPTION' ... ERROR
+Required field missing or empty:
+  'Author'
+* DONE
+Status: 1 ERROR

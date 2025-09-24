@@ -16,22 +16,24 @@ get_acs_data(
 )
 }
 \arguments{
-\item{variable}{The variable you wish to plot. A list of available census 
+\item{variable}{The variable you wish to plot. A list of available census
 variables can be obtained using tidycensus::load_variables()}
 
-\item{tableId}{Alternatively, you may specify the ACS table you wish to plot. 
-If the table has more than one variable inside it, you must also specify the 
-index of the column you wish to plot.}
+\item{tableId}{Alternatively, you may specify the ACS table you wish to plot.
+If the table has more than one variable inside it, you must also specify
+the index of the column you wish to plot.}
 
 \item{column_idx}{The index of the desired column within the table.}
 
-\item{map}{The type map you wish to create; either 'state', 'county', 'zip', or 'tract'}
+\item{map}{The type map you wish to create; either 'state', 'county', 'zip',
+or 'tract'}
 
 \item{endyear}{The end year of the survey to use.}
 
 \item{span}{Either 1, 3, or 5, the ACS vintage you wish to use.}
 
-\item{census_api_key}{Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html}
+\item{census_api_key}{Optional. Census API keys can be obtained at:
+https://api.census.gov/data/key_signup.html}
 
 \item{include_moe}{Whether to include the 90 percent margin of error.}
 }

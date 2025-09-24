@@ -40,7 +40,8 @@ tract_choropleth(
 \arguments{
 \item{df}{A dataframe containing census tract level data for a given state.}
 
-\item{state_name}{The state in question, given by either proper name, abbreviation, or FIPS code.}
+\item{state_name}{The state in question, given by either proper name,
+abbreviation, or FIPS code.}
 
 \item{geoid.name}{The variable that identifies each tract.}
 
@@ -51,15 +52,17 @@ function will try to automatically determine geoid.type.}
 
 \item{value.name}{The name of the variable you wish to plot.}
 
-\item{map_year}{Uses tract definitions for that particular year, as reported by the tigris package. Only years 2013 and later are supported.}
+\item{map_year}{Uses tract definitions for that particular year, as reported
+by the tigris package. Only years 2013 and later are supported.}
 
 \item{num_colors}{The number of colors you want in your graph when plotting
 continuous data. If num_colors > 1, the variable in question will be
 divided into quantiles and converted into a factor with that many levels.
-If num_colors = 1, a continuous color gradient will be used; if num_colors = 0,
-a diverging color gradient will be used (useful for visualizing negative
-and positive numbers).  Use color.max and color.min to control the range of
-colors displayed. num_colors is ignored when plotting categorical data.}
+If num_colors = 1, a continuous color gradient will be used; if num_colors
+= 0, a diverging color gradient will be used (useful for visualizing
+negative and positive numbers).  Use color.max and color.min to control the
+range of colors displayed. num_colors is ignored when plotting categorical
+data.}
 
 \item{color.max}{The color of the highest value in your data. Ignored if the
 plotted variable is categorical.}
@@ -78,18 +81,18 @@ should match the order of the levels of in your factor variable.}
 \item{nbreaks}{The number of breaks you wish to show in the legend when using
 a continuous color scale. Ignored if num_colors > 1.}
 
-\item{tract_zoom}{An optional vector of tracts to zoom in on, written in the same
-manner as geoid.name.}
+\item{tract_zoom}{An optional vector of tracts to zoom in on, written in the
+same manner as geoid.name.}
 
 \item{county_zoom}{An optional vector of countries to zoom in on, written as
 they appear in the "county.fips.numeric" column of the object returned from
 get_tract_map().}
 
 \item{projection}{One of the following: "cartesian", "mercator", "robinson",
-or "albers", for equirectangular, Mercator, Robinson, and Albers Equal Area
-projections, respectively. When using the Mercator projection for world
-maps, setting limits_lon is recommended to prevent exaggeration of the size
-of Antarctica.}
+or "albers", for the equirectangular, Mercator, Robinson, and Albers Equal
+Area projections, respectively. When using the Mercator projection for
+world maps, setting limits_lon is recommended to prevent exaggeration of
+the size of Antarctica.}
 
 \item{border_color}{The color of the borders on your map}
 
@@ -148,5 +151,6 @@ tract_choropleth(df = df_ny_tract_demographics, state_name = 'NY',
 }
 }
 \seealso{
-\url{https://www.census.gov/data/academy/data-gems/2018/tract.html} for more information on Census Tracts
+\url{https://www.census.gov/data/academy/data-gems/2018/tract.html}
+  for more information on Census Tracts
 }

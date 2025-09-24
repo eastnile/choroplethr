@@ -16,12 +16,12 @@ state_choropleth_acs(
 )
 }
 \arguments{
-\item{variable}{The variable you wish to plot. A list of available census 
+\item{variable}{The variable you wish to plot. A list of available census
 variables can be obtained using tidycensus::load_variables()}
 
-\item{tableId}{Alternatively, you may specify the ACS table you wish to plot. 
-If the table has more than one variable inside it, you must also specify the 
-index of the column you wish to plot.}
+\item{tableId}{Alternatively, you may specify the ACS table you wish to plot.
+If the table has more than one variable inside it, you must also specify
+the index of the column you wish to plot.}
 
 \item{column_idx}{The index of the desired column within the table.}
 
@@ -29,23 +29,27 @@ index of the column you wish to plot.}
 
 \item{span}{Either 1, 3, or 5, the ACS vintage you wish to use.}
 
-\item{title}{A title for the plot; if not specified, a title will be assigned based on the variable.}
+\item{title}{A title for the plot; if not specified, a title will be assigned
+based on the variable.}
 
-\item{census_api_key}{Optional. Census API keys can be obtained at: https://api.census.gov/data/key_signup.html}
+\item{census_api_key}{Optional. Census API keys can be obtained at:
+https://api.census.gov/data/key_signup.html}
 
-\item{...}{Other arguments passed to state_choropleth; see ?state_choropleth()}
+\item{...}{Other arguments passed to state_choropleth; see
+?state_choropleth()}
 }
 \value{
 A choropleth.
 }
 \description{
-Creates a choropleth of US states using the US Census' American Community Survey (ACS) data.
+Creates a choropleth of US states using the US Census' American Community
+Survey (ACS) data.
 }
 \examples{
 \donttest{
-# Create a state choropleth for median household income zooming in 
+# Create a state choropleth for median household income zooming in
 # on New York, New Jersey and Connecticut
-state_choropleth_acs(variable = "B19013_001", endyear = 2011, num_colors=1, 
+state_choropleth_acs(variable = "B19013_001", endyear = 2011, num_colors=1,
 zoom=c("new york", "new jersey", "connecticut"))
 }
 

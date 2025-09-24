@@ -2,7 +2,8 @@
 #' @import ggplot2 
 #' @importFrom R6 R6Class
 #' @importFrom stringr str_split str_replace_all
-#' @importFrom sf sf_use_s2 st_drop_geometry st_bbox st_as_sfc st_intersection st_crs st_coordinates st_centroid
+#' @importFrom sf sf_use_s2 st_drop_geometry st_bbox st_as_sfc st_intersection
+#'   st_crs st_coordinates st_centroid
 #' @importFrom dplyr left_join join_by
 #' @importFrom ggrepel geom_label_repel
 #' @export

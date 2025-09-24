@@ -41,19 +41,26 @@ state_choropleth(
 
 \item{geoid.name}{The variable that identifies each state}
 
-\item{geoid.type}{How the variable given by geoid.name specifies each state (full name, abbreviation, etc). The allowed geoid.type are given in choroplethr::state.regions. If "auto", the function will try to automatically determine geoid.type.}
+\item{geoid.type}{How the variable given by geoid.name specifies each state
+(full name, abbreviation, etc). The allowed geoid.type are given in
+choroplethr::state.regions. If "auto", the function will try to
+automatically determine geoid.type.}
 
 \item{value.name}{The name of the variable you wish to plot.}
 
-\item{style}{Either "geographic" for a literal map of US states, "geographic_bigdc" to make Washington DC more visible, or "hexgrid" for a stylized hexagonal tile map. Note: projection = 'mercator' is suggested when using the hexgrid map.}
+\item{style}{Either "geographic" for a literal map of US states,
+"geographic_bigdc" to make Washington DC more visible, or "hexgrid" for a
+stylized hexagonal tile map. Note: projection = 'mercator' is suggested
+when using the hexgrid map.}
 
 \item{num_colors}{The number of colors you want in your graph when plotting
 continuous data. If num_colors > 1, the variable in question will be
 divided into quantiles and converted into a factor with that many levels.
-If num_colors = 1, a continuous color gradient will be used; if num_colors = 0,
-a diverging color gradient will be used (useful for visualizing negative
-and positive numbers).  Use color.max and color.min to control the range of
-colors displayed. num_colors is ignored when plotting categorical data.}
+If num_colors = 1, a continuous color gradient will be used; if num_colors
+= 0, a diverging color gradient will be used (useful for visualizing
+negative and positive numbers).  Use color.max and color.min to control the
+range of colors displayed. num_colors is ignored when plotting categorical
+data.}
 
 \item{color.max}{The color of the highest value in your data. Ignored if the
 plotted variable is categorical.}
@@ -72,13 +79,14 @@ should match the order of the levels of in your factor variable.}
 \item{nbreaks}{The number of breaks you wish to show in the legend when using
 a continuous color scale. Ignored if num_colors > 1.}
 
-\item{zoom}{An optional vector of states to zoom in on, written in the same manner as geoid.name.}
+\item{zoom}{An optional vector of states to zoom in on, written in the same
+manner as geoid.name.}
 
 \item{projection}{One of the following: "cartesian", "mercator", "robinson",
-or "albers", for equirectangular, Mercator, Robinson, and Albers Equal Area
-projections, respectively. When using the Mercator projection for world
-maps, setting limits_lon is recommended to prevent exaggeration of the size
-of Antarctica.}
+or "albers", for the equirectangular, Mercator, Robinson, and Albers Equal
+Area projections, respectively. When using the Mercator projection for
+world maps, setting limits_lon is recommended to prevent exaggeration of
+the size of Antarctica.}
 
 \item{border_color}{The color of the borders on your map}
 

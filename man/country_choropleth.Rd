@@ -53,10 +53,11 @@ the function will try to automatically determine geoid.type.}
 \item{num_colors}{The number of colors you want in your graph when plotting
 continuous data. If num_colors > 1, the variable in question will be
 divided into quantiles and converted into a factor with that many levels.
-If num_colors = 1, a continuous color gradient will be used; if num_colors = 0,
-a diverging color gradient will be used (useful for visualizing negative
-and positive numbers).  Use color.max and color.min to control the range of
-colors displayed. num_colors is ignored when plotting categorical data.}
+If num_colors = 1, a continuous color gradient will be used; if num_colors
+= 0, a diverging color gradient will be used (useful for visualizing
+negative and positive numbers).  Use color.max and color.min to control the
+range of colors displayed. num_colors is ignored when plotting categorical
+data.}
 
 \item{color.max}{The color of the highest value in your data. Ignored if the
 plotted variable is categorical.}
@@ -82,10 +83,10 @@ same manner as geoid.name.}
 countries belong to which continent, see choroplethr::country.regions}
 
 \item{projection}{One of the following: "cartesian", "mercator", "robinson",
-or "albers", for equirectangular, Mercator, Robinson, and Albers Equal Area
-projections, respectively. When using the Mercator projection for world
-maps, setting limits_lon is recommended to prevent exaggeration of the size
-of Antarctica.}
+or "albers", for the equirectangular, Mercator, Robinson, and Albers Equal
+Area projections, respectively. When using the Mercator projection for
+world maps, setting limits_lon is recommended to prevent exaggeration of
+the size of Antarctica.}
 
 \item{limits_lat}{A length two vector giving the minimum and maximum latitude
 you wish to include in your map.}
@@ -147,27 +148,32 @@ beginning of this object.
 \examples{
 # Create a choropleth map using country level data:
 data(df_country_demographics)
-country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
-                   value.name = 'gdp',
-                   title = "GDP of Countries in the World", legend = 'GDP (millions)')
+country_choropleth(df_country_demographics, geoid.name = 'region', 
+                   geoid.type = 'iso_a3', value.name = 'gdp',
+                   title = "GDP of Countries in the World", 
+                   legend = 'GDP (millions)')
 
 # Use a divergent continuous color scale and customize map appearance:
-country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
-                   value.name = 'gdp', num_colors = 0, border_color = 'grey', 
+country_choropleth(df_country_demographics, geoid.name = 'region', 
+                   geoid.type = 'iso_a3', value.name = 'gdp', 
+                   num_colors = 0, border_color = 'grey', 
                    color.max = 'gold', color.min = 'navyblue',
                    projection = 'robinson', latlon_ticks = TRUE, 
                    gridlines = TRUE, whitespace = FALSE,
                    background_color = 'azure',
-                   title = "GDP of Countries in the World", legend = 'GDP (millions)')
+                   title = "GDP of Countries in the World", 
+                   legend = 'GDP (millions)')
 
 # Zoom in on South America:
-country_choropleth(df_country_demographics, geoid.name = 'region', geoid.type = 'iso_a3',
+country_choropleth(df_country_demographics, geoid.name = 'region', 
+                   geoid.type = 'iso_a3',
                    value.name = 'gdp', num_colors = 0, border_color = 'grey', 
                    continent_zoom = 'South America',
                    color.max = 'gold', color.min = 'navyblue',
                    projection = 'robinson', latlon_ticks = TRUE, 
                    gridlines = TRUE, whitespace = FALSE,
                    background_color = 'azure',
-                   title = "GDP of Countries in the World", legend = 'GDP (millions)',
+                   title = "GDP of Countries in the World", 
+                   legend = 'GDP (millions)',
                    label = 'iso_a2', label_text_size = 5)
 }

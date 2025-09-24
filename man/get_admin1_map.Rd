@@ -2,7 +2,8 @@
 % Please edit documentation in R/admin1.R
 \name{get_admin1_map}
 \alias{get_admin1_map}
-\title{Download a map of first level administrative regions from naturalearthdata.com}
+\title{Download a map of first level administrative regions from
+naturalearthdata.com}
 \usage{
 get_admin1_map(cache = TRUE, drop_geometry = TRUE)
 }
@@ -12,7 +13,8 @@ get_admin1_map(cache = TRUE, drop_geometry = TRUE)
 \item{drop_geometry}{Drop geometry data?}
 }
 \value{
-An sf dataframe uniquely identified by the variables "adm1_code", "diss_me", and "ne_id".
+An sf dataframe uniquely identified by the variables "adm1_code",
+  "diss_me", and "ne_id".
 }
 \description{
 Uses the rnaturalearth package.

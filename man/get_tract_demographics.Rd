@@ -2,7 +2,8 @@
 % Please edit documentation in R/get_usa_demographics.R
 \name{get_tract_demographics}
 \alias{get_tract_demographics}
-\title{Get a handful of demographic variables on Census Tracts in a State from the US Census Bureau as a data.frame.}
+\title{Get a handful of demographic variables on Census Tracts in a State from the
+US Census Bureau as a data.frame.}
 \usage{
 get_tract_demographics(
   state_name,
@@ -12,15 +13,17 @@ get_tract_demographics(
 )
 }
 \arguments{
-\item{state_name}{The name of the state. See ?state.regions for proper spelling and capitalization.}
+\item{state_name}{The name of the state. See ?state.regions for proper
+spelling and capitalization.}
 
-\item{county_fips}{An optional vector of county fips codes within the state. Useful to set because getting data on all tracts can be slow.}
+\item{county_fips}{An optional vector of county fips codes within the state.
+Useful to set because getting data on all tracts can be slow.}
 
 \item{endyear}{The end year for the survey}
 
 \item{span}{The span of the survey}
 }
 \description{
-The data comes from the American Community Survey (ACS). The variables are total population
-and median household income.
+The data comes from the American Community Survey (ACS). The variables are
+total population and median household income.
 }

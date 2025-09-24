@@ -4,7 +4,10 @@ if (F) {
   tools::resaveRdaFiles("data/", compress = "xz")
   devtools::load_all() 
   devtools::document()
-  devtools::check(cran = T)
+  devtools::check(cran = T, manual = T)
+  devtools::check(manual = T)
+  # to check in console, first build, then run:
+  #"C:\Program Files\R\R-4.3.3\bin\R.exe" CMD check choroplethr_5.0.1.tar.gz
 }
 
 df_world = choroplethr::df_country_demographics
@@ -15,8 +18,10 @@ df_county_demographics = choroplethr::df_county_demographics
 state_choropleth(df = df_pop_state)
 state_choropleth(df = df_pop_state, value.name = 'value', label = 'state.abb', style = 'hexgrid', projection = 'mercator')
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population')
-county_choropleth(df = df_county_demographics, geoid.name = 'region', value.name = 'median_hh_income', state_zoom = c('CA','OR','WA'))
 county_choropleth(df = df_county_demographics, map_year = 2015, geoid.name = 'region', value.name = 'median_hh_income')
+county_choropleth(df = df_county_demographics, map_year = 2015, geoid.name = 'region', value.name = 'median_hh_income', add_state_outline = FALSE)
+county_choropleth(df = df_county_demographics, geoid.name = 'region', value.name = 'median_hh_income', state_zoom = c('CA','OR','WA'))
+
 
 # return = sf 
 z = country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population', label = 'continent', return = 'sf')

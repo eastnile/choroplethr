@@ -3,16 +3,17 @@
 \docType{data}
 \name{df_pop_ny_tract}
 \alias{df_pop_ny_tract}
-\title{A data.frame containing population estimates for all Census Tracts in New York 
-State in 2012.}
+\title{A data.frame containing population estimates for all Census Tracts in New
+York State in 2012.}
 \usage{
 data(df_pop_ny_tract)
 }
 \description{
-A data.frame containing population estimates for all Census Tracts in New York 
-State in 2012.
+A data.frame containing population estimates for all Census Tracts in New
+York State in 2012.
 }
 \references{
-Taken from the US American Community Survey (ACS) 5 year estimates.
+Taken from the US American Community Survey (ACS) 5 year
+  estimates.
 }
 \keyword{data}

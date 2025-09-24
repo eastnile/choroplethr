@@ -1,7 +1,8 @@
-#' Get a handful of demographic variables on US States from the US Census Bureau as a data.frame.
-#' 
-#' The data comes from the American Community Survey (ACS). The variables are total population
-#' and median household income.
+#' Get a handful of demographic variables on US States from the US Census Bureau
+#' as a data.frame.
+#'
+#' The data comes from the American Community Survey (ACS). The variables are
+#' total population and median household income.
 #' @param endyear The end year for the survey
 #' @param span The span of the survey
 #' @importFrom utils data
@@ -21,10 +22,11 @@ get_state_demographics = function(endyear=2013, span=5)
 }
 
 
-#' Get a handful of demographic variables on US Counties from the US Census Bureau as a data.frame.
-#' 
-#' The data comes from the American Community Survey (ACS). The variables are total population
-#' and median household income.
+#' Get a handful of demographic variables on US Counties from the US Census
+#' Bureau as a data.frame.
+#'
+#' The data comes from the American Community Survey (ACS). The variables are
+#' total population and median household income.
 #' @param endyear The end year for the survey
 #' @param span The span of the survey
 #' @export
@@ -41,12 +43,15 @@ get_county_demographics = function(endyear=2013, span=5)
   return(acs_df)
 }
 
-#' Get a handful of demographic variables on Census Tracts in a State from the US Census Bureau as a data.frame.
-#' 
-#' The data comes from the American Community Survey (ACS). The variables are total population
-#' and median household income.
-#' @param state_name The name of the state. See ?state.regions for proper spelling and capitalization.
-#' @param county_fips An optional vector of county fips codes within the state. Useful to set because getting data on all tracts can be slow.
+#' Get a handful of demographic variables on Census Tracts in a State from the
+#' US Census Bureau as a data.frame.
+#'
+#' The data comes from the American Community Survey (ACS). The variables are
+#' total population and median household income.
+#' @param state_name The name of the state. See ?state.regions for proper
+#'   spelling and capitalization.
+#' @param county_fips An optional vector of county fips codes within the state.
+#'   Useful to set because getting data on all tracts can be slow.
 #' @param endyear The end year for the survey
 #' @param span The span of the survey
 #' @importFrom stringr str_sub

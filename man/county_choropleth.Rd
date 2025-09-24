@@ -40,23 +40,26 @@ county_choropleth(
 \arguments{
 \item{df}{A dataframe containing U.S. county level data}
 
-\item{map_year}{Either 2015 or 2024; uses county definitions from that particular year.}
+\item{map_year}{Either 2015 or 2024; uses county definitions from that
+particular year.}
 
 \item{geoid.name}{The name of the variable that identifies each county}
 
 \item{geoid.type}{Either "fips.numeric" or "fips.character"; if "auto", the
 function will try to automatically determine geoid.type. See
-choroplethr::county.regions.2015 or choroplethr::county.regions.2024 a lookup table.}
+choroplethr::county.regions.2015 or choroplethr::county.regions.2024 a
+lookup table.}
 
 \item{value.name}{The name of the variable you wish to plot.}
 
 \item{num_colors}{The number of colors you want in your graph when plotting
 continuous data. If num_colors > 1, the variable in question will be
 divided into quantiles and converted into a factor with that many levels.
-If num_colors = 1, a continuous color gradient will be used; if num_colors = 0,
-a diverging color gradient will be used (useful for visualizing negative
-and positive numbers).  Use color.max and color.min to control the range of
-colors displayed. num_colors is ignored when plotting categorical data.}
+If num_colors = 1, a continuous color gradient will be used; if num_colors
+= 0, a diverging color gradient will be used (useful for visualizing
+negative and positive numbers).  Use color.max and color.min to control the
+range of colors displayed. num_colors is ignored when plotting categorical
+data.}
 
 \item{color.max}{The color of the highest value in your data. Ignored if the
 plotted variable is categorical.}
@@ -82,10 +85,10 @@ the same manner as geoid.name.}
 this vector must match one of the columns in choroplethr::state.regions.}
 
 \item{projection}{One of the following: "cartesian", "mercator", "robinson",
-or "albers", for equirectangular, Mercator, Robinson, and Albers Equal Area
-projections, respectively. When using the Mercator projection for world
-maps, setting limits_lon is recommended to prevent exaggeration of the size
-of Antarctica.}
+or "albers", for the equirectangular, Mercator, Robinson, and Albers Equal
+Area projections, respectively. When using the Mercator projection for
+world maps, setting limits_lon is recommended to prevent exaggeration of
+the size of Antarctica.}
 
 \item{border_color}{The color of the borders on your map}
 
@@ -130,23 +133,25 @@ to draw the map (useful if you wish to customize the map yourself).}
 \item{add_state_outline}{Should state borders be outlined in your map?}
 }
 \description{
-Counties must be identified by FIPS code; see choroplethr::county.regions.2015 or 
-choroplethr::county.regions.2024 for an object
-that can help you coerce your county names into this format.
+Counties must be identified by FIPS code; see
+choroplethr::county.regions.2015 or choroplethr::county.regions.2024 for an
+object that can help you coerce your county names into this format.
 }
 \examples{
 \donttest{
 # Create a map based on US county data:
 data("df_county_demographics")
-county_choropleth(df_county_demographics, geoid.name = 'region', geoid.type = 'fips.numeric',
+county_choropleth(df_county_demographics, geoid.name = 'region', 
+                  geoid.type = 'fips.numeric',
                   value.name = 'median_hh_income',
-                  title = "Median Household Income of U.S. Counties", 
+                  title = "Median Household Income of U.S. Counties",
                   legend = 'Median HH Income')
 
-county_choropleth(df_county_demographics, geoid.name = 'region', geoid.type = 'fips.numeric',
+county_choropleth(df_county_demographics, geoid.name = 'region', 
+                  geoid.type = 'fips.numeric',
                   value.name = 'median_hh_income',
                   state_zoom = c('CA', 'OR', 'WA'),
-                  title = "Median Household Income of West Coast Counties", 
+                  title = "Median Household Income of West Coast Counties",
                   legend = 'Median HH Income')
 }
 }

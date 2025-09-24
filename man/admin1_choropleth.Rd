@@ -42,8 +42,7 @@ admin1_choropleth(
 \item{df}{A dataframe containing regional data at the sub-country level for
 one or more countries.}
 
-\item{geoid.name}{The variable that identifies each
-administrative region}
+\item{geoid.name}{The variable that identifies each administrative region}
 
 \item{geoid.type}{How the variable given by geoid.name specifies each
 country. The allowed geoid.type are given by the columns "adm1_code",
@@ -56,10 +55,11 @@ function will try to automatically determine geoid.type.}
 \item{num_colors}{The number of colors you want in your graph when plotting
 continuous data. If num_colors > 1, the variable in question will be
 divided into quantiles and converted into a factor with that many levels.
-If num_colors = 1, a continuous color gradient will be used; if num_colors = 0,
-a diverging color gradient will be used (useful for visualizing negative
-and positive numbers).  Use color.max and color.min to control the range of
-colors displayed. num_colors is ignored when plotting categorical data.}
+If num_colors = 1, a continuous color gradient will be used; if num_colors
+= 0, a diverging color gradient will be used (useful for visualizing
+negative and positive numbers).  Use color.max and color.min to control the
+range of colors displayed. num_colors is ignored when plotting categorical
+data.}
 
 \item{color.max}{The color of the highest value in your data. Ignored if the
 plotted variable is categorical.}
@@ -86,10 +86,10 @@ they appear in the "adm0_a3" column of the object returned from
 get_tract_map().}
 
 \item{projection}{One of the following: "cartesian", "mercator", "robinson",
-or "albers", for equirectangular, Mercator, Robinson, and Albers Equal Area
-projections, respectively. When using the Mercator projection for world
-maps, setting limits_lon is recommended to prevent exaggeration of the size
-of Antarctica.}
+or "albers", for the equirectangular, Mercator, Robinson, and Albers Equal
+Area projections, respectively. When using the Mercator projection for
+world maps, setting limits_lon is recommended to prevent exaggeration of
+the size of Antarctica.}
 
 \item{limits_lat}{A length two vector giving the minimum and maximum latitude
 you wish to include in your map.}
@@ -151,31 +151,36 @@ data.
 }
 \details{
 Note: This function requires the package rnatrualearthhires, which is not
-available on CRAN due to the filesize of the map being large. 
-You can install it using: remotes::install_github("ropensci/rnaturalearthhires")
+available on CRAN due to the filesize of the map being large. You can install
+it using: 
+remotes::install_github("ropensci/rnaturalearthhires")
 }
 \examples{
 \donttest{
 library(dplyr)
-# Our Japanese data is at the prefecture level, with names in English lower case.
-df_japan_census = choroplethr::df_japan_census 
-# We match our data to one of the geoids ("adm1_code", "diss_me", or "ne_id" )
-# in the output of get_admin1_map().
+# Our Japanese data is at the prefecture level, with names in English lower
+# case. We match our data to one of the geoids ("adm1_code", "diss_me", or
+# "ne_id" ) # in the output of get_admin1_map().
 
 if (requireNamespace("rnaturalearthhires")) {
-  admin1_lookup = get_admin1_map() 
-  # The "name_en" variable is very close to how the prefectures are named in our data.
-  admin1_lookup = admin1_lookup[admin1_lookup$admin == 'Japan', c('adm1_code', 'name_en')]
+  admin1_lookup = get_admin1_map()
+  # The "name_en" variable is very close to how the prefectures are named in
+  # our data.
+  admin1_lookup = admin1_lookup[admin1_lookup$admin == 'Japan', 
+                                c('adm1_code', 'name_en')]
   admin1_lookup$name_lower = tolower(admin1_lookup$name_en)
-  admin1_lookup$name_lower = iconv(admin1_lookup$name_lower, 
-                                  from = "UTF-8", to = "ASCII//TRANSLIT") # Remove accent marks
-  admin1_lookup$name_lower = gsub(pattern = ' prefecture', replacement = '',  
+  # Remove accent marks
+  admin1_lookup$name_lower = iconv(admin1_lookup$name_lower,
+                                  from = "UTF-8", to = "ASCII//TRANSLIT") 
+  admin1_lookup$name_lower = gsub(pattern = ' prefecture', replacement = '',
                                  x = admin1_lookup$name_lower)
   # We merge in admin1_code after making name_en resemble our data.
-  data_prepped = left_join(df_japan_census, admin1_lookup[, c('adm1_code', 'name_lower')], 
-                           by = join_by(region == name_lower)) 
-  admin1_choropleth(data_prepped, geoid.name = 'adm1_code', value.name = 'pop_2010',
-                   country_zoom = 'JPN', num_colors = 4) # Create the map
+  data_prepped = left_join(df_japan_census, 
+                           admin1_lookup[, c('adm1_code', 'name_lower')],
+                           by = join_by(region == name_lower))
+  admin1_choropleth(data_prepped, geoid.name = 'adm1_code', 
+                    value.name = 'pop_2010',
+                    country_zoom = 'JPN', num_colors = 4) # Create the map
 }
 }
 }

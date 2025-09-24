@@ -1,10 +1,11 @@
 #' Download a map of all census tracts in a given state
 #' 
-#' The map returned is exactly the same map which tract_choropleth uses. It is downloaded
-#' using the "tracts" function in the tigris package, and then it is modified for use with 
-#' choroplethr.
+#' The map returned is exactly the same map which tract_choropleth uses. It is
+#' downloaded using the "tracts" function in the tigris package, and then it is
+#' modified for use with choroplethr.
 #'
-#' @param state_name The name of the state, given by proper name, abbreviation, for FIPS code.
+#' @param state_name The name of the state, given by proper name, abbreviation,
+#'   for FIPS code.
 #' @param map_year The year of the map you want to download.
 #' @param drop_geometry Drop geometry data?
 #' @importFrom tigris tracts
@@ -25,15 +26,17 @@ get_tract_map = function(state_name, map_year, drop_geometry = TRUE) {
 #' 
 #' @inheritParams common_args
 #' @param df A dataframe containing census tract level data for a given state.
-#' @param state_name The state in question, given by either proper name, abbreviation, or FIPS code.
+#' @param state_name The state in question, given by either proper name,
+#'   abbreviation, or FIPS code.
 #' @param geoid.name The variable that identifies each tract.
 #' @param geoid.type How the variable given by geoid.name specifies each tract;
 #'   the allowed geoid.type are given by the columns "AFFGEOID", "GEOID", or
 #'   "tractid.numeric" variable obtained from get_tract_map(). If "auto", the
 #'   function will try to automatically determine geoid.type.
-#' @param map_year Uses tract definitions for that particular year, as reported by the tigris package. Only years 2013 and later are supported.
-#' @param tract_zoom An optional vector of tracts to zoom in on, written in the same
-#'   manner as geoid.name.
+#' @param map_year Uses tract definitions for that particular year, as reported
+#'   by the tigris package. Only years 2013 and later are supported.
+#' @param tract_zoom An optional vector of tracts to zoom in on, written in the
+#'   same manner as geoid.name.
 #' @param county_zoom An optional vector of countries to zoom in on, written as
 #'   they appear in the "county.fips.numeric" column of the object returned from
 #'   get_tract_map().
@@ -49,7 +52,8 @@ get_tract_map = function(state_name, map_year, drop_geometry = TRUE) {
 #'                  geoid.name = 'region', value.name = 'population',
 #'                  county_zoom = c(36005, 36047, 36061, 36081, 36085))
 #' }
-#' @seealso \url{https://www.census.gov/data/academy/data-gems/2018/tract.html} for more information on Census Tracts
+#' @seealso \url{https://www.census.gov/data/academy/data-gems/2018/tract.html}
+#'   for more information on Census Tracts
 #' @export
 #' 
 tract_choropleth = function(df, state_name, geoid.name = 'region', geoid.type = 'auto', value.name = 'value', map_year = 2020,

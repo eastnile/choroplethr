@@ -11,6 +11,7 @@ data(df_state_age_2015)
 A data.frame containing median age estimates for US states in 2015
 }
 \references{
-Taken from the US American Community Survey (ACS) 5 year estimates.
+Taken from the US American Community Survey (ACS) 5 year
+  estimates.
 }
 \keyword{data}

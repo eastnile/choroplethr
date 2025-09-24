@@ -1,35 +1,39 @@
 #' Create a choropleth map using U.S. county level data:
-#' 
-#' Counties must be identified by FIPS code; see choroplethr::county.regions.2015 or 
-#' choroplethr::county.regions.2024 for an object
-#' that can help you coerce your county names into this format.
-#' 
+#'
+#' Counties must be identified by FIPS code; see
+#' choroplethr::county.regions.2015 or choroplethr::county.regions.2024 for an
+#' object that can help you coerce your county names into this format.
+#'
 #' @inheritParams common_args
 #' @param df A dataframe containing U.S. county level data
-#' @param map_year Either 2015 or 2024; uses county definitions from that particular year.
+#' @param map_year Either 2015 or 2024; uses county definitions from that
+#'   particular year.
 #' @param geoid.name The name of the variable that identifies each county
 #' @param geoid.type Either "fips.numeric" or "fips.character"; if "auto", the
 #'   function will try to automatically determine geoid.type. See
-#'   choroplethr::county.regions.2015 or choroplethr::county.regions.2024 a lookup table.
+#'   choroplethr::county.regions.2015 or choroplethr::county.regions.2024 a
+#'   lookup table.
 #' @param state_zoom An optional vector of states to zoom in on. Elements of
 #'   this vector must match one of the columns in choroplethr::state.regions.
 #' @param county_zoom An optional vector of counties to zoom in on, written in
 #'   the same manner as geoid.name.
 #' @param add_state_outline Should state borders be outlined in your map?
-#' 
+#'
 #' @examples
 #' \donttest{
 #' # Create a map based on US county data:
 #' data("df_county_demographics")
-#' county_choropleth(df_county_demographics, geoid.name = 'region', geoid.type = 'fips.numeric',
+#' county_choropleth(df_county_demographics, geoid.name = 'region', 
+#'                   geoid.type = 'fips.numeric',
 #'                   value.name = 'median_hh_income',
-#'                   title = "Median Household Income of U.S. Counties", 
+#'                   title = "Median Household Income of U.S. Counties",
 #'                   legend = 'Median HH Income')
-#' 
-#' county_choropleth(df_county_demographics, geoid.name = 'region', geoid.type = 'fips.numeric',
+#'
+#' county_choropleth(df_county_demographics, geoid.name = 'region', 
+#'                   geoid.type = 'fips.numeric',
 #'                   value.name = 'median_hh_income',
 #'                   state_zoom = c('CA', 'OR', 'WA'),
-#'                   title = "Median Household Income of West Coast Counties", 
+#'                   title = "Median Household Income of West Coast Counties",
 #'                   legend = 'Median HH Income')
 #' }
 #' @export
@@ -99,7 +103,7 @@ county_choropleth = function(df, map_year = 2024, geoid.name = 'region', geoid.t
     states_used = unique(floor(counties_used/1000))
     state_map = choroplethr::state.map.hires
     state_map = state_map[state_map$fips.numeric %in% states_used, ]
-    state_outline = geom_sf(data = state_map, color = 'black', fill = NA, linewidth = 0.5)
+    state_outline = geom_sf(data = state_map, color = 'black', fill = NA, linewidth = .75)
   } else {
     state_outline = NULL
   }
