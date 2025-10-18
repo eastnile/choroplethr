@@ -45,9 +45,9 @@ one or more countries.}
 \item{geoid.name}{The variable that identifies each administrative region}
 
 \item{geoid.type}{How the variable given by geoid.name specifies each
-country. The allowed geoid.type are given by the columns "adm1_code",
-"diss_me", "ne_id" in the output of get_admin1_map(); use this output to
-match the names of your regions to the correct geoid. If "auto", the
+region. The allowed geoid.type are given by the columns "adm1_code",
+"diss_me", "ne_id" in choroplethr::admin1_regions; use this dataframe to
+match the names of your regions to an allowed GEOID. If "auto", the
 function will try to automatically determine geoid.type.}
 
 \item{value.name}{The name of the variable you wish to plot.}
@@ -73,7 +73,7 @@ plotted variable is categorical.}
 map when plotting factor variables. The length of this vector must match
 the number of levels in your factor variable, or num_colors for a
 continuous variable that will be discretized by the function, and the order
-should match the order of the levels of in your factor variable.}
+should match the order of the levels in your factor variable.}
 
 \item{nbreaks}{The number of breaks you wish to show in the legend when using
 a continuous color scale. Ignored if num_colors > 1.}
@@ -82,8 +82,7 @@ a continuous color scale. Ignored if num_colors > 1.}
 manner as geoid.name.}
 
 \item{country_zoom}{An optional vector of countries to zoom in on, written as
-they appear in the "adm0_a3" column of the object returned from
-get_tract_map().}
+they appear in the "adm0_a3" column of choroplethr::admin1_regions.}
 
 \item{projection}{One of the following: "cartesian", "mercator", "robinson",
 or "albers", for the equirectangular, Mercator, Robinson, and Albers Equal
@@ -145,42 +144,34 @@ to draw the map (useful if you wish to customize the map yourself).}
 \description{
 This function can be used to plot regional data at the first sub-level of
 administration (ie., state, province, prefecture, etc.) for one or more
-countries. Use get_admin1_map() for an object which can help you coerce your
-region names into the required format; see below for an example with Japanese
-data.
-}
-\details{
-Note: This function requires the package rnatrualearthhires, which is not
-available on CRAN due to the filesize of the map being large. You can install
-it using: \cr
-remotes::install_github("ropensci/rnaturalearthhires")
+countries. Use choroplethr::admin1_regions to help you coerce your region
+names into the required format; see below for an example with Japanese data.
 }
 \examples{
 \donttest{
 library(dplyr)
 # Our Japanese data is at the prefecture level, with names in English lower
 # case. We match our data to one of the geoids ("adm1_code", "diss_me", or
-# "ne_id" ) # in the output of get_admin1_map().
+# "ne_id" ) in choroplethr::admin1.regions.
 
-if (requireNamespace("rnaturalearthhires")) {
-  admin1_lookup = get_admin1_map()
-  # The "name_en" variable is very close to how the prefectures are named in
-  # our data.
-  admin1_lookup = admin1_lookup[admin1_lookup$admin == 'Japan', 
-                                c('adm1_code', 'name_en')]
-  admin1_lookup$name_lower = tolower(admin1_lookup$name_en)
-  # Remove accent marks
-  admin1_lookup$name_lower = iconv(admin1_lookup$name_lower,
-                                  from = "UTF-8", to = "ASCII//TRANSLIT") 
-  admin1_lookup$name_lower = gsub(pattern = ' prefecture', replacement = '',
-                                 x = admin1_lookup$name_lower)
-  # We merge in admin1_code after making name_en resemble our data.
-  data_prepped = left_join(df_japan_census, 
-                           admin1_lookup[, c('adm1_code', 'name_lower')],
-                           by = join_by(region == name_lower))
-  admin1_choropleth(data_prepped, geoid.name = 'adm1_code', 
-                    value.name = 'pop_2010',
-                    country_zoom = 'JPN', num_colors = 4) # Create the map
-}
+admin1_lookup = choroplethr::admin1.regions
+head(admin1_lookup)
+# The "name_en" variable is very close to how the prefectures are named in
+# our data.
+admin1_lookup = admin1_lookup[admin1_lookup$admin == 'Japan', 
+                              c('adm1_code', 'name_en')]
+admin1_lookup$name_lower = tolower(admin1_lookup$name_en)
+# Remove accent marks
+admin1_lookup$name_lower = iconv(admin1_lookup$name_lower,
+                                 from = "UTF-8", to = "ASCII//TRANSLIT") 
+admin1_lookup$name_lower = gsub(pattern = ' prefecture', replacement = '',
+                               x = admin1_lookup$name_lower)
+# We join with lookup after making name_en resemble our data.
+data_prepped = left_join(df_japan_census, 
+                         admin1_lookup[, c('adm1_code', 'name_lower')],
+                         by = join_by(region == name_lower))
+admin1_choropleth(data_prepped, geoid.name = 'adm1_code', 
+                  value.name = 'pop_2010',
+                  country_zoom = 'JPN', num_colors = 4) # Create the map
 }
 }

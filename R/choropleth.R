@@ -106,7 +106,7 @@ Choropleth = R6Class("Choropleth",
       }
       names(user.df.prepped) = c(geoid.type, value.name)
       ref_cols_needed = unique(c(self$geoid.all, label_col))
-      user.df.prepped = dplyr::left_join(self$ref.regions[, ref_cols_needed], user.df.prepped, by = geoid.type)
+      user.df.prepped = left_join(self$ref.regions[ref_cols_needed], user.df.prepped, by = geoid.type)
 
       # Discretize value if need be
       if (num_colors > 1 & !self$user_value_factor_or_string) {

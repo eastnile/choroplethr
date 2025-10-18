@@ -1,5 +1,7 @@
 # choroplethr 5.0.1
-Fixed minor bugs and issues related to depreciation of ggplot2::aes_str(). 
+- Removed dependency on the non-CRAN package rnatrualearthhires
+- Added support for zip code level maps
+- Fixed bugs and issues related to depreciation of ggplot2::aes_str(). 
 
 # choroplethr 5.0.0
 Many changes have been made to this version of the package, some of which are not backwards compatible with previous versions. If you need everything to work as before, please install an older version of choroplethr (instructions available on https://github.com/eastnile/choroplethr).

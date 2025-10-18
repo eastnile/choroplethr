@@ -3,10 +3,10 @@
 \docType{data}
 \name{country.regions}
 \alias{country.regions}
-\title{Supported regions for world countries}
+\title{Supported countries along with lookup data in multiple languages}
 \usage{
 data(country.regions)
 }
 \description{
-Supported regions for world countries
+Supported countries along with lookup data in multiple languages
 }

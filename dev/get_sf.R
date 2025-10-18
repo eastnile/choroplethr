@@ -4,6 +4,9 @@ library(sf)
 library(dplyr)
 library(ggplot2)
 library(rmapshaper)
+library(nngeo)
+library(stringr)
+library(stringi)
 
 ## 1. US States ----
 state.map = states(cb = TRUE, year = 2024)
@@ -124,8 +127,8 @@ prep_county_map = function(tigris_output) {
   county.map$fips.numeric = as.numeric(county.map$fips.character)
   county.map = county.map[, c('fips.numeric', 'fips.character', 'name.proper', 'state.fips.numeric', 'state.fips.character', 'state.abb', 'state.name.proper', 'geometry')]
   county.map = county.map[order(county.map$state.fips.numeric, county.map$fips.numeric), ]
-  county.map = ms_simplify(county.map, keep = 0.05, keep_shapes = TRUE)
-  sum(!st_is_valid(county.map))
+  county.map = ms_simplify(county.map, keep = 0.03, keep_shapes = TRUE)
+  print(sum(!st_is_valid(county.map)))
   return(county.map)
 }
 
@@ -134,20 +137,22 @@ county.map.2024 = prep_county_map(tigris::counties(cb = TRUE, year = 2024))
 county.map.2015 = prep_county_map(tigris::counties(cb = TRUE, year = 2015))
 
 if (F) {
-  ggplot(county.map.2024) + geom_sf()
+  ggplot(county.map.2024[county.map.2024$state.abb == 'AL',]) + geom_sf()
+  format(object.size(county.map.2024), 'MB')
   ggplot(county.map.2015) + geom_sf()
-  county.map.2024 <- ms_simplify(county.map.2024, keep = 0.05, keep_shapes = TRUE)
+  format(object.size(county.map.2015), 'MB')
+  # county.map.2024 <- ms_simplify(county.map.2024, keep = 0.03, keep_shapes = TRUE)
 }
 
 county.regions.2024 = st_drop_geometry(county.map.2024)
-save(county.regions.2024, file = 'data/county.regions.2024.rda')
+save(county.regions.2024, file = 'data/county.regions.2024.rda', compress = 'xz')
 county.map.2024 = county.map.2024[, c('fips.numeric', 'geometry')]
-save(county.map.2024, file = 'data/county.map.2024.rda')
+save(county.map.2024, file = 'data/county.map.2024.rda', compress = 'xz')
 
 county.regions.2015 = st_drop_geometry(county.map.2015)
-save(county.regions.2015, file = 'data/county.regions.2015.rda')
+save(county.regions.2015, file = 'data/county.regions.2015.rda', compress = 'xz')
 county.map.2015 = county.map.2015[, c('fips.numeric', 'geometry')]
-save(county.map.2015, file = 'data/county.map.2015.rda')
+save(county.map.2015, file = 'data/county.map.2015.rda', compress = 'xz')
 
 
 ## 3. World  ----
@@ -249,17 +254,131 @@ save(country.map, file = 'data/country.map.rda', compress = TRUE)
 
 # Admin1
 
-sf_admin1 = rnaturalearth::ne_states(returnclass = "sf")
-sf_admin1 = st_transform(sf_admin1, 4326)
-vars_needed = names(sf_admin1)[-grep('FCLASS', names(sf_admin1))]
-sf_admin1 = sf_admin1[, vars_needed]
+sf_admin1_orig = rnaturalearth::ne_states(returnclass = "sf")
+sf_admin1 = st_transform(sf_admin1, 3857)
+sf_admin1 = st_make_valid(sf_admin1)
+if (F) {
+  size_breakdown = function(df) {
+    duplicated = unlist(lapply(df,  function(x){sum(duplicated(x))}))
+    isna = unlist(lapply(df,  function(x){sum(is.na(x))}))
+    size = lapply(df, object.size)
+    sizenum = as.numeric(size)
+    names(sizenum) = names(size)
+    sizenum = sort(sizenum)
+    sizerel = round(sizenum/sum(sizenum), 3)
+    return(data.frame(dup = duplicated,
+                      isna = isna,
+                      name = names(sizenum), 
+                      size = sizenum, 
+                      sizerel = sizerel))
+  }
+  size_breakdown(sf_admin1)
+}
+langnames = grep('name_', names(sf_admin1_orig), value = T) 
+otherkeep = c('adm1_code', 'diss_me', 'ne_id', 'code_hasc', 'iso_3166_2', 'iso_a2',
+              'type', 'type_en', 'name', 'name_alt', 'provnum_ne', 'fips', 'woe_id',
+              'woe_label', 'woe_name', 'sov_a3', 'adm0_a3', 'admin', 'geonunit',
+              'gu_a3', 'gn_id', 'gn_name', 'gns_id', 'gns_name', 'geometry')
+keepfinal = union(langnames, otherkeep)
+sf_admin1 = sf_admin1[, keepfinal]
 
-sf_admin1_lores <- ms_simplify(sf_admin1, keep = 0.05, keep_shapes = TRUE)
+## Clean strings
+clean_text <- function(x) {
+  x <- stri_enc_toutf8(x)
+  x <- stri_trans_nfkc(x)       # normalize (NFKC or NFC)
+  x <- trimws(x)
+  x
+}
 
+object.size(sf_admin1)
+for (var in names(sf_admin1)) {
+  if ('character' %in% class(sf_admin1[[var]])) {
+    sf_admin1[[var]] = clean_text(sf_admin1[[var]])
+  }
+}
+object.size(sf_admin1)
+
+## simplify geometries
+
+## simplify based on size of country
+load('data/country.map.rda')
+
+country.map$size = st_area(country.map)/1000000
+
+hist(log10(country.map$size))
+
+if (F) { # pass 1: establish which geos are dropped when simplifying
+  test = sf_admin1_orig[, c('scalerank', 'name', 'type_en', 'geometry', 'admin')]
+  test <- st_make_valid(test)
+  
+  # scalerank = 10
+  smallcountry = test %>% filter(admin == 'Liechtenstein')
+  smallcountry_simp = ms_simplify(smallcountry, keep = 0.5, keep_shapes = TRUE)
+  ggplot(smallcountry_simp) + geom_sf()
+  # 9
+  smallcountry = test %>% filter(admin == 'Azerbaijan')
+  smallcountry_simp = ms_simplify(smallcountry, keep = 0.3, keep_shapes = TRUE)
+  ggplot(smallcountry_simp) + geom_sf()
+  # 8
+  smallcountry = test %>% filter(admin == 'Latvia')
+  smallcountry_simp = ms_simplify(smallcountry, keep = 0.3, keep_shapes = TRUE)
+  ggplot(smallcountry_simp) + geom_sf()
+  # 7
+  smallcountry = test %>% filter(admin == 'Vietnam')
+  smallcountry_simp = ms_simplify(smallcountry, keep = 0.2, keep_shapes = TRUE)
+  ggplot(smallcountry_simp) + geom_sf()
+  
+}
+
+
+sf_admin1 <- st_make_valid(sf_admin1)
+st_admin_meta = st_drop_geometry(sf_admin1)
+sf_admin1_geo = sf_admin1[, c('geonunit', 'featurecla', 'name',  'geometry')]
+
+ok <- sum(st_is_valid(sf_admin1_geo))
+bad_idx <- which(!ok)
+
+
+saveRDS(st_admin_meta, 'dev/admin1_meta.rds', compress = 'xz')
+saveRDS(sf_admin1_geo, "dev/sf_admin1_hires.rds", compress = "xz")  
+
+
+
+
+
+
+sf_admin1_lores1 <- ms_simplify(sf_admin1_geo, keep = 0.05, keep_shapes = TRUE)
+format(object.size(sf_admin1_lores1), 'MB')
+
+sf_admin1_lores2 <- lwgeom::st_snap_to_grid(sf_admin1_lores1, size = 10000)
+sf_admin1_lores2   <- ms_simplify(sf_admin1_lores2, keep = 1, keep_shapes = TRUE)
+sf_admin1_lores2 <- st_make_valid(sf_admin1_lores2)
+
+sf_admin1_lores2$empty = st_is_empty(sf_admin1_lores2$geometry)
+sf_admin1_lores2 <- st_cast(st_union(st_cast(sf_admin1_lores2, "MULTILINESTRING")), "POLYGON")
+
+format(object.size(sf_admin1_lores2), 'MB')
+
+saveRDS(sf_admin1_lores2, "dev/sf_admin1_lores2.rds", compress = "xz")  
+
+nverts <- function(g) sum(lwgeom::st_npoints(st_geometry(g)))
+nverts(sf_admin1_lores2)
+
+n_total <- nrow(st_coordinates(sf_admin1_lores2))
+
+format(object.size(x_clean), 'MB')
 format(object.size(sf_admin1), 'MB')
 
 format(object.size(sf_admin1_lores), 'MB')
 
-ggplot(sf_admin1_lores %>% filter(geonunit == 'Japan')) + geom_sf()
+format(object.size(z), 'MB')
 
+z = st_drop_geometry(sf_admin1_lores)
 
+ggplot(sf_admin1_lores2 %>% filter(geonunit == 'Japan')) + geom_sf()
+
+ggplot(sf_admin1 %>% filter(geonunit == 'Japan')) + geom_sf()
+
+library(sf)
+nverts <- function(g) sum(st_npoints(st_cast(st_geometry(g), "MULTILINESTRING")))
+c(bytes = as.numeric(object.size(sf_admin1_lores1)), verts = nverts(x))

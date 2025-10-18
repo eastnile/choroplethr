@@ -74,7 +74,7 @@ plotted variable is categorical.}
 map when plotting factor variables. The length of this vector must match
 the number of levels in your factor variable, or num_colors for a
 continuous variable that will be discretized by the function, and the order
-should match the order of the levels of in your factor variable.}
+should match the order of the levels in your factor variable.}
 
 \item{nbreaks}{The number of breaks you wish to show in the legend when using
 a continuous color scale. Ignored if num_colors > 1.}

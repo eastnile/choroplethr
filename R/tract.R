@@ -12,7 +12,7 @@
 #' @importFrom sf st_transform st_drop_geometry
 #' @export
 get_tract_map = function(state_name, map_year, drop_geometry = TRUE) {
-  tract.map.df = tracts(state = state_name, cb = TRUE, year = map_year)
+  tract.map.df = tracts(state = state_name, cb = TRUE, year = map_year, progress_bar = FALSE)
   tract.map.df$tractid.numeric = as.numeric(tract.map.df$GEOID)
   tract.map.df$county.fips.numeric = as.numeric(paste0(tract.map.df$STATEFP, tract.map.df$COUNTYFP))
   tract.map.df = st_transform(tract.map.df, 4326)

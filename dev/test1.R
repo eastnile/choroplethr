@@ -6,6 +6,7 @@ if (F) {
   devtools::document()
   devtools::check(cran = T, manual = T)
   devtools::check(manual = T)
+  devtools::submit_cran()
   # to check in console, first build, then run:
   #"C:\Program Files\R\R-4.3.3\bin\R.exe" CMD check choroplethr_5.0.1.tar.gz
 }
@@ -15,8 +16,8 @@ df_pop_state = choroplethr::df_pop_state
 df_county_demographics = choroplethr::df_county_demographics
 
 # Baseline
-state_choropleth(df = df_pop_state)
-state_choropleth(df = df_pop_state, value.name = 'value', label = 'state.abb', style = 'hexgrid', projection = 'mercator')
+state_choropleth(df = df_state_demographics, value = 'population')
+state_choropleth(df = df_state_demographics, value.name = 'population', label = 'state.abb', style = 'hexgrid', projection = 'mercator')
 country_choropleth(df = df_world, geoid.name = 'region', value.name = 'population')
 county_choropleth(df = df_county_demographics, map_year = 2015, geoid.name = 'region', value.name = 'median_hh_income')
 county_choropleth(df = df_county_demographics, map_year = 2015, geoid.name = 'region', value.name = 'median_hh_income', add_state_outline = FALSE)
@@ -126,7 +127,9 @@ country_choropleth(df = df_world, geoid.name = 'region', value.name = 'populatio
 
     library(dplyr)
     data("df_japan_census") # Our Japanese data is at the prefecture level, with names in english lower case.
-    admin1_lookup = get_admin1_map() # We match our data to one of the geoids ("adm1_code", "diss_me", or "ne_id" ) in output of get_admin1_map().
+    admin1_lookup = choroplethr::admin1.regions
+      
+      #get_admin1_map() # We match our data to one of the geoids ("adm1_code", "diss_me", or "ne_id" ) in output of get_admin1_map().
     admin1_lookup = admin1_lookup[admin1_lookup$admin == 'Japan', c('adm1_code', 'name_en')] # The "name_en" variable is very close to how the prefectures are named in our data.
     admin1_lookup$name_lower = tolower(admin1_lookup$name_en)
     admin1_lookup$name_lower = iconv(admin1_lookup$name_lower, from = "UTF-8", to = "ASCII//TRANSLIT") # Remove accent marks
@@ -143,5 +146,9 @@ country_choropleth(df = df_world, geoid.name = 'region', value.name = 'populatio
                      geoid.name = 'region', value.name = 'population',
                      county_zoom = c(36005, 36047, 36061, 36081, 36085))
 
-
+# test zip
+    df_zip = choroplethr::df_ri_zip_demographics
+    zip_choropleth(df = df_zip, geoid.name = 'region', value.name = 'population', label = 'zip_code')
+    zip_choropleth(df = df_zip, geoid.name = 'region', value.name = 'population', zoom = c('02830', '02876', '02895'))
+    
 

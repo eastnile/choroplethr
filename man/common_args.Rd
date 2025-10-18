@@ -66,7 +66,7 @@ a continuous color scale. Ignored if num_colors > 1.}
 map when plotting factor variables. The length of this vector must match
 the number of levels in your factor variable, or num_colors for a
 continuous variable that will be discretized by the function, and the order
-should match the order of the levels of in your factor variable.}
+should match the order of the levels in your factor variable.}
 
 \item{projection}{One of the following: "cartesian", "mercator", "robinson",
 or "albers", for the equirectangular, Mercator, Robinson, and Albers Equal

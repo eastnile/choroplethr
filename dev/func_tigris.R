@@ -91,6 +91,29 @@ check_tigris_tract_avail = function(years) {
   return(avail_df)
 }
 
+check_tigris_zip_avail = function(years) {
+  info = list()
+  for (i in seq_along(years)) {
+    cat(years[i], ' ')
+    res = try(zctas(cb = TRUE, starts_with = c("02817"), year = years[i]))
+    if ('try-error' %in% class(res)) {
+      info[[i]] = data.frame(year = years[i], avail = 0, df_class = NA, ncol = NA, nrow = NA,
+                             colnames = NA, uniqueids = NA)
+    } else {
+      unique_cols = character()
+      for (col in names(res)) {
+        if (sum(duplicated(res[[col]])) == 0) {
+          unique_cols = c(col, unique_cols)
+        }
+      }
+      info[[i]] = data.frame(year = years[i], avail = 1, df_class = paste0(class(res), collapse = ';'), 
+                             ncol = ncol(res), nrow = nrow(res),
+                             colnames = paste0(names(res), collapse = ';'), uniqueids = paste0(unique_cols, collapse = ';'))
+    }
+  }
+  avail_df = do.call(rbind, info)
+  return(avail_df)
+}
 
 
 if (F) {
@@ -108,6 +131,9 @@ if (F) {
   chk_tract = check_tigris_tract_avail(2000:2025)
   saveRDS(chk_tract, 'dev/tigris_tract_avail.rds')
   # Only avail for 2019 to 2025, 3 naming regimes
+  
+  chk_zip = check_tigris_zip_avail(1900:2025)
+  saveRDS(chk_zip, 'dev/tigris_zip_avail.rds')
 
 }
 

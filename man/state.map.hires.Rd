@@ -8,7 +8,7 @@
 data(state.map.hires)
 }
 \description{
-Note: Resolution is still much lower than raw data from tigris
+An sf containing higher resolution geometry data for US states
 }
 \references{
 obtained using tigris::states()
