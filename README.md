@@ -5,7 +5,7 @@
 
 <!-- badges: end -->
 
-Choroplethr makes it easy to create color-coded (choropleth) maps in R. No knowledge of cartography or shapefiles needed; go directly from your geographically identified data to a highly customizable map with a single line of code! Supported geographies: U.S. states, counties, and census tracts, world countries and sub-country regions (e.g., provinces, prefectures, etc.).
+Choroplethr makes it easy to create color-coded (choropleth) maps in R. No knowledge of cartography or shapefiles needed; go directly from your geographically identified data to a highly customizable map with a single line of code! Supported geographies: U.S. states, counties, census tracts, and zip codes; world countries and sub-country regions (e.g., provinces, prefectures, etc.).
 
 ## 📦 Installation
 
@@ -90,6 +90,7 @@ Choroplethr currently supports five different map types:
 -   U.S. State level maps: **state_choropleth()**
 -   U.S. County level maps: **county_choropleth()**
 -   U.S. Census tract level maps: **tract_choropleth()**
+-   U.S. Zip Code level maps: **zip_choropleth()**
 -   World maps by country: **country_choropleth()**
 -   World maps by sub-country administrative regions (ie, provinces, prefectures, etc): **admin1_choropleth()**
 
